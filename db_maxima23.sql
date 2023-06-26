@@ -100,9 +100,10 @@ CREATE TABLE `state_registration` (
   `nim` int(11) NOT NULL,
   `attendanceTime` datetime DEFAULT NULL,
   `isFirstAttended` tinyint(1) NOT NULL,
-  `isLastAttendaned` tinyint(1) NOT NULL
+  `isLastAttendaned` tinyint(1) NOT NULL,
   PRIMARY KEY (`stateID`, `nim`),
-  FOREIGN KEY (`stateID`) REFERENCES state_activities(`stateID`) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (`stateID`) REFERENCES state_activities(`stateID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`nim`) REFERENCES mahasiswa(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
