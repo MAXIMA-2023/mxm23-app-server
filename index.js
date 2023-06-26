@@ -11,6 +11,7 @@ app.use(fileUpload())
 
 //user
 require('./user/routes/divisi.route')(app)
+require('./user/routes/mahasiswa.route')(app)
 
 app.get('/', (req, res) => {
     res.status(200).send('<h1>Welcome to MAXIMA 2023 API</h1>')

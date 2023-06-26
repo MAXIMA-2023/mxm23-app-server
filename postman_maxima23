@@ -1,0 +1,213 @@
+{
+	"info": {
+		"_postman_id": "374a6332-c7e7-4558-a08d-1af704db4453",
+		"name": "MAXIMA 2023",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25136659"
+	},
+	"item": [
+		{
+			"name": "Mahasiswa",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nim\" : \"00000055704\",\r\n    \"nama\" : \"Siapa Aja lah ye\",\r\n    \"email\" : \"farrel.dinarta@student.umn.ac.id\", \r\n    \"password\" : \"1234567\",\r\n    \"whatsapp\" : \"9193881\",    \r\n    \"angkatan\" : \"2023\",  \r\n    \"prodi\" : \"10292\", \r\n    \"idLine\" : \"fareldnarnt\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/register",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nim\" : \"00000055702\",\r\n    \"password\" : \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/login",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/00000056044",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"00000056044"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nama\" : \"awokawok\",\r\n    \"email\" : \"farrel.dsinarta@student.umn.ac.id\",\r\n    \"password\" : \"1234567\",\r\n    \"whatsapp\" : \"9193881\",    \r\n    \"angkatan\" : \"2023\",  \r\n    \"prodi\" : \"10292\", \r\n    \"idLine\" : \"fareldnarssssnt\"\r\n}    \r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/update/00000056044",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"update",
+								"00000056044"
+							],
+							"query": [
+								{
+									"key": "nim",
+									"value": "00000056044",
+									"disabled": true
+								},
+								{
+									"key": "nama",
+									"value": "Farrel Dinarta",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "farrel.dinarta@student.umn.ac.id",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/delete/00000088484",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"delete",
+								"00000088484"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api_url",
+			"value": "localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "production_url",
+			"value": "api.maxima.umn.ac.id",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "development_url",
+			"value": "localhost:3000",
+			"type": "string",
+			"disabled": true
+		}
+	]
+}
