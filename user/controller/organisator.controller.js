@@ -103,7 +103,7 @@ exports.loginOrganisator = async (req, res) => {
             role: 'organisator',
             stateName: checkingnim[0].name,
             stateID: getStateName[0].stateID
-        },process.env.SECRET_KEY, {
+        },process.env.JWT_SECRET, {
             expiresIn: 86400 //equals to 24H
     })
 

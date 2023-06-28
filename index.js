@@ -12,12 +12,13 @@ app.use(fileUpload())
 //user
 require('./user/routes/divisi.route')(app)
 require('./user/routes/mahasiswa.route')(app)
+require('./user/routes/organisator.route')(app)
 
 app.get('/', (req, res) => {
     res.status(200).send('<h1>Welcome to MAXIMA 2023 API</h1>')
 })
 
-const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT || 80 
 app.listen(PORT, () =>{
     console.log(`Listening to the server ${PORT}`)
 })
