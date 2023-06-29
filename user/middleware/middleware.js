@@ -7,7 +7,7 @@ exports.verifyJWT = async(req, res, next)=>{
         return res.status(403).send({ message: "Harap login terlebih dahulu!" })
     }
 
-    await jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+    await jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if(err){
             return res.status(401).send({ message: "Unauthorized!" })
         }
