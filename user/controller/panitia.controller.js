@@ -66,7 +66,7 @@ exports.register = async(req, res) => {
         //     })
         // }
 
-        const verified2 = 1
+        const verified2 = 0
         await PanitDB.query().insert({
             name,
             nim,
@@ -123,6 +123,8 @@ exports.login = async(req, res)=>{
         //assign jwt nim aja 
         const JWTtoken = jwt.sign({
                 nim: checkingNim[0].nim
+                //nama
+                //role: 'panitia' / 'organsator'
             }, process.env.JWT_SECRET, {
                 expiresIn: 86400 //equals to 24Hprocess.env.JWT_LIFETIME
         })
@@ -267,7 +269,7 @@ exports.updateVerified = async(req, res) => {
         }
 
         const { isverified } = req.body
-        
+        //note klo frontend dah kelar, buatin jadi dia langsung berubah otomatis tanpa input value isverified
         //cek nim 
         const cekNIM = await PanitDB.query().where({ nim })
         if(cekNIM.length === 0 || cekNIM === []){

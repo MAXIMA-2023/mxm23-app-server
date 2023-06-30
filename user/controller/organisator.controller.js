@@ -163,121 +163,124 @@ exports.getOrganisatorspesifik = async (req, res) => {
     }
 }
 
-// exports.getUpdate = async (req, res) => {
-//     try{
-//         const { nim } = req.params
+exports.getUpdate = async (req, res) => {
+    try{
+        const { nim } = req.params
+        const { name, email, stateID } = req.body
 
-//         if(nim === null || nim === ':nim'){
-//             return res.status(404).send({
-//                 message: 'NIM anda kosong! Harap diisi'
-//             })
-//         }
+        if(nim === null || nim === ':nim'){
+            return res.status(404).send({
+                message: 'NIM anda kosong! Harap diisi'
+            })
+        }
 
-//         const authorizedDiv = ['D01', 'D02']
-//         const division = req.division
+        const authorizedDiv = ['D01', 'D02']
+        const division = req.divisiID
 
-//         if(!authorizedStatename.includes(Statenameision)){
-//             return res.status(403).send({
-//                 message: "Divisi anda tidak punya otoritas yang cukup!"
-//             })
-//         }
+        if(!authorizedDiv.includes(division)){
+            return res.status(403).send({
+                message: "Divisi anda tidak punya otoritas yang cukup!"
+            })
+        }
 
-//         const cekNIM = await OrganisatorDB.query().where({ nim })
-//         if(cekNIM.length === 0 || cekNIM === []){
-//             return res.status(404).send({ 
-//                 message: 'NIM ' + nim + ' tidak ditemukan!'
-//             })
-//         }
+        const cekNIM = await OrganisatorDB.query().where({ nim })
+        if(cekNIM.length === 0 || cekNIM === []){
+            return res.status(404).send({ 
+                message: 'NIM ' + nim + ' tidak ditemukan!'
+            })
+        }
 
-//         const liatState = await StateDB.query().select('stateID').where({ stateID: cekNIM[0].stateID })
-//         if(liatState.length === 0 || liatState === []){
-//             return res.status(403).send({
-//                 message: "State anda tidak terdaftar!"
-//             })
-//         }
-//         await OrganisatorDB.query().update({
-//             isverified: verified
-//         }).where({ nim })
-//         return res.status(200).send({ message: 'Data berhasil diupdate' })
+        const liatState = await StateDB.query().select('stateID').where({ stateID: cekNIM[0].stateID })
+        if(liatState.length === 0 || liatState === []){
+            return res.status(403).send({
+                message: "State anda tidak terdaftar!"
+            })
+        }
+        await OrganisatorDB.query().update({
+            name,
+            email,
+            stateID
+        }).where({ nim })
+        return res.status(200).send({ message: 'Data berhasil diupdate' })
         
-//     }catch (err) {
-//         return res.status(500).send({ message: err.message })
-//     }
-// }
+    }catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
 
 
-// exports.updateVerified = async(req, res) => {
-//     try{
-//         const { nim } = req.params
+exports.updateVerified = async(req, res) => {
+    try{
+        const { nim } = req.params
 
-//         if(nim === null || nim === ':nim'){
-//             return res.status(404).send({
-//                 message: 'NIM anda kosong! Harap diisi terlebih dahulu'
-//             })
-//         }
+        if(nim === null || nim === ':nim'){
+            return res.status(404).send({
+                message: 'NIM anda kosong! Harap diisi terlebih dahulu'
+            })
+        }
 
-//         const { verified } = req.body
-//         const authorizedStatename = ['D01', 'D02', 'D03', 'D04']
-//         const Statenameision = req.Statenameision
+        const { verified } = req.body
+        const authorizedDiv = ['D01', 'D02', 'D03', 'D04']
+        const division = req.divisiID
 
-//         if(!authorizedStatename.includes(Statenameision)){
-//             return res.status(403).send({
-//                 message: "Statenameisi anda tidak punya otoritas yang cukup!"
-//             })
-//         }
+        if(!authorizedDiv.includes(division)){
+            return res.status(403).send({
+                message: "Divisi anda tidak punya otoritas yang cukup!"
+            })
+        }
 
-//         const cekNIM = await OrganisatorDB.query().where({ nim })
-//         if(cekNIM.length === 0 || cekNIM === []){
-//             return res.status(404).send({ 
-//                 message: 'NIM ' + nim + ' tidak ditemukan!'
-//             })
-//         }
+        const cekNIM = await OrganisatorDB.query().where({ nim })
+        if(cekNIM.length === 0 || cekNIM === []){
+            return res.status(404).send({ 
+                message: 'NIM ' + nim + ' tidak ditemukan!'
+            })
+        }
 
-//         if(verified < 0 || verified > 1){
-//             return res.status(406).send({ 
-//                 message: 'Value hanya boleh angka 0 atau 1 saja!' 
-//             })
-//         }
+        if(verified < 0 || verified > 1){
+            return res.status(406).send({ 
+                message: 'Value hanya boleh angka 0 atau 1 saja!' 
+            })
+        }
 
-//         await OrgDB.query().update({
-//             verified
-//         }).where({ nim })
-//         return res.status(200).send({ message: 'Data berhasil diupdate' })
-//     }
-//     catch (err) {
-//         return res.status(500).send({ message: err.message })
-//     }
-// }
+        await OrganisatorDB.query().update({
+            verified
+        }).where({ nim })
+        return res.status(200).send({ message: 'Data berhasil diupdate' })
+    }
+    catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
 
-// exports.getDelete = async (req, res) => {
-//     try {
-//         const { nim } = req.params
-//         const authorizedStatename = ['D01', 'D02']
-//         const division = req.division
+exports.getDelete = async (req, res) => {
+    try {
+        const { nim } = req.params
+        const authorizedDiv = ['D01', 'D02']
+        const division = req.divisiID
 
-//         if(nim === null || nim === ':nim'){
-//             return res.status(404).send({
-//                 message: 'NIM anda kosong! Harap diisi'
-//             })
-//         }
+        if(nim === null || nim === ':nim'){
+            return res.status(404).send({
+                message: 'NIM anda kosong! Harap diisi'
+            })
+        }
 
-//         if(!authorizedStatename.includes(Statenameision)){
-//             return res.status(403).send({
-//                 message: "Divisi anda tidak punya otoritas yang cukup!"
-//             })
-//         }
+        if(!authorizedDiv.includes(division)){
+            return res.status(403).send({
+                message: "Divisi anda tidak punya otoritas yang cukup!"
+            })
+        }
 
-//         const cekNIM = await OrganisatorDB.query().where({ nim })
-//         if(cekNIM.length === 0 || cekNIM === []){
-//             return res.status(404).send({ 
-//                 message: 'NIM ' + nim + ' tidak ditemukan!'
-//             })
-//         }
+        const cekNIM = await OrganisatorDB.query().where({ nim })
+        if(cekNIM.length === 0 || cekNIM === []){
+            return res.status(404).send({ 
+                message: 'NIM ' + nim + ' tidak ditemukan!'
+            })
+        }
     
-//         await OrganisatorDB.query().delete().where({ nim })
-//         return res.status(200).send({ message: 'Data berhasil dihapus' })
-//     }
-//     catch (err) {
-//         return res.status(500).send({ message: err.message })
-//     }
-// }
+        await OrganisatorDB.query().delete().where({ nim })
+        return res.status(200).send({ message: 'Data berhasil dihapus' })
+    }
+    catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}

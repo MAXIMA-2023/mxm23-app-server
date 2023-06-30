@@ -22,23 +22,23 @@ module.exports = function(app){
         organisatorController.getOrganisatorspesifik
     )
 
-    // app.put(
-    //     '/api/organisator/update/:nim',
-    //     middleware.verifyJWT, 
-    //     middleware.isPanitia,
-    //     organisatorController.getUpdate
-    // )
+    app.put(
+        '/api/organisator/update/:nim',
+        middleware.verifyJWT, 
+        middleware.isPanitia,
+        organisatorController.getUpdate
+    )
 
-    // app.put(
-    //     '/api/organisator/updateAcc/:nim',
-    //     middleware.verifyJWT, middleware.isPanitia,
-    //     organisatorController.updateAcc
-    // )
+    app.put(
+        '/api/organisator/updateAcc/:nim',
+        middleware.verifyJWT, middleware.isPanitia,
+        organisatorController.updateVerified
+    )
 
-    // app.delete(
-    //     '/api/organisator/delete/:nim',
-    //     middleware.verifyJWT, 
-    //     middleware.isPanitia,
-    //     organisatorController.getDelete
-    // )
+    app.delete(
+        '/api/organisator/delete/:nim',
+        middleware.verifyJWT, 
+        middleware.isPanitia,
+        organisatorController.getDelete
+    )
 }
