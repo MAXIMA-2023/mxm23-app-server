@@ -45,7 +45,7 @@ CREATE TABLE `mahasiswa` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `mahasiswa` (`name`, `nim`, `password`, `whatsapp`, `email`, `angkatan`, `idLine`, `prodi`) VALUES
-('Dummy', 88484, 'TdkBisaDipakekBuatLogin', '080809090707', 'tes@student.umn.ac.id', 'dummylineid', 2023, 'Informatika');
+('Dummy', 88484, 'TdkBisaDipakekBuatLogin', '080809090707', 'tes@student.umn.ac.id', 2023,'dummylineid', 'Informatika');
 
 -- --------------------------------------------------------
 
