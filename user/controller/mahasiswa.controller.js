@@ -120,7 +120,7 @@ const login = async (req, res) => {
         }
 
         // Assign JWT
-        const jwtPayload = {id : user.nim, name : user.name} 
+        const jwtPayload = {nim : user.nim, name : user.name} 
         const token = jwt.sign(jwtPayload, process.env.JWT_SECRET, {expiresIn : process.env.JWT_LIFETIME * 86400}) // NOTE : lifetime berapa lama?
 
         // NOTE : password perlu dihide ga di response?

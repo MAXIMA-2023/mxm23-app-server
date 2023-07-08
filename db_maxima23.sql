@@ -41,6 +41,7 @@ CREATE TABLE `mahasiswa` (
   `angkatan` year(4) NOT NULL,
   `idLine` varchar(32) NOT NULL,
   `prodi` varchar(32) NOT NULL,
+  `token` varchar(32) NOT NULL,
   PRIMARY KEY (`nim`) 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -91,7 +92,7 @@ INSERT INTO `state_activities` (`stateID`, `name`, `day`, `stateLogo`, `quota`, 
 
 -- --------------------------------------------------------
 
---table dari mahasiswa x state_activities (m*n relation), untuk menampung data peserta yang mendaftar state apa
+-- table dari mahasiswa x state_activities (m*n relation), untuk menampung data peserta yang mendaftar state apa
 -- attendanceTime untuk menampung waktu peserta melakukan absen
 -- isFirstAttended untuk menampung apakah peserta sudah absen awal atau belum
 -- isLastAttended untuk menampung apakah peserta sudah absen akhir atau belum

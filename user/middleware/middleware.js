@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const PanitiaDB = require("../model/panitia.model");
-const orgDB = require("../model/panitia.model");
+const OrgDB = require("../model/panitia.model");
 
 exports.verifyJWT = async(req, res, next)=>{
     const token = req.headers['x-access-token']
