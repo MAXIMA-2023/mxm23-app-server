@@ -124,7 +124,7 @@ const handleRegistration = async (req, res) => {
     
         return res.status(201).send({
             code : 201, 
-            message : "Pendaftaran berhasil."
+            message : "Pendaftaran STATE berhasil."
         })     
 
     } catch (err){
@@ -146,7 +146,38 @@ const handleRegistration = async (req, res) => {
 };
 
 const cancelRegistration = async (req, res) => {
-    
+    const { stateID = "" }  = req.params;
+    const nim = req.decoded_nim || "";
+
+    try {
+
+        const deleteRegistrationData = await stateRegDB.query().where({
+            nim, 
+            stateID
+        }).delete();
+
+        if (!deleteRegistrationData){
+            return res.status(404).send({
+                code : 404, 
+                message : 'Data pendaftaran tidak ditemukan.'
+            });            
+        }
+
+        return res.status(200).send({
+            code : 200, 
+            message : "Berhasil menghapus data pendaftaran STATE."
+        })            
+
+    } catch (err) {
+        return res.status(500).send({
+            code : 500, 
+            message : err.message
+        });         
+    }
+
+
+
+
 }
 
 /*
@@ -196,4 +227,4 @@ NOTE untuk maba absen STATE:
 
 */
 
-module.exports = { handleRegistration }
+module.exports = { handleRegistration, cancelRegistration }

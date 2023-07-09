@@ -8,4 +8,10 @@ module.exports = function (app){
         middleware.isMahasiswa, 
         stateRegController.handleRegistration
     );
+
+    app.delete('/api/state/cancel_registration/:stateID',
+        middleware.verifyJWT, 
+        middleware.isMahasiswa, 
+        stateRegController.cancelRegistration
+    )
 }
