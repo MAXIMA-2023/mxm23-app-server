@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const MahasiswaDB = require("../model/mahasiswa.model");
 const PanitiaDB = require("../model/panitia.model");
 const OrgDB = require("../model/panitia.model");
 
@@ -16,6 +17,22 @@ exports.verifyJWT = async(req, res, next)=>{
         req.decoded_nim = decoded.nim
         next()
     })
+}
+
+exports.isMahasiswa = async(req, res, next)=>{
+    try{
+        const nim = req.decoded_nim
+        const data = await MahasiswaDB.query().where({ nim })
+
+        if(data.length === 0){
+            return res.status(200).send({ message: "Anda tidak punya hak untuk akses ke halaman ini!" })
+        }
+        
+        next()
+    }
+    catch(err){
+        return res.status(500).send({ message: err.message })
+    }
 }
 
 exports.isPanitia = async(req, res, next)=>{
