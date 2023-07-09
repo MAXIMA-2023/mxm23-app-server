@@ -1,0 +1,805 @@
+{
+	"info": {
+		"_postman_id": "0dfaf806-fe9a-444f-8f81-5746f7a5d3af",
+		"name": "MAXIMA 2023",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25136659",
+		"_collection_link": "https://galactic-space-369876.postman.co/workspace/MAXIMA-2023~6e86a0e0-b176-4c05-a270-0811218f5fc9/collection/25136659-0dfaf806-fe9a-444f-8f81-5746f7a5d3af?action=share&creator=25136659&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Mahasiswa",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nim\" : \"00000055704\",\r\n    \"nama\" : \"Siapa Aja lah ye\",\r\n    \"email\" : \"farrel.dinarta@student.umn.ac.id\", \r\n    \"password\" : \"12345678\",\r\n    \"whatsapp\" : \"9193881\",    \r\n    \"angkatan\" : \"2023\",  \r\n    \"prodi\" : \"10292\", \r\n    \"idLine\" : \"fareldnarnt\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/register",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nim\" : \"00000055704\",\r\n    \"password\" : \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/login",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/00000056044",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"00000056044"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nama\" : \"awokawok\",\r\n    \"email\" : \"farrel.dsinarta@student.umn.ac.id\",\r\n    \"password\" : \"1234567\",\r\n    \"whatsapp\" : \"9193881\",    \r\n    \"angkatan\" : \"2023\",  \r\n    \"prodi\" : \"10292\", \r\n    \"idLine\" : \"fareldnarssssnt\"\r\n}    \r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/update/00000056044",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"update",
+								"00000056044"
+							],
+							"query": [
+								{
+									"key": "nim",
+									"value": "00000056044",
+									"disabled": true
+								},
+								{
+									"key": "nama",
+									"value": "Farrel Dinarta",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "farrel.dinarta@student.umn.ac.id",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/delete/00000088484",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"delete",
+								"00000088484"
+							],
+							"query": [
+								{
+									"key": "x-access-token",
+									"value": "{{token}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Organisator",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Zedro Deniro Masson",
+									"type": "text"
+								},
+								{
+									"key": "nim",
+									"value": "66946",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "zedro.deniro@student.umn.ac.id",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "12345",
+									"type": "text"
+								},
+								{
+									"key": "stateID",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/organisator/register",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"organisator",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "nim",
+									"value": "66946",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "12345",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/organisator/login",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"organisator",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/organisator/get",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"organisator",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/organisator/get/66946",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"organisator",
+								"get",
+								"66946"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "TES",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "tes@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "stateID",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/organisator/update/55915",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"organisator",
+								"update",
+								"55915"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Verify",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "Verify",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/organisator/updateVerify/",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"organisator",
+								"updateVerify",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/api/mahasiswa/delete/66999",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"mahasiswa",
+								"delete",
+								"66999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Panitia",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Farrl",
+									"type": "text"
+								},
+								{
+									"key": "nim",
+									"value": "55702",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "12345678",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "farrel.dinartax@student.umn.ac.id",
+									"type": "text"
+								},
+								{
+									"key": "divisiID",
+									"value": "D01",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/panit/register",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"panit",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nim",
+									"value": "55702",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "12345678",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/panit/login",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"panit",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Specific",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjIzNDU2LCJpYXQiOjE2ODgxMjk3MTgsImV4cCI6MTY4ODIxNjExOH0.ZKWYa882TSgDcj6xVPCanv8i7WX0x0nBURI8LuqAV30",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{api_url}}/api/panit",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"panit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjIzNDU2LCJpYXQiOjE2ODgxMjk3MTgsImV4cCI6MTY4ODIxNjExOH0.ZKWYa882TSgDcj6xVPCanv8i7WX0x0nBURI8LuqAV30",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{api_url}}api/panit",
+							"host": [
+								"{{api_url}}api"
+							],
+							"path": [
+								"panit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Verify",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjIzNDU2LCJpYXQiOjE2ODgwMTQ3OTMsImV4cCI6MTY4ODEwMTE5M30.sGG7qxv2oSBzr_7dBmbEhRpI5F97Spku8fEkjQtLB4w",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "isverified",
+									"value": "0",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/panit/updateVerified/55702",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"panit",
+								"updateVerified",
+								"55702"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjExMTExLCJpYXQiOjE2ODc5NjM3NDMsImV4cCI6MTY4ODA1MDE0M30.zQC_uyWMoZna2_-T7tKCQW6hBFfrI78iVoNmV6osCOk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "mulyono",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mulyono.ml@student.umn.ac.id",
+									"type": "text"
+								},
+								{
+									"key": "divisiID",
+									"value": "D02",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/panit/update/11111",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"panit",
+								"update",
+								"11111"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjExMTExLCJpYXQiOjE2ODc5NjM3NDMsImV4cCI6MTY4ODA1MDE0M30.zQC_uyWMoZna2_-T7tKCQW6hBFfrI78iVoNmV6osCOk",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nimPanit",
+									"value": "43297",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/panit/delete/11111",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"panit",
+								"delete",
+								"11111"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "State",
+			"item": [
+				{
+					"name": "Registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nim",
+									"value": "557042",
+									"type": "text"
+								},
+								{
+									"key": "stateID",
+									"value": "7",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/state/registration",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"state",
+								"registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{api_url}}/api/state/cancel_registration/9",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"state",
+								"cancel_registration",
+								"9"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "api_url",
+			"value": "localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "production_url",
+			"value": "api.maxima.umn.ac.id",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "development_url",
+			"value": "localhost:3000",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NTU3MDIsIm5hbWUiOiJTaWFwYSBBamEgbGFoIHllIiwiaWF0IjoxNjg4ODA2MDg2LCJleHAiOjE2OTEzOTgwODZ9.QuDAl_dW_oxWCTBxf53chH0fSs_TNneOKCnUTvM7uOw",
+			"type": "string"
+		}
+	]
+}
