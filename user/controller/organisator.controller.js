@@ -220,7 +220,7 @@ exports.updateVerified = async(req, res) => {
         }
 
         const { verified } = req.body
-        const authorizedDiv = ['D01', 'D02', 'D03', 'D04']
+        const authorizedDiv = ['D01', 'D02', 'D05']
         const division = req.divisiID
 
         if(!authorizedDiv.includes(division)){
