@@ -13,5 +13,17 @@ module.exports = function (app){
         middleware.verifyJWT, 
         middleware.isMahasiswa, 
         stateRegController.cancelRegistration
-    )
+    ); 
+
+    app.post('/api/state/attendance/first',     
+        middleware.verifyJWT, 
+        middleware.isMahasiswa, 
+        stateRegController.handleFirstAttendance
+    );
+
+    app.post('/api/state/attendance/last',     
+        middleware.verifyJWT, 
+        middleware.isMahasiswa, 
+        stateRegController.handleLastAttendance
+    );    
 }
