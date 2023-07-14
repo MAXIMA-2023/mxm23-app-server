@@ -2,7 +2,8 @@ const stateRegDB = require('../model/state_registration.model')
 const stateDB = require('../model/state_activities.model')
 const MhsDB = require('../../user/model/mahasiswa.model')
 const { validateEmptyEntries } = require("../../helpers/FormValidator");
-const { Model, ForeignKeyViolationError } = require('objection')
+const { Model, ForeignKeyViolationError } = require('objection');
+const Mahasiswa = require('../../user/model/mahasiswa.model');
 
 /*
 NOTE untuk INTERNAL STATE: pendaftaran maba ke state (christo):
@@ -179,41 +180,51 @@ const cancelRegistration = async (req, res) => {
 const handleFirstAttendance = async (req, res) => {
 
     const { token = "", stateID = "" } = req.body; 
-    const nim = req.decoded_nim;
+
 
     try {
 
-        const participant = await stateRegDB.query()
+        const participant = await Mahasiswa.query().where({token}).first();
+
+        if (!participant){
+            return res.status(404).send({
+                code : 404, 
+                message : "Token tidak valid."
+            })
+        }
+
+        const nim = participant.nim;
+
+        const registration = await stateRegDB.query()
             .where({stateID, nim})
             .first()
-        
-        if (!participant){
+    
+        if (!registration){
             return res.status(404).send({
                 code : 404,
                 message : "Tidak terdaftar pada state ini."
             })               
-        }
+        }    
 
-        if (participant.isFirstAttended){
+        if (registration.isFirstAttended){
             return res.status(409).send({
                 code : 409,
                 message : "Peserta sudah melalui proses absen sebelumnya."
             })              
-        }
+        }        
 
         const markAttendance = await stateRegDB.query()
-            .join('mahasiswa', 'mahasiswa.nim', '=', 'state_registration.nim')
-            .where({'state_registration.nim' : nim, 'state_registration.stateID' : stateID})
-            .where('mahasiswa.token', '=', token)  
-            .where('mahasiswa.nim', '=', nim)
-            .update({attendanceTime : new Date(), isFirstAttended : true})
+                    .where({stateID, nim})
+                    .update({attendanceTime : new Date(), isFirstAttended : true})
+
 
         if (!markAttendance) {
-            return res.status(403).send({
-                code : 403,
-                message : "Token tidak valid."
-            })  
-        }
+            return res.status(404).send({
+                code : 404,
+                message : "Tidak terdaftar pada state ini."
+            })
+        }        
+
 
         return res.status(200).send({
             code : 200, 
@@ -230,23 +241,34 @@ const handleFirstAttendance = async (req, res) => {
 
 const handleLastAttendance = async (req, res) => {
     const { token = "", stateID = "" } = req.body; 
-    const nim = req.decoded_nim;  
+    // const nim = req.decoded_nim;  
     
 
     try {
 
-        const participant = await stateRegDB.query()
+        const participant = await Mahasiswa.query().where({token}).first();
+
+        if (!participant){
+            return res.status(404).send({
+                code : 404, 
+                message : "Token tidak valid."
+            })
+        }
+
+        const nim = participant.nim;        
+
+        const registration = await stateRegDB.query()
             .where({stateID, nim})
             .first()
         
-        if (!participant){
+        if (!registration){
             return res.status(404).send({
                 code : 404,
                 message : "Tidak terdaftar pada state ini."
             })               
         }
 
-        if (!participant.isFirstAttended){
+        if (!registration.isFirstAttended){
             return res.status(403).send({
                 code : 403,
                 type : "ABSENCE",
@@ -254,7 +276,7 @@ const handleLastAttendance = async (req, res) => {
             })              
         }
 
-        if (participant.isLastAttendaned){
+        if (registration.isLastAttendaned){
             return res.status(403).send({
                 code : 403,
                 type : "DOUBLE_PRESENCE",
@@ -263,17 +285,14 @@ const handleLastAttendance = async (req, res) => {
         }
 
         const markAttendance = await stateRegDB.query()
-            .join('mahasiswa', 'mahasiswa.nim', '=', 'state_registration.nim')
-            .where({'state_registration.nim' : nim, 'state_registration.stateID' : stateID})
-            .where('mahasiswa.token', '=', token)  
-            .where('mahasiswa.nim', '=', nim)
+            .where({stateID, nim})
             .update({isLastAttendaned : true})
 
         if (!markAttendance) {
-            return res.status(403).send({
-                code : 403,
-                message : "Token tidak valid."
-            })  
+            return res.status(404).send({
+                code : 404,
+                message : "Tidak terdaftar pada state ini."
+            })
         }
 
         return res.status(200).send({

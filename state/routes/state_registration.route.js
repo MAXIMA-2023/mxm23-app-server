@@ -17,13 +17,13 @@ module.exports = function (app){
 
     app.post('/api/state/attendance/first',     
         middleware.verifyJWT, 
-        middleware.isMahasiswa, 
+        middleware.isPanitia,
         stateRegController.handleFirstAttendance
     );
 
     app.post('/api/state/attendance/last',     
         middleware.verifyJWT, 
-        middleware.isMahasiswa, 
+        middleware.isPanitia,
         stateRegController.handleLastAttendance
     );    
 }
