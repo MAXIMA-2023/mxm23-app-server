@@ -82,7 +82,8 @@ const register = async (req, res) => {
             whatsapp, 
             angkatan,
             idLine,
-            prodi
+            prodi, 
+            token : 'MXM23-' + nim
         });
 
         return res.status(201).send({

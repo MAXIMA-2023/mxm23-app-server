@@ -17,7 +17,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nim\" : \"00000055704\",\r\n    \"nama\" : \"Siapa Aja lah ye\",\r\n    \"email\" : \"farrel.dinarta@student.umn.ac.id\", \r\n    \"password\" : \"12345678\",\r\n    \"whatsapp\" : \"9193881\",    \r\n    \"angkatan\" : \"2023\",  \r\n    \"prodi\" : \"10292\", \r\n    \"idLine\" : \"fareldnarnt\"\r\n}",
+							"raw": "{\r\n    \"nim\" : \"00000055707\",\r\n    \"nama\" : \"Siapa Aja lah ye\",\r\n    \"email\" : \"farrel.dinarta@student.umn.ac.id\", \r\n    \"password\" : \"12345678\",\r\n    \"whatsapp\" : \"9193881\",    \r\n    \"angkatan\" : \"2023\",  \r\n    \"prodi\" : \"10292\", \r\n    \"idLine\" : \"fareldnarnt\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -750,6 +750,88 @@
 								"state",
 								"cancel_registration",
 								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "First Attendance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "stateID",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "token",
+									"value": "aaaa",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/state/attendance/first",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"state",
+								"attendance",
+								"first"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Last Attendance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "stateID",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "token",
+									"value": "aaaa",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{api_url}}/api/state/attendance/last",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"api",
+								"state",
+								"attendance",
+								"last"
 							]
 						}
 					},

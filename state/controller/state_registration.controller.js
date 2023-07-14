@@ -174,10 +174,119 @@ const cancelRegistration = async (req, res) => {
             message : err.message
         });         
     }
+}
 
+const handleFirstAttendance = async (req, res) => {
 
+    const { token = "", stateID = "" } = req.body; 
+    const nim = req.decoded_nim;
 
+    try {
 
+        const participant = await stateRegDB.query()
+            .where({stateID, nim})
+            .first()
+        
+        if (!participant){
+            return res.status(404).send({
+                code : 404,
+                message : "Tidak terdaftar pada state ini."
+            })               
+        }
+
+        if (participant.isFirstAttended){
+            return res.status(409).send({
+                code : 409,
+                message : "Peserta sudah melalui proses absen sebelumnya."
+            })              
+        }
+
+        const markAttendance = await stateRegDB.query()
+            .join('mahasiswa', 'mahasiswa.nim', '=', 'state_registration.nim')
+            .where({'state_registration.nim' : nim, 'state_registration.stateID' : stateID})
+            .where('mahasiswa.token', '=', token)  
+            .where('mahasiswa.nim', '=', nim)
+            .update({attendanceTime : new Date(), isFirstAttended : true})
+
+        if (!markAttendance) {
+            return res.status(403).send({
+                code : 403,
+                message : "Token tidak valid."
+            })  
+        }
+
+        return res.status(200).send({
+            code : 200, 
+            message : "Berhasil melakukan absensi."
+        })  
+
+    } catch (err) {
+        return res.status(500).send({
+            code : 500, 
+            message : err.message
+        });           
+    }
+}
+
+const handleLastAttendance = async (req, res) => {
+    const { token = "", stateID = "" } = req.body; 
+    const nim = req.decoded_nim;  
+    
+
+    try {
+
+        const participant = await stateRegDB.query()
+            .where({stateID, nim})
+            .first()
+        
+        if (!participant){
+            return res.status(404).send({
+                code : 404,
+                message : "Tidak terdaftar pada state ini."
+            })               
+        }
+
+        if (!participant.isFirstAttended){
+            return res.status(403).send({
+                code : 403,
+                type : "ABSENCE",
+                message : "Peserta tidak melalui presensi tahap pertama."
+            })              
+        }
+
+        if (participant.isLastAttendaned){
+            return res.status(403).send({
+                code : 403,
+                type : "DOUBLE_PRESENCE",
+                message : "Peserta sudah melalui presensi tahap kedua."
+            })              
+        }
+
+        const markAttendance = await stateRegDB.query()
+            .join('mahasiswa', 'mahasiswa.nim', '=', 'state_registration.nim')
+            .where({'state_registration.nim' : nim, 'state_registration.stateID' : stateID})
+            .where('mahasiswa.token', '=', token)  
+            .where('mahasiswa.nim', '=', nim)
+            .update({isLastAttendaned : true})
+
+        if (!markAttendance) {
+            return res.status(403).send({
+                code : 403,
+                message : "Token tidak valid."
+            })  
+        }
+
+        return res.status(200).send({
+            code : 200, 
+            message : "Berhasil melakukan absensi."
+        })  
+
+    } catch (err) {
+        return res.status(500).send({
+            code : 500, 
+            message : err.message
+        });           
+    }    
 }
 
 /*
@@ -227,4 +336,4 @@ NOTE untuk maba absen STATE:
 
 */
 
-module.exports = { handleRegistration, cancelRegistration }
+module.exports = { handleRegistration, cancelRegistration, handleFirstAttendance, handleLastAttendance }
