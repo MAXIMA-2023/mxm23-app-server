@@ -4,6 +4,7 @@ const fileUpload = require('express-fileupload')
 const cors = require('cors')
 const app = express()
 
+
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(cors())
@@ -17,7 +18,7 @@ require('./user/routes/panitia.route')(app)
 
 //state
 require('./state/routes/day_management.route')(app)
-// require('./state/routes/state_activities.route')(app)
+require('./state/routes/state_activities.route')(app)
 require('./state/routes/state_registration.route')(app)
 
 app.get('/', (req, res) => {
