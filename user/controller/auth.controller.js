@@ -39,6 +39,12 @@ exports.loginpanitorganisator = async (req, res) => {
       });
     }
 
+    if ((cekOrg && !cekOrg.isverified) || (cekPanit && !cekPanit.isverified)) {
+      return res.status(401).send({
+        message: "Akun anda belum terverifikasi!",
+      });
+    }
+
     const JWTtoken = jwt.sign(
       {
         nim: cekOrg ? cekOrg.nim : cekPanit.nim,
