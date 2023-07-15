@@ -19,18 +19,24 @@ const register = async (req, res) => {
     });
   }
   try {
-    const hashedPassword = await bcrypt.hash(validateBody.data.password, 10);
+    const mahasiswa = await Mahasiswa.query()
+      .where({ nim: validateBody.data.nim })
+      .first();
+    if (mahasiswa) {
+      return res.status(400).send({
+        code: 400,
+        message: "NIM kamu telah terdaftar sebelumnya.",
+      });
+    }
+
+    validateBody.data.password = await bcrypt.hash(
+      validateBody.data.password,
+      10
+    );
 
     // Sukses
     await Mahasiswa.query().insert({
-      nim: validateBody.data.nim,
-      name: validateBody.data.name,
-      email: validateBody.data.email,
-      password: hashedPassword,
-      whatsapp: validateBody.data.whatsapp,
-      angkatan: validateBody.data.angkatan,
-      idLine: validateBody.data.idLine,
-      prodi: validateBody.data.prodi,
+      ...validateBody.data,
       token: "MXM23-" + nim,
     });
 
@@ -61,17 +67,19 @@ const login = async (req, res) => {
 
   try {
     // Cek NIM & Password
-    const user = await Mahasiswa.query()
+    const mahasiswa = await Mahasiswa.query()
       .where({ nim: validateBody.data.nim })
       .first();
-    if (!user) {
+    if (!mahasiswa) {
       return res.status(401).json({
         code: 404,
         message: `Tidak dapat menemukan Mahasiswa dengan NIM ${nim}.`,
       });
     }
 
-    if (!(await bcrypt.compare(validateBody.data.password, user.password))) {
+    if (
+      !(await bcrypt.compare(validateBody.data.password, mahasiswa.password))
+    ) {
       return res.status(401).json({
         code: 401,
         message: "NIM dan/atau kata sandi salah.",
@@ -79,7 +87,7 @@ const login = async (req, res) => {
     }
 
     // Assign JWT
-    const token = jwt.sign({ nim: user.nim }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ nim: mahasiswa.nim }, process.env.JWT_SECRET, {
       expiresIn: 86400,
     }); // NOTE : lifetime berapa lama?
 
@@ -107,7 +115,7 @@ const login = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-    const dataMahasiswa = await Mahasiswa.query()
+    const mahasiswa = await Mahasiswa.query()
       .where({ nim: req.decoded_nim })
       .first()
       .select(
@@ -120,7 +128,7 @@ const getProfile = async (req, res) => {
         "prodi",
         "token"
       );
-    if (!dataMahasiswa) {
+    if (!mahasiswa) {
       return res.status(404).send({
         code: 404,
         message: `Mahasiswa dengan NIM : ${req.decoded_nim} tidak ditemukan.`,
@@ -130,7 +138,7 @@ const getProfile = async (req, res) => {
     return res.status(200).send({
       code: 200,
       message: `Berhasil mengambil data mahasiswa dengan NIM : ${req.decoded_nim}`,
-      data: dataMahasiswa,
+      data: mahasiswa,
     });
   } catch (err) {
     return res.status(500).send({
@@ -180,7 +188,7 @@ const getSpecificStudent = async (req, res) => {
       });
     }
 
-    const dataMahasiswa = await Mahasiswa.query()
+    const mahasiswa = await Mahasiswa.query()
       .where({ nim: validateNim.data })
       .first()
       .select(
@@ -193,7 +201,7 @@ const getSpecificStudent = async (req, res) => {
         "prodi",
         "token"
       );
-    if (!dataMahasiswa) {
+    if (!mahasiswa) {
       return res.status(404).send({
         code: 404,
         message: `Mahasiswa dengan NIM : ${validateNim.data} tidak ditemukan.`,
@@ -203,7 +211,7 @@ const getSpecificStudent = async (req, res) => {
     return res.status(200).send({
       code: 200,
       message: `Berhasil mengambil data mahasiswa dengan NIM : ${validateNim.data}`,
-      data: dataMahasiswa,
+      data: mahasiswa,
     });
   } catch (err) {
     return res.status(500).send({
@@ -244,7 +252,7 @@ const updateStudent = async (req, res) => {
   }
 
   try {
-    const daftarMahasiswa = await Mahasiswa.query()
+    const mahasiswa = await Mahasiswa.query()
       .where({ nim: validateNim.data })
       .update({
         ...validateBody.data,
@@ -254,7 +262,7 @@ const updateStudent = async (req, res) => {
       })
       .first();
 
-    if (!daftarMahasiswa) {
+    if (!mahasiswa) {
       return res.status(404).send({
         code: 404,
         message: `Mahasiswa dengan NIM : ${validateNim.data} tidak ditemukan.`,
@@ -264,7 +272,7 @@ const updateStudent = async (req, res) => {
     return res.status(200).send({
       code: 200,
       message: `Berhasil mengubah data mahasiswa dengan NIM : ${validateNim.data}`,
-      data: daftarMahasiswa,
+      data: mahasiswa,
     });
   } catch (err) {
     return res.status(500).send({
@@ -287,10 +295,10 @@ const deleteStudent = async (req, res) => {
   }
 
   try {
-    const daftarMahasiswa = await Mahasiswa.query()
+    const mahasiswa = await Mahasiswa.query()
       .where({ nim: validateNim.data })
       .delete();
-    if (!daftarMahasiswa) {
+    if (!mahasiswa) {
       return res.status(404).send({
         code: 404,
         message: `Mahasiswa dengan NIM : ${validateNim.data} tidak ditemukan.`,
