@@ -42,7 +42,7 @@ exports.loginpanitorganisator = async (req, res) => {
     const JWTtoken = jwt.sign(
       {
         nim: cekOrg ? cekOrg.nim : cekPanit.nim,
-        role: cekOrg ? "organisator" : "panitia",
+        role: cekOrg ? "organisator" : "panit",
       },
       process.env.JWT_SECRET,
       {
