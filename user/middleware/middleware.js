@@ -4,13 +4,13 @@ const PanitiaDB = require("../model/panitia.model");
 const OrgDB = require("../model/organisator.model");
 
 exports.verifyJWT = async (req, res, next) => {
-  const token = req.headers["x-access-token"];
+  const token = req.headers.Authorization;
   if (!token) {
     return res.status(403).send({ message: "Harap login terlebih dahulu!" });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token.split[" "][1], process.env.JWT_SECRET);
     req.decoded_nim = decoded.nim;
 
     next();
