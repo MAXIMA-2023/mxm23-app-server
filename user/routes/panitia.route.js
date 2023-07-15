@@ -33,7 +33,7 @@ module.exports = function (app) {
     "/api/panit/verifyAcc/:nim",
     middleware.verifyJWT,
     middleware.isPanitia,
-    PanitController.updateVerified
+    PanitController.verifyAcc
   );
 
   app.delete(
