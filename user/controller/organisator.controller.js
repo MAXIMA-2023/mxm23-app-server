@@ -79,12 +79,12 @@ exports.loginOrganisator = async (req, res) => {
   }
 
   try {
-    const account = await OrganisatorDB.query()
+    const organisator = await OrganisatorDB.query()
       .where({ nim: validateBody.data.nim })
       .first();
 
     //nim salah
-    if (!account) {
+    if (!organisator) {
       return res.status(404).send({
         code: 404,
         message: `NIM : ${validateBody.data.nim} tidak terdaftar! Harap melakukan register!`,
@@ -94,7 +94,7 @@ exports.loginOrganisator = async (req, res) => {
     //password salah
     const isPassValid = await bcrypt.compare(
       validateBody.data.password,
-      account.password
+      organisator.password
     );
     if (!isPassValid) {
       return res.status(400).send({
@@ -103,7 +103,7 @@ exports.loginOrganisator = async (req, res) => {
       });
     }
 
-    if (!account.isverified) {
+    if (!organisator.isverified) {
       return res.status(400).send({
         code: 400,
         message: "Akun anda belum terverifikasi!",
@@ -112,7 +112,7 @@ exports.loginOrganisator = async (req, res) => {
 
     const JWTtoken = jwt.sign(
       {
-        nim: account.nim,
+        nim: organisator.nim,
         role: "organisator",
       },
       process.env.JWT_SECRET,
@@ -210,7 +210,7 @@ exports.getOrganisatorspesifik = async (req, res) => {
   }
 
   try {
-    const account = await OrganisatorDB.query()
+    const organisator = await OrganisatorDB.query()
       .where({ nim: validateNim.data })
       .first()
       .join(
@@ -228,7 +228,7 @@ exports.getOrganisatorspesifik = async (req, res) => {
         "state_activities.name as stateName"
       );
 
-    if (!account) {
+    if (!organisator) {
       return res.status(404).send({
         code: 404,
         message: `NIM : ${validateNim.data} tidak ditemukan`,
@@ -238,7 +238,7 @@ exports.getOrganisatorspesifik = async (req, res) => {
     return res.status(200).send({
       code: 200,
       message: "Berhasil mendapatkan data organisator",
-      data: account,
+      data: organisator,
     });
   } catch (err) {
     return res.status(500).send({
@@ -280,19 +280,9 @@ exports.updateOrganisator = async (req, res) => {
       });
     }
 
-    const account = await OrganisatorDB.query()
-      .where({ nim: validateNim.data })
-      .first();
-    if (!account) {
-      return res.status(404).send({
-        code: 404,
-        message: `NIM : ${validateNim.data} tidak ditemukan!`,
-      });
-    }
-
     const liatState = await StateDB.query()
       .select("stateID")
-      .where({ stateID: account.stateID })
+      .where({ stateID: organisator.stateID })
       .first();
     if (!liatState) {
       return res.status(403).send({
@@ -308,9 +298,16 @@ exports.updateOrganisator = async (req, res) => {
       );
     }
 
-    await OrganisatorDB.query()
+    const organisator = await OrganisatorDB.query()
       .where({ nim: validateNim.data })
       .update(validateBody.data);
+
+    if (!organisator) {
+      return res.status(404).send({
+        code: 404,
+        message: `NIM : ${validateNim.data} tidak ditemukan!`,
+      });
+    }
 
     return res.status(200).send({
       code: 200,
@@ -355,21 +352,19 @@ exports.verifyAcc = async (req, res) => {
       });
     }
 
-    const cekNIM = await OrganisatorDB.query()
-      .where({ nim: validateNim.data })
-      .first();
-    if (!cekNIM) {
+    const organisator = await OrganisatorDB.query()
+      .update({
+        isverified: validateBody.data.isverified,
+      })
+      .where({ nim: validateNim.data });
+
+    if (!organisator) {
       return res.status(404).send({
         code: 404,
         message: `NIM :${validateNim.data} tidak ditemukan!`,
       });
     }
 
-    await OrganisatorDB.query()
-      .update({
-        isverified: validateBody.data.isverified,
-      })
-      .where({ nim: validateNim.data });
     return res.status(200).send({
       code: 200,
       message: "Data berhasil diupdate",
