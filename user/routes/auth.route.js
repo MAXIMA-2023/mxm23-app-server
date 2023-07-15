@@ -1,12 +1,5 @@
-const authController = require('../controller/auth.controller');
-const {isOrganisatorAndPanitia} = require('../../state/middleware/middleware');
-const { verifyJWT } = require('./middleware/middleware');
+const authController = require("../controller/auth.controller");
 
-module.exports = function(app){
-    app.get(
-        '/api/internal/login',
-        verifyJWT,
-        isOrganisatorAndPanitia,
-        authController.loginpanitorganisator
-    )
-}
+module.exports = function (app) {
+  app.post("/api/internal/login", authController.loginpanitorganisator);
+};
