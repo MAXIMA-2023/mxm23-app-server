@@ -122,9 +122,9 @@ exports.login = async(req, res)=>{
 
         //assign jwt nim aja 
         const JWTtoken = jwt.sign({
-                nim: checkingNim[0].nim
-                //nama
-                //role: 'panitia' / 'organsator'
+                name: checkingNim[0].name,
+                nim: checkingNim[0].nim,
+                role: 'panitia'
             }, process.env.JWT_SECRET, {
                 expiresIn: 86400 //equals to 24Hprocess.env.JWT_LIFETIME
         })
@@ -180,7 +180,6 @@ exports.readSpecificData = async(req, res) => {
         const result = await PanitDB.query().where({ nim })
         const div = await DivisiDB.query().select('name').where({ divisiID: result[0].divisiID })
         result[0].divisi = div[0].name
-
         return res.status(200).send(result)
     }
     catch (err) {
@@ -261,14 +260,14 @@ exports.updateVerified = async(req, res) => {
         }
 
         //cek divisi dari divisi D01 ato D02
-        const cekDivisi = await PanitDB.query().select('divisiID').where({ nim });
-        if (cekDivisi.length === 0 || (cekDivisi[0].divisiID !== "D01" && cekDivisi[0].divisiID !== "D02")) {
+        const cekDivisi = req.divisiID;
+        if (cekDivisi !== "D01" && cekDivisi !== "D02") {
             return res.status(403).send({
-                message: "Divisi anda tidak memiliki otoritas yang cukup! " + cekDivisi[0].divisiID
+                message: "Divisi anda tidak memiliki otoritas yang cukup! ",
             });
         }
 
-        const { isverified } = req.body
+        
         //note klo frontend dah kelar, buatin jadi dia langsung berubah otomatis tanpa input value isverified
         //cek nim 
         const cekNIM = await PanitDB.query().where({ nim })
@@ -278,13 +277,15 @@ exports.updateVerified = async(req, res) => {
             })
         }
 
-        //value verified hanya 0 atau 1
-        if(isverified < 0 || isverified > 1){
-            return res.status(406).send({ 
-                message: 'Value hanya boleh angka 0 atau 1 saja!' 
-            })
-        }
 
+        const cekVerified = await PanitDB.query().select('isverified').where({ nim });
+        let isverified ;
+        if(cekVerified[0].isverified===1){
+            isverified=0;
+        }else{
+            isverified=1;
+        }
+        
         //update ke db isverified
         await PanitDB.query().update({
             isverified
@@ -299,32 +300,32 @@ exports.updateVerified = async(req, res) => {
 exports.deleteData = async (req, res) => {
     try {
         const { nim } = req.params;
-        const { nimPanit } = req.body;
+
         //nim kosong?
-        if (!nimPanit || nimPanit === ':nim') {
+        if (!nim || nim === ':nim') {
             return res.status(404).send({
                 message: 'NIM kosong! Harap diisi terlebih dahulu.'
             });
         }
 
-        //cek divisi dari D01/ D02 bukan
-        const cekDivisi = await PanitDB.query().select('divisiID').where({ nim });
-        if (cekDivisi.length === 0 || (cekDivisi[0].divisiID !== "D01" && cekDivisi[0].divisiID !== "D02")) {
+        //cek divisi dari divisi D01 ato D02
+        const cekDivisi = req.divisiID;
+        if (cekDivisi !== "D01" && cekDivisi !== "D02") {
             return res.status(403).send({
-                message: "Divisi anda tidak memiliki otoritas yang cukup! " + cekDivisi[0].divisiID
+                message: "Divisi anda tidak memiliki otoritas yang cukup! ",
             });
         }
 
         //delete panitia yang dipilih
-        const deletedPanitia = await PanitDB.query().where({ nim: nimPanit }).delete();
+        const deletedPanitia = await PanitDB.query().where({ nim: nim }).delete();
         if (deletedPanitia === 0) {
             return res.status(404).send({
-                message: `Mahasiswa dengan NIM ${nimPanit} tidak ditemukan.`
+                message: `Mahasiswa dengan NIM ${nim} tidak ditemukan.`
             });
         }
 
         return res.status(200).send({
-            message: `Berhasil menghapus data mahasiswa dengan NIM ${nimPanit}.`
+            message: `Berhasil menghapus data mahasiswa dengan NIM ${nim}.`
         });
 
     } catch (error) {
