@@ -280,15 +280,17 @@ exports.updateOrganisator = async (req, res) => {
       });
     }
 
-    const liatState = await StateDB.query()
-      .select("stateID")
-      .where({ stateID: organisator.stateID })
-      .first();
-    if (!liatState) {
-      return res.status(403).send({
-        code: 403,
-        message: "State anda tidak terdaftar!",
-      });
+    if (validateBody.data.stateID) {
+      const liatState = await StateDB.query()
+        .select("stateID")
+        .where({ stateID: validateBody.data.stateID })
+        .first();
+      if (!liatState) {
+        return res.status(403).send({
+          code: 403,
+          message: "State yang anda pilih tidak terdaftar!",
+        });
+      }
     }
 
     if (validateBody.data.password) {
