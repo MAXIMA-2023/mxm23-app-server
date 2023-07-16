@@ -15,10 +15,11 @@ exports.loginpanitorganisator = async (req, res) => {
       });
     }
 
-    const cekOrg = await OrganisatorDB.query()
+    const cekPanit = await PanitDB.query()
       .where({ nim: validationResult.data.nim })
       .first();
-    const cekPanit = await PanitDB.query()
+
+    const cekOrg = await OrganisatorDB.query()
       .where({ nim: validationResult.data.nim })
       .first();
 
@@ -50,8 +51,8 @@ exports.loginpanitorganisator = async (req, res) => {
 
     const JWTtoken = jwt.sign(
       {
-        nim: cekOrg ? cekOrg.nim : cekPanit.nim,
-        role: cekOrg ? "organisator" : "panit",
+        nim: cekPanit ? cekPanit.nim : cekOrg.nim,
+        role: cekPanit ? "panit" : "organisator",
       },
       process.env.JWT_SECRET,
       {
