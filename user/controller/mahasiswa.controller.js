@@ -37,7 +37,7 @@ const register = async (req, res) => {
     // Sukses
     await Mahasiswa.query().insert({
       ...validateBody.data,
-      token: "MXM23-" + nim,
+      token: `MXM23-${validateBody.data.nim}`,
     });
 
     return res.status(201).send({
