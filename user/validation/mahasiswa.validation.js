@@ -16,8 +16,8 @@ const registerValidator = z.object({
   password: z.string().min(8, "Password minimal 8 karakter"),
   angkatan: z
     .number()
-    .min(2023, "Angkatan harus 2023")
-    .max(2023, "Angkatan harus 2023"),
+    .min(2023, "Maaf, MAXIMA dibuka hanya untuk mahasiswa angkatan 2023")
+    .max(2023, "Maaf, MAXIMA dibuka hanya untuk mahasiswa angkatan 2023"),
   idLine: z.string(),
   prodi: z.string(),
 });

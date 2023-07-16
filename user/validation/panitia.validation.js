@@ -10,7 +10,10 @@ const registerValidator = z.object({
   email: z
     .string()
     .email("Format email tidak valid")
-    .endsWith("@student.umn.ac.id"),
+    .endsWith(
+      "@student.umn.ac.id",
+      "Email harus menggunakan @student.umn.ac.id"
+    ),
   divisiID: z
     .string()
     .min(3, "ID divisi harus berupa 3 karakter")
