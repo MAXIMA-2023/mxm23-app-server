@@ -3,12 +3,12 @@ const DivisiDB = require("../model/divisi.model");
 const { validateEmptyEntries } = require("../../helpers/FormValidator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-import {
+const {
   registerValidator,
   nimValidator,
   verifyValidator,
-} from "../validation/panitia.validation";
-import { loginValidator } from "../validation/auth.validation";
+} = require("../validation/panitia.validation");
+const { loginValidator } = require("../validation/auth.validation");
 
 exports.register = async (req, res) => {
   const validateBody = await registerValidator.safeParseAsync(req.body);
@@ -142,6 +142,41 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.getProfile = async (req, res) => {
+  try {
+    const panitia = await PanitDB.query()
+      .where({ nim: req.decoded_nim })
+      .first()
+      .join("divisi", "panitia.divisiID", "=", "divisi.divisiID")
+      .select(
+        "panitia.nim",
+        "panitia.name",
+        "panitia.email",
+        "panitia.isverified",
+        "panitia.divisiID",
+        "divisi.name as divisiName"
+      );
+
+    if (!panitia) {
+      return res.status(404).send({
+        code: 404,
+        message: "Panitia tidak ditemukan",
+      });
+    }
+
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mengambil data profile panitia",
+      data: panitia,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
+
 exports.readAllData = async (req, res) => {
   try {
     const result = await PanitDB.query()
@@ -233,14 +268,16 @@ exports.updateData = async (req, res) => {
 
   try {
     //cek divisi terdaftar ato kaga
-    const cekDiv = await DivisiDB.query()
-      .where({ divisiID: validateBody.data.divisiID })
-      .first();
-    if (!cekDiv) {
-      return res.status(404).send({
-        code: 404,
-        message: "Divisi yang kamu input tidak terdaftar!",
-      });
+    if (validateBody.data.divisiID) {
+      const cekDiv = await DivisiDB.query()
+        .where({ divisiID: validateBody.data.divisiID })
+        .first();
+      if (!cekDiv) {
+        return res.status(404).send({
+          code: 404,
+          message: "Divisi yang kamu input tidak terdaftar!",
+        });
+      }
     }
 
     if (validateBody.data.password) {
