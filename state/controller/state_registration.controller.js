@@ -9,7 +9,7 @@ const Mahasiswa = require('../../user/model/mahasiswa.model');
 NOTE untuk INTERNAL STATE: pendaftaran maba ke state (christo):
 -   Fitur untuk organisator dan panit:
     - READ data yang daftar (all, specific(by nim dan token), by day, by stateID,)
-    - UPDATE data yang daftar (cmn bisa facio dan bph doang)
+    - UPDATE data yang daftar (cmn bisa facio dan bph doang) 
     - DELETE data yang daftar (cmn bisa facio dan bph doang)
 
 - Data yng ada di db state_registration:
@@ -33,7 +33,256 @@ NOTE untuk INTERNAL STATE: pendaftaran maba ke state (christo):
     dan status absen (absen pertama, absen kedua). Yang berarti perlu join table state_activities, dan mahasiswa ke state_registration.
 
 */
+const readAllReg = async (req,res) =>{
+    try {
+        let result = await stateRegDB.query();
+      
+        result = await Promise.all(
+          result.map(async (item) => {
+            const nMhs = await MhsDB.query().select('name').where({ nim: item.nim }).first();
+            const nState = await stateDB.query().where({ stateID: item.stateID }).first();
+      
+            return {
+              ...item,
+              name: nMhs.name,
+              stateName: nState.name,
+              stateLogo: nState.stateLogo,
+            };
+          })
+        );
+      
+        return res.status(200).send(result);
+    } catch (err) {
+        return res.status(500).send({ message: err.message });
+    }
+}
+const readSpecificReg = async (req,res) =>{
+    const { nim } = req.params
 
+    if(nim === null || nim === ':nim'){
+        return res.status(200).send({
+            message: 'NIM kosong! Harap diisi terlebih dahulu'
+        })
+    }
+    
+    try{
+        let result = await stateRegDB.query().where({ nim })
+
+        for(let i = 0; i < result.length; i++){
+            const nMhs = await MhsDB.query().select('name').where({ nim: result[i].nim })
+            const nState = await stateDB.query().where({ stateID: result[i].stateID })
+
+            result[i].name = nMhs[0].name
+            result[i].stateName = nState[0].name
+            result[i].stateLogo = nState[0].stateLogo
+        }
+ 
+        return res.status(200).send(result)  
+    } 
+    catch(err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
+const readStateRegByStateID = async (req,res) =>{
+    try{
+        const { stateID } = req.params
+
+        if(stateID === null || stateID === ':stateID'){
+            return res.status(200).send({
+                message: 'STATE ID kosong! Harap diisi terlebih dahulu'
+            })
+        }
+
+        cekSID = await stateDB.query().where({ stateID })
+        if(cekSID.length === 0 || cekSID === []){
+            return res.status(200).send({
+                message: 'STATE ID ' + stateID + ' tidak ditemukan!'
+            })
+        }
+
+        cekRegList = await stateRegDB.query().where({ stateID })
+        if(cekRegList.length === 0 || cekRegList === []){
+            return res.status(200).send({
+                message: 'STATE ID ' + stateID + ' belum ada yang mendaftar'
+            })
+        }
+        const result = await stateRegDB.query().where({ stateID })
+        for(let i = 0; i < result.length; i++){
+            const nMhs = await MhsDB.query().select('name').where({ nim: result[i].nim })
+            const nState = await stateDB.query().where({ stateID: result[i].stateID })            
+        
+            result[i].name = nMhs[0].name
+            result[i].stateName = nState[0].name
+            result[i].stateLogo = nState[0].stateLogo
+        }
+
+        return res.status(200).send(result)
+    }
+    catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
+
+const readStateRegByDay = async (req,res) =>{
+    try{
+        const { day } = req.params
+
+        if(day === null || day === ':day'){
+            return res.status(200).send({
+                message: 'Day kosong! Harap diisi terlebih dahulu'
+            })
+        }
+
+        cekDay = await stateDB.query().where({ day })
+        
+        if(cekDay.length === 0 || cekDay === []){
+            return res.status(200).send({
+                message: 'Day ' + day + ' tidak ditemukan!'
+            })
+        }
+        const Sday = await stateDB.query().select('stateID').where({ day })
+
+        const result = await stateRegDB.query().where({ stateID:Sday[0].stateID })
+        // const result = await stateRegDB.query().where({ stateID })
+        for(let i = 0; i < result.length; i++){
+            const nMhs = await MhsDB.query().select('name').where({ nim: result[i].nim })
+            const nState = await stateDB.query().where({ stateID: result[i].stateID })                 
+
+            result[i].name = nMhs[0].name
+            result[i].stateName = nState[0].name
+            result[i].stateLogo = nState[0].stateLogo
+        }
+        
+        return res.status(200).send(result)
+    }
+    catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
+
+// gak kepake keknya
+const updateRegData = async(req,res)=>{
+    const { stateIDNew } = req.body
+    const {stateID,nim} = req.params
+
+    try{   
+        const divisiID = req.divisiID
+        if(divisiID === "D05"){
+            return res.status(200).send({
+                message: 'Divisi anda tidak punya otoritas yang cukup!'
+            })
+        }
+        //nim kosong?
+        if(nim === null || nim === ':nim'){
+            return res.status(200).send({
+                message: 'NIM anda kosong! Harap diisi terlebih dahulu'
+            })
+        }
+
+        const emptyEntriesValidation = validateEmptyEntries(req.body);
+        if (emptyEntriesValidation.length > 0){
+            return res.status(400).send({
+                message : "Kolom input kosong.",
+                error : emptyEntriesValidation
+            });
+        }
+
+        const cekSTATE = await stateDB.query().where({ stateID:stateIDNew })
+        if(cekSTATE.length === 0 || cekSTATE === []){
+            return res.status(404).send({ 
+                message: 'STATE yang kamu input tidak terdaftar, dicek lagi ya!' 
+            }) 
+        }
+
+        const cekRegister = await stateRegDB.query().where({ nim, stateID }) 
+        if(cekRegister.length === 0 || cekRegister === []){
+            return res.status(403).send({ 
+                message: 'Kamu tidak mendaftar pada STATE ini!' 
+            })
+        }
+
+        const cekReg = await stateRegDB.query().select('stateID').where({ nim, stateID:stateIDNew }) 
+        if(cekReg.length != 0 && cekReg != []){
+            return res.status(403).send({ 
+                message: 'Kamu sudah mendaftar pada STATE ini!' 
+            })
+        }
+
+        await stateRegDB.query().where({stateID}).update({
+            stateID:stateIDNew
+        })
+
+        // const cekDivisi = req.stateID
+        return res.status(200).send({message:  'Data berhasil diupdate'})
+
+    }
+    catch (err) {
+        return res.status(500).send({ message: 'Halo Maximers, maaf ada kesalahan dari internal '+err })
+    }
+}
+ 
+const deleteRegData = async(req,res)=>{
+    const { nim } = req.params
+    const nim2 = req.decoded_nim
+    // const ip = address.ip()
+
+    try{      
+        const divisiID = req.divisiID
+        if(divisiID === "D05"){
+            return res.status(200).send({
+                message: 'Divisi anda tidak punya otoritas yang cukup!'
+            })
+        }
+
+        const { stateID } = req.params
+        if(nim === null || nim === ':nim'){
+            return res.status(404).send({
+                message: 'NIM anda kosong! Harap diisi terlebih dahulu'
+            })
+        }
+
+        if(stateID === null || stateID === ':stateID'){
+            return res.status(404).send({
+                message: 'STATE ID kosong! Harap diisi terlebih dahulu'
+            })
+        } 
+
+        if(nim2 != nim) {
+            return res.status(403).send({ 
+                message: 'Kamu tidak dapat menghapus Registered STATE milik akun lain!' 
+            })
+        }
+
+        const cekSTATE = await stateDB.query().where({ stateID })
+        if(cekSTATE.length === 0 || cekSTATE === []){
+            return res.status(404).send({ 
+                message: 'STATE yang kamu input tidak terdaftar, dicek lagi ya!' 
+            }) 
+        }
+
+        const cekRegister = await stateRegDB.query().where({ nim, stateID }) 
+        if(cekRegister.length === 0 || cekRegister === []){
+            return res.status(403).send({ 
+                message: 'Kamu belum mendaftar pada STATE ini!' 
+            })
+        }
+            
+        await stateRegDB.query().delete().where({ nim, stateID })
+        const dbActivities = await stateDB.query().where({ stateID })
+        
+        await stateDB.query()
+        .where('stateID', stateID)
+        .patch({
+            registered: dbActivities[0].registered - 1
+        })
+        
+        return res.status(200).send({ message: 'Registrasi STATE berhasil dihapus' })
+    }
+    catch (err) {
+        // logging.cancelStateLog('CancelState', nim, ip, err.message)
+        return res.status(500).send({ message: 'Halo Maximers, maaf ada kesalahan dari internal '+err })
+    }
+}
 
 const handleRegistration = async (req, res) => {
     const {nim, stateID} = req.body;
@@ -111,7 +360,8 @@ const handleRegistration = async (req, res) => {
             nim, 
             attendanceTime : null, 
             isFirstAttended : false, 
-            isLastAttendaned : false
+            isLastAttended : false, 
+            created_at : new Date()
         }); 
         if (!insert) throw new Error(); 
 
@@ -276,7 +526,7 @@ const handleLastAttendance = async (req, res) => {
             })              
         }
 
-        if (registration.isLastAttendaned){
+        if (registration.isLastAttended){
             return res.status(403).send({
                 code : 403,
                 type : "DOUBLE_PRESENCE",
@@ -286,7 +536,7 @@ const handleLastAttendance = async (req, res) => {
 
         const markAttendance = await stateRegDB.query()
             .where({stateID, nim})
-            .update({isLastAttendaned : true})
+            .update({isLastAttended : true})
 
         if (!markAttendance) {
             return res.status(404).send({
@@ -355,4 +605,14 @@ NOTE untuk maba absen STATE:
 
 */
 
-module.exports = { handleRegistration, cancelRegistration, handleFirstAttendance, handleLastAttendance }
+module.exports = { 
+    readAllReg,
+    readSpecificReg, 
+    readStateRegByStateID, 
+    readStateRegByDay,
+    updateRegData,
+    deleteRegData,
+    handleRegistration, 
+    cancelRegistration, 
+    handleFirstAttendance, 
+    handleLastAttendance }
