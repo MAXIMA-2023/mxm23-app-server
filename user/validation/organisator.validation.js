@@ -6,7 +6,10 @@ const registerValidator = z.object({
     .number()
     .min(10000, "NIM harus 5 digit")
     .max(99999, "NIM harus 5 digit"),
-  email: z.string().email().endsWith("@student.umn.ac.id"),
+  email: z
+    .string()
+    .email()
+    .endsWith("@student.umn.ac.id", "Email harus menggunakan email student"),
   password: z.string().min(8, "Password minimal 8 karakter"),
   stateID: z.number().positive(),
 });

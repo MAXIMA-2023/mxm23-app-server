@@ -8,7 +8,10 @@ const registerValidator = z.object({
     .min(10000, "NIM harus 5 digit")
     .max(99999, "NIM harus 5 digit"),
   name: z.string(),
-  email: z.string().email().endsWith("@student.umn.ac.id"),
+  email: z
+    .string()
+    .email()
+    .endsWith("@student.umn.ac.id", "Email harus menggunakan email student"),
   whatsapp: z
     .string()
     .min(10, "Nomor Whatsapp harus diatas 10 digit")
