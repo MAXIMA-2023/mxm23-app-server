@@ -111,7 +111,8 @@ const handleRegistration = async (req, res) => {
             nim, 
             attendanceTime : null, 
             isFirstAttended : false, 
-            isLastAttendaned : false
+            isLastAttended : false, 
+            created_at : new Date()
         }); 
         if (!insert) throw new Error(); 
 
@@ -276,7 +277,7 @@ const handleLastAttendance = async (req, res) => {
             })              
         }
 
-        if (registration.isLastAttendaned){
+        if (registration.isLastAttended){
             return res.status(403).send({
                 code : 403,
                 type : "DOUBLE_PRESENCE",
@@ -286,7 +287,7 @@ const handleLastAttendance = async (req, res) => {
 
         const markAttendance = await stateRegDB.query()
             .where({stateID, nim})
-            .update({isLastAttendaned : true})
+            .update({isLastAttended : true})
 
         if (!markAttendance) {
             return res.status(404).send({

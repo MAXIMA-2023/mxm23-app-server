@@ -48,6 +48,7 @@ CREATE TABLE `mahasiswa` (
   `idLine` varchar(32) NOT NULL,
   `prodi` varchar(32) NOT NULL,
   `token` varchar(32) NOT NULL,
+  `created_at` datetime DEFAULT NOW(),
   PRIMARY KEY (`nim`) 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -176,6 +177,7 @@ CREATE TABLE `state_registration` (
   `attendanceTime` datetime DEFAULT NULL,
   `isFirstAttended` tinyint(1) NOT NULL,
   `isLastAttended` tinyint(1) NOT NULL,
+  `created_at` datetime DEFAULT NOW(),  
   PRIMARY KEY (`stateID`, `nim`),
   FOREIGN KEY (`stateID`) REFERENCES state_activities(`stateID`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`nim`) REFERENCES mahasiswa(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
