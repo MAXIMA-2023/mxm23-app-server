@@ -9,6 +9,13 @@ module.exports = function (app) {
   app.post("/api/panit/login", PanitController.login);
 
   app.get(
+    "/api/panit/profile",
+    middleware.verifyJWT,
+    middleware.isPanitia,
+    PanitController.getProfile
+  );
+
+  app.get(
     "/api/panit/data",
     middleware.verifyJWT,
     middleware.isPanitia,
