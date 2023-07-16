@@ -1,5 +1,5 @@
-const toggle = require('../controllers/toggle.controller')
-const middleware = require('../../user/middleware/user.middleware')
+const toggle = require('../controller/toggle.controller')
+const middleware = require('../../user/middleware/middleware')
 
 module.exports = function(app){
     app.get(
