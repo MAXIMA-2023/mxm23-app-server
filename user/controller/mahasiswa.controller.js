@@ -1,307 +1,327 @@
-
-const env = require("dotenv").config({path : "../../.env"});
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const Mahasiswa = require('../model/mahasiswa.model');
-const { validateEmptyEntries } = require("../../helpers/FormValidator");
-
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const Mahasiswa = require("../model/mahasiswa.model");
+const {
+  registerValidator,
+  nimValidator,
+} = require("../validation/mahasiswa.validation");
+const { loginValidator } = require("../validation/auth.validation");
 
 // API Client
 const register = async (req, res) => {
+  const validateBody = await registerValidator.safeParseAsync(req.body);
 
-    // NOTE : blm fix
-    const {nim, nama, email, password, whatsapp, angkatan, idLine, prodi} = req.body;
-    const body = {nim, nama, email, password, whatsapp, angkatan, idLine, prodi};
-
-    // Cek input kosong 
-    const emptyEntriesValidation = validateEmptyEntries(body);
-
-    if (emptyEntriesValidation.length > 0){
-        return res.status(400).send({
-            code : 400, 
-            message : "Kolom input kosong.",
-            error : emptyEntriesValidation
-        });
-    } 
-
-    try {
-
-        const fieldErrorList = [];
-
-        // Validasi NIM
-        const mahasiswa = await Mahasiswa.query().where({nim}).first();
-        if (mahasiswa) {
-            return res.status(409).send({
-                code : 409,
-                message : "NIM sudah terdaftar."
-            })
-        } 
-
-        // Validasi Password 
-        if (password.length < 8){
-            fieldErrorList.push({
-                error : `INVALID_PASSWORD`,
-                message : `Password harus lebih panjang dari 8 karakter.`                
-            })          
-        }
-
-        // Validasi Email 
-        const studentEmailPattern = /^(\w+(.\w+)*)(@student.umn.ac.id)$/gm;
-        if (!studentEmailPattern.test(email)){
-            fieldErrorList.push({
-                error : `INVALID_EMAIL`,
-                message : `Email harus menggunakan email student.`                
-            })                 
-        }        
-        
-        // Validasi Angkatan 
-        if (angkatan != 2023){
-            fieldErrorList.push({
-                error : `INVALID_CLASSYEAR`,
-                message : `HoMe hanya dibuka untuk mahasiswa angkatan 2023.`                
-            })               
-        }
-
-        // Error Handling
-        if (fieldErrorList.length > 0){
-            return res.status(400).send({
-                code : 400,
-                message : "Gagal melakukan registrasi.",
-                error : fieldErrorList
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Sukses
-        await Mahasiswa.query().insert({
-            nim, 
-            name : nama, 
-            email,
-            password : hashedPassword,
-            whatsapp, 
-            angkatan,
-            idLine,
-            prodi, 
-            token : 'MXM23-' + nim
-        });
-
-        return res.status(201).send({
-            code : 201, 
-            message : "Pendaftaran berhasil."
-        })        
-
-    } catch (err){
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });
+  if (!validateBody.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateBody.error,
+    });
+  }
+  try {
+    const mahasiswa = await Mahasiswa.query()
+      .where({ nim: validateBody.data.nim })
+      .first();
+    if (mahasiswa) {
+      return res.status(400).send({
+        code: 400,
+        message: "NIM kamu telah terdaftar sebelumnya.",
+      });
     }
 
-}
+    validateBody.data.password = await bcrypt.hash(
+      validateBody.data.password,
+      10
+    );
 
+    // Sukses
+    await Mahasiswa.query().insert({
+      ...validateBody.data,
+      token: `MXM23-${validateBody.data.nim}`,
+    });
 
+    return res.status(201).send({
+      code: 201,
+      message: "Pendaftaran berhasil.",
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
 // API Client
 const login = async (req, res) => {
+  // NOTE : login pake nim aja ato (nim or email) ato gmn??
+  const validateBody = await loginValidator.safeParseAsync(req.body);
 
-    // NOTE : login pake nim aja ato (nim or email) ato gmn??
-    const { nim = "", password = "" } = req.body; 
+  if (!validateBody.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateBody.error,
+    });
+  }
 
-    try {
-        
-        // Cek NIM & Password
-        const user = await Mahasiswa.query().where({nim}).first() || {}
-        const userPassword = user?.password || "";
-        if (user === {} || !await bcrypt.compare(password, userPassword)){
-            return res.status(401).json({
-                code : 401,                    
-                message : "NIM dan/atau kata sandi salah."
-            });                          
-        }
-
-        // Assign JWT
-        const jwtPayload = {nim : user.nim, name : user.name} 
-        const token = jwt.sign(jwtPayload, process.env.JWT_SECRET, {expiresIn : process.env.JWT_LIFETIME * 86400}) // NOTE : lifetime berapa lama?
-
-        // NOTE : password perlu dihide ga di response?
-        const data = user;
-        delete data.password;
-
-        res.cookie('__SESS_TOKEN', token, {
-            httpOnly : true,
-            sameSite : 'None',
-            secure : true,
-        });        
-
-        return res.status(200).send({
-            code : 200, 
-            message : "Login berhasil.",
-            data,
-            token,
-            expiresIn : process.env.JWT_LIFETIME * 86400
-        })        
-
-    } catch(err){
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });
+  try {
+    // Cek NIM & Password
+    const mahasiswa = await Mahasiswa.query()
+      .where({ nim: validateBody.data.nim })
+      .first();
+    if (!mahasiswa) {
+      return res.status(401).json({
+        code: 404,
+        message: `Tidak dapat menemukan Mahasiswa dengan NIM ${nim}.`,
+      });
     }
 
-}
+    if (
+      !(await bcrypt.compare(validateBody.data.password, mahasiswa.password))
+    ) {
+      return res.status(401).json({
+        code: 401,
+        message: "NIM dan/atau kata sandi salah.",
+      });
+    }
 
+    // Assign JWT
+    const token = jwt.sign({ nim: mahasiswa.nim }, process.env.JWT_SECRET, {
+      expiresIn: 86400,
+    }); // NOTE : lifetime berapa lama?
+
+    // res.cookie("__SESS_TOKEN", token, {
+    //   httpOnly: true,
+    //   sameSite: "None",
+    //   secure: true,
+    // });
+
+    return res.status(200).send({
+      code: 200,
+      message: "Login berhasil.",
+      data: {
+        token,
+        expiresIn: 86400,
+      },
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
+
+const getProfile = async (req, res) => {
+  try {
+    const mahasiswa = await Mahasiswa.query()
+      .where({ nim: req.decoded_nim })
+      .first()
+      .select(
+        "nim",
+        "name",
+        "email",
+        "whatsapp",
+        "angkatan",
+        "idLine",
+        "prodi",
+        "token"
+      );
+    if (!mahasiswa) {
+      return res.status(404).send({
+        code: 404,
+        message: `Mahasiswa dengan NIM : ${req.decoded_nim} tidak ditemukan.`,
+      });
+    }
+
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil mengambil data mahasiswa dengan NIM : ${req.decoded_nim}`,
+      data: mahasiswa,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
 // API Internal
 const getAllStudent = async (req, res) => {
-    try {
+  try {
+    const daftarMahasiswa = await Mahasiswa.query().select(
+      "nim",
+      "name",
+      "email",
+      "whatsapp",
+      "angkatan",
+      "idLine",
+      "prodi",
+      "token"
+    );
 
-        const daftarMahasiswa = await Mahasiswa.query();
-
-        return res.status(200).send({
-            code : 200, 
-            message : "Berhasil mengambil seluruh data mahasiswa.",
-            data : daftarMahasiswa
-        });
-
-    } catch (err){
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });        
-    }
-}
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mengambil seluruh data mahasiswa.",
+      data: daftarMahasiswa,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
 // API Internal
 const getSpecificStudent = async (req, res) => {
-    try {
+  try {
+    const validateNim = await nimValidator.safeParseAsync(req.params.nim);
 
-        const { nim = "" } = req.params;
-
-        const dataMahasiswa = await Mahasiswa.query().where({nim}).first();
-        if (!dataMahasiswa){
-            return res.status(404).send({
-                code : 404, 
-                message : `Mahasiswa dengan NIM : ${nim} tidak ditemukan.`
-            });
-        }
-
-        return res.status(200).send({
-            code : 200, 
-            message : `Berhasil mengambil data mahasiswa dengan NIM : ${nim}`,
-            data : dataMahasiswa
-        });
-
-    } catch (err){
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });        
+    if (!validateNim.success) {
+      return res.status(400).send({
+        code: 400,
+        message: "Validasi gagal.",
+        error: validateNim.error,
+      });
     }
-}
+
+    const mahasiswa = await Mahasiswa.query()
+      .where({ nim: validateNim.data })
+      .first()
+      .select(
+        "nim",
+        "name",
+        "email",
+        "whatsapp",
+        "angkatan",
+        "idLine",
+        "prodi",
+        "token"
+      );
+    if (!mahasiswa) {
+      return res.status(404).send({
+        code: 404,
+        message: `Mahasiswa dengan NIM : ${validateNim.data} tidak ditemukan.`,
+      });
+    }
+
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil mengambil data mahasiswa dengan NIM : ${validateNim.data}`,
+      data: mahasiswa,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
 // API Internal
 const updateStudent = async (req, res) => {
-    // NOTE : blm fix
+  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
 
-    const {nama, email, whatsapp, angkatan, idLine, prodi} = req.body;
-    const body = {nama, email, whatsapp, angkatan, idLine, prodi};
+  if (!validateNim.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateNim.error,
+    });
+  }
 
-    // Cek input kosong 
-    const emptyEntriesValidation = validateEmptyEntries(body);
+  const validateBody = await registerValidator
+    .partial()
+    .safeParseAsync(req.body);
+  if (!validateBody.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateBody.error,
+    });
+  }
 
-    if (emptyEntriesValidation.length > 0){
-        return res.status(400).send({
-            code : 400, 
-            message : "Kolom input kosong.",
-            error : emptyEntriesValidation
-        });
-    }     
+  if (validateBody.data.password) {
+    validateBody.data.password = await bcrypt.hash(
+      validateBody.data.password,
+      10
+    );
+  }
 
-    try {
+  try {
+    const mahasiswa = await Mahasiswa.query()
+      .where({ nim: validateNim.data })
+      .update({
+        ...validateBody.data,
+        token: validateBody.data.nim
+          ? `MXM-${validateBody.data.nim}`
+          : undefined,
+      })
+      .first();
 
-        const { nim = " " } = req.params;
-
-        const fieldErrorList = [];
-
-        // Validasi Email 
-        const studentEmailPattern = /^(\w+(.\w+)*)(@student.umn.ac.id)$/gm;
-        if (!studentEmailPattern.test(email)){
-            fieldErrorList.push({
-                error : `INVALID_EMAIL`,
-                message : `Email harus menggunakan email student.`                
-            })                 
-        }        
-        
-        // Validasi Angkatan 
-        if (angkatan != 2023){
-            fieldErrorList.push({
-                error : `INVALID_CLASSYEAR`,
-                message : `HoMe hanya dibuka untuk mahasiswa angkatan 2023.`                
-            })               
-        } 
-        
-        // Error Handler 
-        if (fieldErrorList.length > 0){
-            return res.status(400).send({
-                code : 400,
-                message : "Gagal melakukan perubahan data.",
-                error : fieldErrorList
-            });
-        }
-
-        const daftarMahasiswa = await Mahasiswa.query().where({nim}).update({ 
-            name : nama, email, whatsapp, angkatan, idLine, prodi
-        });
-
-        if (!daftarMahasiswa){
-            return res.status(404).send({
-                code : 404, 
-                message : `Mahasiswa dengan NIM : ${nim} tidak ditemukan.`
-            });
-        }
-
-        return res.status(200).send({
-            code : 200, 
-            message : `Berhasil mengubah data mahasiswa dengan NIM : ${nim}`,
-        });
-
-
-    } catch(err) {
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });         
+    if (!mahasiswa) {
+      return res.status(404).send({
+        code: 404,
+        message: `Mahasiswa dengan NIM : ${validateNim.data} tidak ditemukan.`,
+      });
     }
-    
-}
 
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil mengubah data mahasiswa dengan NIM : ${validateNim.data}`,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
 // API Internal
 const deleteStudent = async (req, res) => {
-    try {
+  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
 
-        const { nim = "" } = req.params;
+  if (!validateNim.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateNim.error,
+    });
+  }
 
-        const daftarMahasiswa = await Mahasiswa.query().where({nim}).delete();
-        if (!daftarMahasiswa){
-            return res.status(404).send({
-                code : 404, 
-                message : `Mahasiswa dengan NIM : ${nim} tidak ditemukan.`
-            });
-        }
-
-        return res.status(200).send({
-            code : 200, 
-            message : `Berhasil menghapus data mahasiswa dengan NIM : ${nim}`,
-        });
-
-    } catch (err){
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });        
+  try {
+    const mahasiswa = await Mahasiswa.query()
+      .where({ nim: validateNim.data })
+      .delete();
+    if (!mahasiswa) {
+      return res.status(404).send({
+        code: 404,
+        message: `Mahasiswa dengan NIM : ${validateNim.data} tidak ditemukan.`,
+      });
     }
-}
 
-module.exports = {register, login, getAllStudent, getSpecificStudent, updateStudent, deleteStudent}
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil menghapus data mahasiswa dengan NIM : ${validateNim.data}`,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  getProfile,
+  getAllStudent,
+  getSpecificStudent,
+  updateStudent,
+  deleteStudent,
+};

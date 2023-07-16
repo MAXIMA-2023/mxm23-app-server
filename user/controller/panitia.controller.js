@@ -1,336 +1,400 @@
-const PanitDB = require('../model/panitia.model')
-const DivisiDB = require('../model/divisi.model')
+const PanitDB = require("../model/panitia.model");
+const DivisiDB = require("../model/divisi.model");
 const { validateEmptyEntries } = require("../../helpers/FormValidator");
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken')
-// const address = require('address')
-// const logging = require('../../loggings/controllers/loggings.controllers')
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const {
+  registerValidator,
+  nimValidator,
+  verifyValidator,
+} = require("../validation/panitia.validation");
+const { loginValidator } = require("../validation/auth.validation");
 
-exports.register = async(req, res) => {
+exports.register = async (req, res) => {
+  const validateBody = await registerValidator.safeParseAsync(req.body);
+  if (!validateBody.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateBody.error,
+    });
+  }
 
-    try{
-        const { 
-            name,
-            nim, 
-            password, 
-            email, 
-            divisiID
-        } = req.body
-
-        //cek form kosong
-        const emptyEntriesValidation = validateEmptyEntries(req.body);
-        if (emptyEntriesValidation.length > 0){
-            return res.status(400).send({
-                message : "Kolom input kosong.",
-                error : emptyEntriesValidation
-            });
-        }
-
-        //cek paswword
-        if(password.length<8){
-            return res.status(400).send({
-                message: 'password harus terdiri dari setidaknya 8 karakter.  '
-            })
-        }
-        
-        //password enkripsi
-        const hashPass = await bcrypt.hashSync(password, 8)
-
-
-        //cek nim
-        const cekNIM = await PanitDB.query().where({ nim })
-        if(cekNIM.length !== 0){
-            return res.status(400).send({
-                message: 'NIM sudah terdaftar!'
-            })
-        }
-        
-        //cek divisi
-        const cekDiv = await DivisiDB.query().where({ divisiID })
-        if(cekDiv.length === 0 || cekDiv === []){
-            return res.status(409).send({ 
-                message: 'Divisi yang kamu input tidak terdaftar!' 
-            })       
-        }
-        
-        //cek email student
-        const emailPattern = /^[a-zA-Z0-9._-]+@student\.umn\.ac\.id$/;
-        if(!emailPattern.test(email)){
-            return res.status(400).send({
-                message: 'Email harus menggunakan email student'
-            })
-        }
-        // if(divisiID === 'D01'){
-        //     return res.status(401).send({ 
-        //         message: 'Anda tidak dapat mendaftar pada divisi tersebut' 
-        //     })
-        // }
-
-        const verified2 = 0
-        await PanitDB.query().insert({
-            name,
-            nim,
-            password: hashPass,
-            email,
-            divisiID, 
-            isverified: verified2
-        })
-
-        return res.status(200).send({ message: 'Akun baru berhasil ditambahkan' })
+  try {
+    //cek nim
+    const cekNIM = await PanitDB.query()
+      .where({ nim: validateBody.data.nim })
+      .first();
+    if (cekNIM) {
+      return res.status(400).send({
+        code: 400,
+        message: "NIM sudah terdaftar!",
+      });
     }
-    catch(err){
-        // logging.registerLog('Register/Panitia', nim, ip, err.message)
-        return res.status(500).send({ message: err.message })
+
+    //cek divisi
+    const cekDiv = await DivisiDB.query()
+      .where({ divisiID: validateBody.data.divisiID })
+      .first();
+    if (!cekDiv) {
+      return res.status(409).send({
+        code: 409,
+        message: "Divisi yang kamu input tidak terdaftar!",
+      });
     }
-}
 
-exports.login = async(req, res)=>{
-    const { nim, password } = req.body
-    try{
-        //cek form kosong
-        const emptyEntriesValidation = validateEmptyEntries(req.body);
-        if (emptyEntriesValidation.length > 0){
-            return res.status(400).send({
-                message : "Kolom input kosong.",
-                error : emptyEntriesValidation
-            });
-        }
-        
-        //cek nim terdaftar
-        const checkingNim = await PanitDB.query().where({ nim })
-        if(checkingNim.length === 0){
-            return res.status(404).send({
-                message : 'NIM ' + nim + ' tidak terdaftar! Harap melakukan register dahulu'
-            })
-        }
+    validateBody.data.password = await bcrypt.hash(
+      validateBody.data.password,
+      10
+    );
 
-        //compare password
-        const isPassValid = bcrypt.compareSync(password, checkingNim[0].password)
-        if(!isPassValid){
-            return res.status(400).send({
-                message: 'NIM atau password salah!'
-            })
-        }
-        
-        //is verivied
-        const ver = await PanitDB.query().select('isverified').where({ nim })
-        if(ver[0].isverified === 0){
-            return res.status(400).send({
-                message: 'Akun anda belum terverifikasi!'
-            })
-        }
+    // if(validateBody.data.divisiID === 'D01'){
+    //     return res.status(401).send({
+    //         message: 'Anda tidak dapat mendaftar pada divisi tersebut'
+    //     })
+    // }
 
-        //assign jwt nim aja 
-        const JWTtoken = jwt.sign({
-                name: checkingNim[0].name,
-                nim: checkingNim[0].nim,
-                role: 'panitia'
-            }, process.env.JWT_SECRET, {
-                expiresIn: 86400 //equals to 24Hprocess.env.JWT_LIFETIME
-        })
+    await PanitDB.query().insert({
+      ...validateBody.data,
+      isverified: false,
+    });
 
-        return res.status(200).send({
-            message: "Berhasil login",
-            token: JWTtoken
-        })
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil melakukan registrasi",
+    });
+  } catch (err) {
+    // logging.registerLog('Register/Panitia', nim, ip, err.message)
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
+
+exports.login = async (req, res) => {
+  const validateBody = await loginValidator.safeParseAsync(req.body);
+
+  if (!validateBody.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateBody.error,
+    });
+  }
+  try {
+    //cek nim terdaftar
+    const panitia = await PanitDB.query()
+      .where({ nim: validateBody.data.nim })
+      .first();
+    if (!panitia) {
+      return res.status(404).send({
+        code: 404,
+        message: `NIM : ${validateBody.data.nim} tidak terdaftar! Harap melakukan register dahulu`,
+      });
     }
-    catch(err){
-        // logging.loginLog('Login/Panitia', nim, ip, err.message)
-        return res.status(500).send({ message: err.message })
+
+    //compare password
+    const isPassValid = bcrypt.compareSync(
+      validateBody.data.password,
+      panitia.password
+    );
+    if (!isPassValid) {
+      return res.status(400).send({
+        code: 400,
+        message: "NIM atau password salah!",
+      });
     }
-}
 
-exports.readAllData = async(req, res) => {
-    try {
-        const result = await PanitDB.query()
-
-        for(let i = 0; i < result.length; i++){
-            const div = await DivisiDB.query().select('name').where({ divisiID: result[i].divisiID })
-
-            result[i].divisiName = div[0].name
-        }
-
-        return res.status(200).send(result)    
-    } 
-    catch (err) {
-        return res.status(500).send({ message: err.message })
+    //is verivied
+    if (!panitia.isverified) {
+      return res.status(400).send({
+        code: 400,
+        message: "Akun anda belum terverifikasi!",
+      });
     }
-}
 
-exports.readSpecificData = async(req, res) => {
+    const JWTtoken = jwt.sign(
+      {
+        nim: panitia.nim,
+        role: "panit",
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: 86400, //equals to 24Hprocess.env.JWT_LIFETIME
+      }
+    );
 
-    try {
-        const { nim } = req.params
-        //nim kosong?
-        if(nim === null || nim === ':nim'){
-            return res.status(200).send({
-                message: 'NIM anda kosong! Harap diisi terlebih dahulu'
-            })
-        }
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil login",
+      data: {
+        token: JWTtoken,
+        expiresIn: 86400,
+      },
+    });
+  } catch (err) {
+    // logging.loginLog('Login/Panitia', nim, ip, err.message)
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
-        //cek nim
-        const cekNIM = await PanitDB.query().where({ nim })
-        if(cekNIM.length === 0 || cekNIM === []){
-            return res.status(200).send({ 
-                message: 'NIM ' + nim + ' tidak ditemukan'
-            }) 
-        }
-        
-        //cari spesifik nim
-        const result = await PanitDB.query().where({ nim })
-        const div = await DivisiDB.query().select('name').where({ divisiID: result[0].divisiID })
-        result[0].divisi = div[0].name
-        return res.status(200).send(result)
+exports.getProfile = async (req, res) => {
+  try {
+    const panitia = await PanitDB.query()
+      .where({ nim: req.decoded_nim })
+      .first()
+      .join("divisi", "panitia.divisiID", "=", "divisi.divisiID")
+      .select(
+        "panitia.nim",
+        "panitia.name",
+        "panitia.email",
+        "panitia.isverified",
+        "panitia.divisiID",
+        "divisi.name as divisiName"
+      );
+
+    if (!panitia) {
+      return res.status(404).send({
+        code: 404,
+        message: "Panitia tidak ditemukan",
+      });
     }
-    catch (err) {
-        return res.status(500).send({ message: err.message })
+
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mengambil data profile panitia",
+      data: panitia,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
+
+exports.readAllData = async (req, res) => {
+  try {
+    const result = await PanitDB.query()
+      .join("divisi", "panitia.divisiID", "divisi.divisiID")
+      .select(
+        "panitia.nim",
+        "panitia.name",
+        "panitia.email",
+        "panitia.isverified",
+        "panitia.divisiID",
+        "divisi.name as divisiName"
+      );
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mengambil seluruh data panitia",
+      data: result,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
+
+exports.readSpecificData = async (req, res) => {
+  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
+  if (!validateNim.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateNim.error,
+    });
+  }
+  try {
+    //cek nim
+    const panitia = await PanitDB.query()
+      .where({ nim: validateNim.data })
+      .first()
+      .join("divisi", "panitia.divisiID", "=", "divisi.divisiID")
+      .select(
+        "panitia.nim",
+        "panitia.name",
+        "panitia.email",
+        "panitia.isverified",
+        "panitia.divisiID",
+        "divisi.name as divisiName"
+      );
+    if (!panitia) {
+      return res.status(400).send({
+        code: 400,
+        message: `NIM ${validateNim.data} tidak ditemukan`,
+      });
     }
-}
 
-exports.updateData = async(req,res)=>{
-    try {
-        const { nim } = req.params
-        //nim kosong?
-        if(nim === null || nim === ':nim'){
-            return res.status(404).send({
-                message: 'NIM anda kosong! Harap diisi terlebih dahulu'
-            })
-        }
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil mendapatkan data panitia dengan NIM : ${validateNim.data}`,
+      data: panitia,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
-        const { 
-            name, 
-            email, 
-            divisiID
-        } = req.body
+exports.updateData = async (req, res) => {
+  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
+  if (!validateNim.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateNim.error,
+    });
+  }
 
-        //cek form kosong
-        const emptyEntriesValidation = validateEmptyEntries(req.body);
-        if (emptyEntriesValidation.length > 0){
-            return res.status(400).send({
-                message : "Kolom input kosong.",
-                error : emptyEntriesValidation
-            });
-        }
-        
-        //cek nim
-        const cekNIM = await PanitDB.query().where({ nim })
-        if(cekNIM.length === 0 || cekNIM === []){
-            return res.status(404).send({ 
-                message: 'NIM ' + nim + ' tidak ditemukan!'
-            })
-        }
+  const validateBody = await registerValidator
+    .partial()
+    .safeParseAsync(req.body);
+  if (!validateBody.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateBody.error,
+    });
+  }
 
-        //cek divisi terdaftar ato kaga
-        const cekDiv = await DivisiDB.query().where({ divisiID })
-        if(cekDiv.length === 0 || cekDiv === []){
-            return res.status(404).send({ 
-                message: 'Divisi yang kamu input tidak terdaftar!' 
-            })
-        }
-
-        //cek pake email student
-        const emailPattern = /^[a-zA-Z0-9._-]+@student\.umn\.ac\.id$/;
-        if(!emailPattern.test(email)){
-            return res.status(400).send({
-                message: 'Email harus menggunakan email student'
-            })
-        }
-        //update ke db
-        await PanitDB.query().update({
-            name,
-            email,
-            divisiID
-        }).where({ nim })
-
-        return res.status(200).send({ message: 'Data berhasil diupdate' })
+  try {
+    //cek divisi terdaftar ato kaga
+    if (validateBody.data.divisiID) {
+      const cekDiv = await DivisiDB.query()
+        .where({ divisiID: validateBody.data.divisiID })
+        .first();
+      if (!cekDiv) {
+        return res.status(404).send({
+          code: 404,
+          message: "Divisi yang kamu input tidak terdaftar!",
+        });
+      }
     }
-    catch (err) {
-        return res.status(500).send({ message: err.message })
+
+    if (validateBody.data.password) {
+      validateBody.data.password = await bcrypt.hash(
+        validateBody.data.password,
+        10
+      );
     }
-}
 
-exports.updateVerified = async(req, res) => {
-    try{
-        const { nim } = req.params
-        //nim kosong?
-        if(nim === null || nim === ':nim'){
-            return res.status(404).send({
-                message: 'NIM anda kosong! Harap diisi terlebih dahulu'
-            })
-        }
-
-        //cek divisi dari divisi D01 ato D02
-        const cekDivisi = req.divisiID;
-        if (cekDivisi !== "D01" && cekDivisi !== "D02") {
-            return res.status(403).send({
-                message: "Divisi anda tidak memiliki otoritas yang cukup! ",
-            });
-        }
-
-        
-        //note klo frontend dah kelar, buatin jadi dia langsung berubah otomatis tanpa input value isverified
-        //cek nim 
-        const cekNIM = await PanitDB.query().where({ nim })
-        if(cekNIM.length === 0 || cekNIM === []){
-            return res.status(404).send({ 
-                message: 'NIM ' + nim + ' tidak ditemukan!'
-            })
-        }
-
-
-        const cekVerified = await PanitDB.query().select('isverified').where({ nim });
-        let isverified ;
-        if(cekVerified[0].isverified===1){
-            isverified=0;
-        }else{
-            isverified=1;
-        }
-        
-        //update ke db isverified
-        await PanitDB.query().update({
-            isverified
-        }).where({ nim })
-        return res.status(200).send({ message: 'Data berhasil diupdate' })
+    //update ke db
+    const panitia = await PanitDB.query()
+      .update(validateBody.data)
+      .where({ nim: validateNim.data });
+    if (!panitia) {
+      return res.status(404).send({
+        code: 404,
+        message: `NIM : ${validateNim.data} tidak ditemukan!`,
+      });
     }
-    catch (err) {
-        return res.status(500).send({ message: err.message })
+
+    return res.status(200).send({
+      code: 200,
+      message: "Data berhasil diupdate",
+    });
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};
+
+exports.verifyAcc = async (req, res) => {
+  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
+  if (!validateNim.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateNim.error,
+    });
+  }
+
+  const validateBody = await verifyValidator.safeParseAsync(req.body);
+  if (!validateBody.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateBody.error,
+    });
+  }
+
+  try {
+    const authorizedDiv = ["D01", "D02"];
+    const division = req.divisiID;
+    if (!authorizedDiv.includes(division)) {
+      return res.status(403).send({
+        code: 403,
+        message: "Kamu tidak memiliki akses untuk melakukan verifikasi akun",
+      });
     }
-}
+
+    const panitia = await PanitDB.query()
+      .where({ nim: validateNim.data })
+      .update({ isverified: validateBody.data.isverified });
+    if (!panitia) {
+      return res.status(404).send({
+        code: 404,
+        message: `NIM : ${validateNim.data} tidak ditemukan!`,
+      });
+    }
+
+    return res.status(200).send({
+      code: 200,
+      message: "Data berhasil diupdate",
+    });
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};
 
 exports.deleteData = async (req, res) => {
-    try {
-        const { nim } = req.params;
+  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
+  if (!validateNim.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateNim.error,
+    });
+  }
 
-        //nim kosong?
-        if (!nim || nim === ':nim') {
-            return res.status(404).send({
-                message: 'NIM kosong! Harap diisi terlebih dahulu.'
-            });
-        }
-
-        //cek divisi dari divisi D01 ato D02
-        const cekDivisi = req.divisiID;
-        if (cekDivisi !== "D01" && cekDivisi !== "D02") {
-            return res.status(403).send({
-                message: "Divisi anda tidak memiliki otoritas yang cukup! ",
-            });
-        }
-
-        //delete panitia yang dipilih
-        const deletedPanitia = await PanitDB.query().where({ nim: nim }).delete();
-        if (deletedPanitia === 0) {
-            return res.status(404).send({
-                message: `Mahasiswa dengan NIM ${nim} tidak ditemukan.`
-            });
-        }
-
-        return res.status(200).send({
-            message: `Berhasil menghapus data mahasiswa dengan NIM ${nim}.`
-        });
-
-    } catch (error) {
-        return res.status(500).send({
-            message: 'Terjadi kesalahan pada server.'
-        });
+  try {
+    //cek divisi dari D01/ D02 bukan
+    const authorizedDiv = ["D01", "D02"];
+    const division = req.divisiID;
+    if (!authorizedDiv.includes(division)) {
+      return res.status(403).send({
+        code: 403,
+        message: "Kamu tidak memiliki akses untuk menghapus akun",
+      });
     }
+
+    //delete panitia yang dipilih
+    const panitia = await PanitDB.query()
+      .where({ nim: validateNim.data })
+      .delete();
+    if (!panitia) {
+      return res.status(404).send({
+        code: 404,
+        message: `Mahasiswa dengan NIM ${validateNim.data} tidak ditemukan.`,
+      });
+    }
+
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil menghapus data mahasiswa dengan NIM ${validateNim.data}.`,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      code: 500,
+      message: "Terjadi kesalahan pada server.",
+    });
+  }
 };

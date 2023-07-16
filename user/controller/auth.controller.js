@@ -15,15 +15,17 @@ exports.loginpanitorganisator = async (req, res) => {
       });
     }
 
-    const cekOrg = await OrganisatorDB.query()
+    const cekPanit = await PanitDB.query()
       .where({ nim: validationResult.data.nim })
       .first();
-    const cekPanit = await PanitDB.query()
+
+    const cekOrg = await OrganisatorDB.query()
       .where({ nim: validationResult.data.nim })
       .first();
 
     if (!cekOrg && !cekPanit) {
       return res.status(400).send({
+        code: 400,
         message: "Akun anda belum terdaftar",
       });
     }
@@ -35,20 +37,22 @@ exports.loginpanitorganisator = async (req, res) => {
 
     if (!passwordIsValid) {
       return res.status(401).send({
+        code: 401,
         message: "Password salah!",
       });
     }
 
     if ((cekOrg && !cekOrg.isverified) || (cekPanit && !cekPanit.isverified)) {
       return res.status(401).send({
+        code: 401,
         message: "Akun anda belum terverifikasi!",
       });
     }
 
     const JWTtoken = jwt.sign(
       {
-        nim: cekOrg ? cekOrg.nim : cekPanit.nim,
-        role: cekOrg ? "organisator" : "panit",
+        nim: cekPanit ? cekPanit.nim : cekOrg.nim,
+        role: cekPanit ? "panit" : "organisator",
       },
       process.env.JWT_SECRET,
       {
@@ -57,6 +61,7 @@ exports.loginpanitorganisator = async (req, res) => {
     );
 
     return res.status(200).send({
+      code: 200,
       message: "ok",
       data: {
         token: JWTtoken,
@@ -64,6 +69,9 @@ exports.loginpanitorganisator = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(500).send({ message: err.message });
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
   }
 };

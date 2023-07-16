@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nim\" : 69421,\r\n    \"name\" : \"Fathan Student\",\r\n    \"email\" : \"fathan@student.umn.ac.id\", \r\n    \"password\" : \"12345678\",\r\n    \"whatsapp\" : \"0858623856445\",    \r\n    \"angkatan\" : 2023,  \r\n    \"prodi\" : \"Teknik Mabar\", \r\n    \"idLine\" : \"fathan712\"\r\n}",
+							"raw": "{\r\n    \"nim\" : 55704,\r\n    \"nama\" : \"Siapa Aja lah ye\",\r\n    \"email\" : \"farrel.dinarta@student.umn.ac.id\", \r\n    \"password\" : \"12345678\",\r\n    \"whatsapp\" : \"0858623856445\",    \r\n    \"angkatan\" : \"2023\",  \r\n    \"prodi\" : \"10292\", \r\n    \"idLine\" : \"fareldnarnt\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -69,7 +69,13 @@
 					"name": "Get Profile",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjY2NDg0LCJpYXQiOjE2ODkzNTU5MzIsImV4cCI6MTY4OTQ0MjMzMn0.GtuWAclg-oDu0H6jGqTahW5ROln9iNM8AKUPdHSHisw",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{api_url}}/api/mahasiswa/profile",
 							"host": [
@@ -113,7 +119,13 @@
 					"name": "Get Specific",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjExMTExLCJyb2xlIjoicGFuaXRpYSIsImlhdCI6MTY4OTM1NzY2MSwiZXhwIjoxNjg5NDQ0MDYxfQ.5cqaF7jYDGPWuZu_ZCfo9uId2ix_O8IFwDKheoqtQQY",
+								"type": "text"
+							}
+						],
 						"url": {
 							"raw": "{{api_url}}/api/mahasiswa/data/66484",
 							"host": [
@@ -133,7 +145,13 @@
 					"name": "Update",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjExMTExLCJyb2xlIjoicGFuaXRpYSIsImlhdCI6MTY4OTM1NzY2MSwiZXhwIjoxNjg5NDQ0MDYxfQ.5cqaF7jYDGPWuZu_ZCfo9uId2ix_O8IFwDKheoqtQQY",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"nim\" : 55704,\r\n    \"nama\" : \"Siapa Aja lah ye\",\r\n    \"email\" : \"farrel.dinarta@student.umn.ac.id\", \r\n    \"password\" : \"12345678\",\r\n    \"whatsapp\" : \"0858623856445\",    \r\n    \"angkatan\" : \"2023\",  \r\n    \"prodi\" : \"10292\", \r\n    \"idLine\" : \"fareldnarnt\"\r\n}    ",
@@ -144,7 +162,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{api_url}}/api/mahasiswa/data/69421",
+							"raw": "{{api_url}}/api/mahasiswa/data/55704",
 							"host": [
 								"{{api_url}}"
 							],
@@ -152,7 +170,7 @@
 								"api",
 								"mahasiswa",
 								"data",
-								"69421"
+								"55704"
 							],
 							"query": [
 								{
@@ -180,9 +198,15 @@
 					"name": "Delete",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "{{api_url}}/api/mahasiswa/data/88484",
+							"raw": "{{api_url}}/api/mahasiswa/data/00000088484",
 							"host": [
 								"{{api_url}}"
 							],
@@ -190,7 +214,14 @@
 								"api",
 								"mahasiswa",
 								"data",
-								"88484"
+								"00000088484"
+							],
+							"query": [
+								{
+									"key": "x-access-token",
+									"value": "{{token}}",
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -271,15 +302,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{api_url}}/api/organisator/data/",
+							"raw": "{{api_url}}/api/organisator/get",
 							"host": [
 								"{{api_url}}"
 							],
 							"path": [
 								"api",
 								"organisator",
-								"data",
-								""
+								"get"
 							]
 						}
 					},
@@ -291,15 +321,15 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{api_url}}/api/organisator/data/69524",
+							"raw": "{{api_url}}/api/organisator/get/66946",
 							"host": [
 								"{{api_url}}"
 							],
 							"path": [
 								"api",
 								"organisator",
-								"data",
-								"69524"
+								"get",
+								"66946"
 							]
 						}
 					},
@@ -311,24 +341,35 @@
 						"method": "PUT",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Fathan Ridhwan Testing API lagi\",\n    \"password\": \"12345678\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "TES",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "tes@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "stateID",
+									"value": "1",
+									"type": "text"
 								}
-							}
+							]
 						},
 						"url": {
-							"raw": "{{api_url}}/api/organisator/data/69524",
+							"raw": "{{api_url}}/api/organisator/update/55915",
 							"host": [
 								"{{api_url}}"
 							],
 							"path": [
 								"api",
 								"organisator",
-								"data",
-								"69524"
+								"update",
+								"55915"
 							]
 						}
 					},
@@ -395,13 +436,34 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nim\": 69420,\n    \"name\": \"Joe Biden\",\n    \"password\": \"12345678\",\n    \"email\": \"admin@student.umn.ac.id\",\n    \"divisiID\": \"D01\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Farrl",
+									"type": "text"
+								},
+								{
+									"key": "nim",
+									"value": "55702",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "12345678",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "farrel.dinartax@student.umn.ac.id",
+									"type": "text"
+								},
+								{
+									"key": "divisiID",
+									"value": "D01",
+									"type": "text"
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{api_url}}/api/panit/register",
@@ -423,13 +485,19 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nim\": 69524,\n    \"password\": \"12345678\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "nim",
+									"value": "55702",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "12345678",
+									"type": "text"
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{api_url}}/api/panit/login",
@@ -446,26 +514,38 @@
 					"response": []
 				},
 				{
-					"name": "Get Profile",
+					"name": "Get Specific",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjIzNDU2LCJpYXQiOjE2ODgxMjk3MTgsImV4cCI6MTY4ODIxNjExOH0.ZKWYa882TSgDcj6xVPCanv8i7WX0x0nBURI8LuqAV30",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
 						"url": {
-							"raw": "{{api_url}}/api/panit/profile",
+							"raw": "{{api_url}}/api/panit",
 							"host": [
 								"{{api_url}}"
 							],
 							"path": [
 								"api",
-								"panit",
-								"profile"
+								"panit"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get Specific",
+					"name": "Get All",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -483,41 +563,13 @@
 							"formdata": []
 						},
 						"url": {
-							"raw": "{{api_url}}/api/panit/data/69420",
+							"raw": "{{api_url}}/api/panit",
 							"host": [
 								"{{api_url}}"
 							],
 							"path": [
 								"api",
-								"panit",
-								"data",
-								"69420"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "formdata",
-							"formdata": []
-						},
-						"url": {
-							"raw": "{{api_url}}/api/panit/data",
-							"host": [
-								"{{api_url}}"
-							],
-							"path": [
-								"api",
-								"panit",
-								"data"
+								"panit"
 							]
 						}
 					},
@@ -527,26 +579,33 @@
 					"name": "Update Verify",
 					"request": {
 						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"isverified\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjIzNDU2LCJpYXQiOjE2ODgwMTQ3OTMsImV4cCI6MTY4ODEwMTE5M30.sGG7qxv2oSBzr_7dBmbEhRpI5F97Spku8fEkjQtLB4w",
+								"type": "text"
 							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "isverified",
+									"value": "0",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
-							"raw": "{{api_url}}/api/panit/verifyAcc/69420",
+							"raw": "{{api_url}}/api/panit/updateVerified/55702",
 							"host": [
 								"{{api_url}}"
 							],
 							"path": [
 								"api",
 								"panit",
-								"verifyAcc",
-								"69420"
+								"updateVerified",
+								"55702"
 							]
 						}
 					},
@@ -556,29 +615,45 @@
 					"name": "Update",
 					"request": {
 						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"nim\": 69524,\n    \"name\": \"Fathan\",\n    \"password\": \"12345678\",\n    \"email\": \"fathan@student.umn.ac.id\",\n    \"isverified\": 0,\n    \"divisiID\": \"D02\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjExMTExLCJpYXQiOjE2ODc5NjM3NDMsImV4cCI6MTY4ODA1MDE0M30.zQC_uyWMoZna2_-T7tKCQW6hBFfrI78iVoNmV6osCOk",
+								"type": "text"
 							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "mulyono",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mulyono.ml@student.umn.ac.id",
+									"type": "text"
+								},
+								{
+									"key": "divisiID",
+									"value": "D02",
+									"type": "text"
+								}
+							]
 						},
 						"url": {
-							"raw": "{{api_url}}/api/panit/data/69524",
+							"raw": "{{api_url}}/api/panit/update/11111",
 							"host": [
 								"{{api_url}}"
 							],
 							"path": [
 								"api",
 								"panit",
-								"data",
-								"69524"
+								"update",
+								"11111"
 							]
-						},
-						"description": "## Semua paratemer optional\n\njadi bisa cuma 1 pair aja, cuma gak empty"
+						}
 					},
 					"response": []
 				},
@@ -586,7 +661,13 @@
 					"name": "Delete",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjExMTExLCJpYXQiOjE2ODc5NjM3NDMsImV4cCI6MTY4ODA1MDE0M30.zQC_uyWMoZna2_-T7tKCQW6hBFfrI78iVoNmV6osCOk",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -598,39 +679,19 @@
 							]
 						},
 						"url": {
-							"raw": "{{api_url}}/api/panit/data/69420",
+							"raw": "{{api_url}}/api/panit/delete/11111",
 							"host": [
 								"{{api_url}}"
 							],
 							"path": [
 								"api",
 								"panit",
-								"data",
-								"69420"
+								"delete",
+								"11111"
 							]
 						}
 					},
 					"response": []
-				}
-			],
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							""
-						]
-					}
 				}
 			]
 		},
@@ -739,16 +800,6 @@
 			]
 		}
 	],
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaW0iOjExMTExLCJyb2xlIjoicGFuaXQiLCJpYXQiOjE2ODk0OTQyNzIsImV4cCI6MTY4OTU4MDY3Mn0.un-7W-9avqBOUWNWKqCIGe-6YQWNZlS7XPvu4mQj258",
-				"type": "string"
-			}
-		]
-	},
 	"event": [
 		{
 			"listen": "prerequest",

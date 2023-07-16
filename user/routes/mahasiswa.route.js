@@ -1,22 +1,28 @@
 const {
-    register, 
-    login, 
-    getAllStudent, 
-    getSpecificStudent, 
-    updateStudent, 
-    deleteStudent
+  register,
+  login,
+  getProfile,
+  getAllStudent,
+  getSpecificStudent,
+  updateStudent,
+  deleteStudent,
 } = require("../controller/mahasiswa.controller");
-const { verifyJWT, isPanitia } = require('../middleware/middleware');
+const {
+  verifyJWT,
+  isPanitia,
+  isMahasiswa,
+} = require("../middleware/middleware");
 
 //import midleware
 
-module.exports = (app) => { 
+module.exports = (app) => {
+  app.post("/api/mahasiswa/register", register); // API Client
+  app.post("/api/mahasiswa/login", login); // API Client
+  app.get("/api/mahasiswa/profile", verifyJWT, isMahasiswa, getProfile); // API Client
 
-    app.post('/api/mahasiswa/register', register);  // API Client
-    app.post('/api/mahasiswa/login', login); // API Client
-    //give ispanitia middleware
-    app.get('/api/mahasiswa', verifyJWT, isPanitia, getAllStudent); // API Internal
-    app.get('/api/mahasiswa/:nim', verifyJWT, isPanitia, getSpecificStudent); // API Internal
-    app.put('/api/mahasiswa/update/:nim', verifyJWT, isPanitia, updateStudent); // API Internal
-    app.delete('/api/mahasiswa/delete/:nim', verifyJWT, isPanitia, deleteStudent); // API Internal
-}
+  //give ispanitia middleware
+  app.get("/api/mahasiswa/data", verifyJWT, isPanitia, getAllStudent); // API Internal
+  app.get("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, getSpecificStudent); // API Internal
+  app.put("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, updateStudent); // API Internal
+  app.delete("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, deleteStudent); // API Internal
+};
