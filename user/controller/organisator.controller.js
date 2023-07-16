@@ -401,17 +401,16 @@ exports.getDelete = async (req, res) => {
       });
     }
 
-    const cekNIM = await OrganisatorDB.query()
+    const organisator = await OrganisatorDB.query()
       .where({ nim: validateNim.data })
-      .first();
-    if (!cekNIM) {
+      .delete();
+    if (!organisator) {
       return res.status(404).send({
         code: 404,
         message: `NIM : ${validateNim.data} tidak ditemukan!`,
       });
     }
 
-    await OrganisatorDB.query().delete().where({ nim: validateNim.data });
     return res.status(200).send({
       code: 200,
       message: "Data berhasil dihapus",
