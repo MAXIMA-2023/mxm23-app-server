@@ -272,7 +272,6 @@ const updateStudent = async (req, res) => {
     return res.status(200).send({
       code: 200,
       message: `Berhasil mengubah data mahasiswa dengan NIM : ${validateNim.data}`,
-      data: mahasiswa,
     });
   } catch (err) {
     return res.status(500).send({
