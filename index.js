@@ -23,6 +23,9 @@ require("./state/routes/state_registration.route")(app);
 // auth
 require("./user/routes/auth.route")(app);
 
+// toggle
+require("./toggle/routes/toggle.route")(app);
+
 app.get("/", (req, res) => {
   res.status(200).send("<h1>Welcome to MAXIMA 2023 API</h1>");
 });
