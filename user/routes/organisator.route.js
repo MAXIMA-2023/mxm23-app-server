@@ -47,4 +47,11 @@ module.exports = function (app) {
     middleware.isPanitia,
     organisatorController.getDelete
   );
+
+  app.get(
+    "/api/organisator/state/statistik/:stateID", 
+    middleware.verifyJWT, 
+    middleware.isOrganisator, 
+    organisatorController.getStatistic
+  );  
 };

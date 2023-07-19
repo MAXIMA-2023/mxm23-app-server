@@ -1,5 +1,7 @@
 const OrganisatorDB = require("../model/organisator.model");
 const StateDB = require("../../state/model/state_activities.model");
+const DayManagementDB = require('../../state/model/day_management.model');
+const { Model } = require('objection');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validateEmptyEntries } = require("../../helpers/FormValidator");
@@ -422,3 +424,49 @@ exports.getDelete = async (req, res) => {
     });
   }
 };
+
+
+exports.getStatistic = async (req, res) => {
+    const { decoded_nim } = req;
+    const { stateID = "" } = req.params;
+
+    try {
+
+      const state = await StateDB.query()    
+              .where({'state_activities.stateID' : stateID})
+              .where({'organisator.nim' : decoded_nim})
+              .join('organisator', function(){
+                  this.on(Model.raw('organisator.stateID'), '=', Model.raw('state_activities.stateID'))
+              }).first()
+
+      if (!state){
+        return res.status(404).send({
+          code: 404,
+          message: "State tidak ditemukan.",
+        });      
+      }      
+
+
+      const result = await DayManagementDB.query()
+            .select(Model.raw('DAY(day_management.date) as day'))
+            .count('state_registration.stateID as total')
+            .leftJoin('state_registration', function(){
+              this.on(Model.raw('DAY(day_management.date)'), '=', Model.raw('DAY(state_registration.created_at)'));
+            })
+            .groupBy(Model.raw('DAY(day_management.date)'));      
+
+      return res.status(200).send({
+          code: 200,
+          message: "Berhasil mendapatkan statistik state.",
+          data : result
+      });             
+
+    } catch (err) {
+      return res.status(500).send({
+        code: 500,
+        message: err.message,
+      });      
+    }
+    
+
+}

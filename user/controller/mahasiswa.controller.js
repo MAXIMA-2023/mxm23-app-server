@@ -1,11 +1,14 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const randomToken = require('random-token');
 const Mahasiswa = require("../model/mahasiswa.model");
 const {
   registerValidator,
   nimValidator,
 } = require("../validation/mahasiswa.validation");
 const { loginValidator } = require("../validation/auth.validation");
+const mail = require('../../config/mail');
+
 
 // API Client
 const register = async (req, res) => {
@@ -316,6 +319,21 @@ const deleteStudent = async (req, res) => {
     });
   }
 };
+
+
+
+
+// API Client 
+const sendPasswordRecoveryLink = async (req, res) => {
+  const { decoded_nim = "" } = req;
+
+  const token = randomToken(48);
+
+
+  
+
+
+}
 
 module.exports = {
   register,

@@ -248,3 +248,25 @@ INSERT INTO `technical_toggle` (`id`, `name`, `toggle`) VALUES
 (4, 'deleteState', 1),
 (5, 'stateRegistration', 1),
 (6, 'presensi', 1); 
+
+
+CREATE TABLE `mahasiswa_password_recovery_token` (
+  `nim` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` tinyint(1) NOT NULL,
+  FOREIGN KEY (`nim`) REFERENCES mahasiswa(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `panitia_password_recovery_token` (
+--   `nim` int(11) NOT NULL,
+--   `token` varchar(255) NOT NULL,
+--   `expires_at` tinyint(1) NOT NULL,
+--   FOREIGN KEY (`nim`) REFERENCES panitia(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `organisator_password_recovery_token` (
+--   `nim` int(11) NOT NULL,
+--   `token` varchar(255) NOT NULL,
+--   `expires_at` tinyint(1) NOT NULL,
+--   FOREIGN KEY (`nim`) REFERENCES organisator(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -38,6 +38,7 @@ const sActDB = require('../model/state_activities.model')
 const dayManDB = require('../model/day_management.model')
 const orgDB = require('../../user/model/organisator.model')
 const fs = require('fs')
+const { v4: uuid } = require('uuid');
 
 exports.readState = async(req, res) => {
     try {
@@ -173,6 +174,9 @@ exports.createState = async(req, res) => {
 
         //Simple Upload file
         const uploadedFile = req.files.test_file;
+        const parseExtension = uploadedFile.name.split('.');
+        const extension = parseExtension[parseExtension.length - 1];
+        uploadedFile.name = uuid() + '.' + extension;
         const uploadPathLogo = './uploadLogo/' + uploadedFile.name;
 
         //menentukan nama dari DB dan nama file
@@ -180,7 +184,7 @@ exports.createState = async(req, res) => {
             name, 
             day,
             quota,
-            stateDecs,
+            stateDesc,
             location
         } = req.body
 
@@ -223,20 +227,16 @@ exports.createState = async(req, res) => {
             name,
             day,
             stateLogo: uploadPathLogo,
-            stateDecs,
+            stateDesc,
             location,
             quota,
             registered : 0
         })
 
 
-        uploadedFile.mv(uploadPathLogo, async (err) => {
-            fs.unlink(uploadPathLogo, (err) => {
-                if (err) {
-                    return res.status(500).send({ message: err.messsage })
-                }        
-            })
-        })
+        const upload = await uploadedFile.mv(uploadPathLogo);  
+        return res.status(200).send({ message: 'STATE baru berhasil ditambahkan' })         
+
 
         // stateLogo.mv(uploadPathLogo, async (err) => {
         //     if (err)
@@ -249,8 +249,7 @@ exports.createState = async(req, res) => {
         //         }        
         //     })
         // })
-      
-        return res.status(200).send({ message: 'STATE baru berhasil ditambahkan' })
+ 
     }
     catch (err) {
         return res.status(500).send({ message: err.message })
