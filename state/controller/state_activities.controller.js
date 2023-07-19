@@ -34,6 +34,7 @@ NOTE untuk state_activities(edu):
 -   gw udh nyiapin data dummy di database state_activities klo mau testing.
 */
 
+const env = require('dotenv').config({path : '../../.env'})
 const sActDB = require('../model/state_activities.model')
 const dayManDB = require('../model/day_management.model')
 const orgDB = require('../../user/model/organisator.model')
@@ -226,13 +227,14 @@ exports.createState = async(req, res) => {
         await sActDB.query().insert({
             name,
             day,
-            stateLogo: uploadPathLogo,
+            stateLogo: process.env.APP_URL + uploadPathLogo.replace(new RegExp(`^${'./uploadLogo/'}+`), '/'),
             stateDesc,
             location,
             quota,
             registered : 0
         })
 
+        
 
         const upload = await uploadedFile.mv(uploadPathLogo);  
         return res.status(200).send({ message: 'STATE baru berhasil ditambahkan' })         
