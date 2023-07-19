@@ -6,6 +6,7 @@ const {
   getSpecificStudent,
   updateStudent,
   deleteStudent,
+  getStatistic
 } = require("../controller/mahasiswa.controller");
 const {
   verifyJWT,
@@ -25,4 +26,7 @@ module.exports = (app) => {
   app.get("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, getSpecificStudent); // API Internal
   app.put("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, updateStudent); // API Internal
   app.delete("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, deleteStudent); // API Internal
+
+  app.get('/api/mahasiswa/statistic', verifyJWT, isPanitia, getStatistic)
+
 };
