@@ -458,7 +458,10 @@ exports.getStatistic = async (req, res) => {
       return res.status(200).send({
           code: 200,
           message: "Berhasil mendapatkan statistik state.",
-          data : result
+          data : {
+              name : state.name, 
+              statistic : result
+          }
       });             
 
     } catch (err) {
