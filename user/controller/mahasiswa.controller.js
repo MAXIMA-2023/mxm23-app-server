@@ -1,16 +1,15 @@
-const env = require('dotenv').config({path : '../../.env'});
+const env = require("dotenv").config({ path: "../../.env" });
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const randomToken = require('random-token');
-const { Model } = require('objection');
+const randomToken = require("random-token");
+const { Model } = require("objection");
 const Mahasiswa = require("../model/mahasiswa.model");
 const {
   registerValidator,
   nimValidator,
 } = require("../validation/mahasiswa.validation");
 const { loginValidator } = require("../validation/auth.validation");
-const mail = require('../../config/mail');
-
+const mail = require("../../config/mail");
 
 // API Client
 const register = async (req, res) => {
@@ -42,8 +41,8 @@ const register = async (req, res) => {
     // Sukses
     await Mahasiswa.query().insert({
       ...validateBody.data,
-      token: `MXM23-${validateBody.data.nim}`,
-      created_at : new Date()
+      token: `MXM-${validateBody.data.nim}`,
+      created_at: new Date(),
     });
 
     return res.status(201).send({
@@ -322,40 +321,38 @@ const deleteStudent = async (req, res) => {
   }
 };
 
-
 const getStatistic = async (req, res) => {
-
   const rundown = {
-    maxTown : {
-      start : process.env.MAX_TOWN_START, 
-      end : process.env.MAX_TOWN_END, 
-    }, 
-    home : {
-      start : process.env.HOME_START, 
-      end : process.env.HOME_END
-    }
-  }
+    maxTown: {
+      start: process.env.MAX_TOWN_START,
+      end: process.env.MAX_TOWN_END,
+    },
+    home: {
+      start: process.env.HOME_START,
+      end: process.env.HOME_END,
+    },
+  };
 
   try {
     let rawStatistic = await Mahasiswa.query()
-        .select(
-          Model.raw('DATE(mahasiswa.created_at) AS date'),
-          Model.raw('COUNT(mahasiswa.created_at) AS registered')
-        )
-        .where(
-          Model.raw('mahasiswa.created_at >= ?', rundown.maxTown.start),
-          Model.raw('mahasiswa.created_at <= ?', rundown.maxTown.end)
-        )
-        .orWhere(
-          Model.raw('mahasiswa.created_at >= ?', rundown.home.start),
-          Model.raw('mahasiswa.created_at <= ?', rundown.home.end)
-        )
-        .groupByRaw('DATE(mahasiswa.created_at)')
-        .orderByRaw('DATE(mahasiswa.created_at)'); 
+      .select(
+        Model.raw("DATE(mahasiswa.created_at) AS date"),
+        Model.raw("COUNT(mahasiswa.created_at) AS registered")
+      )
+      .where(
+        Model.raw("mahasiswa.created_at >= ?", rundown.maxTown.start),
+        Model.raw("mahasiswa.created_at <= ?", rundown.maxTown.end)
+      )
+      .orWhere(
+        Model.raw("mahasiswa.created_at >= ?", rundown.home.start),
+        Model.raw("mahasiswa.created_at <= ?", rundown.home.end)
+      )
+      .groupByRaw("DATE(mahasiswa.created_at)")
+      .orderByRaw("DATE(mahasiswa.created_at)");
 
-    rawStatistic = rawStatistic.map(data => ({
-        ...data,
-        date : new Date(data.date).toLocaleDateString()
+    rawStatistic = rawStatistic.map((data) => ({
+      ...data,
+      date: new Date(data.date).toLocaleDateString(),
     }));
 
     // current as starting point
@@ -369,66 +366,63 @@ const getStatistic = async (req, res) => {
     const maxTownStatistic = [];
 
     let rawStatisticCounter = 0;
- 
-    while(current <= maxTownEnd){
-        if (current.toLocaleDateString() != rawStatistic[rawStatisticCounter].date){
-          maxTownStatistic.push({
-            date : current.toISOString(), 
-            registered : 0
-          });
-        } else {
-          maxTownStatistic.push({
-            date : current.toISOString(), 
-            registered : rawStatistic[rawStatisticCounter++].registered
-          });        
-        }
-        current.setDate(current.getDate() + 1);
+
+    while (current <= maxTownEnd) {
+      if (
+        current.toLocaleDateString() != rawStatistic[rawStatisticCounter].date
+      ) {
+        maxTownStatistic.push({
+          date: current.toISOString(),
+          registered: 0,
+        });
+      } else {
+        maxTownStatistic.push({
+          date: current.toISOString(),
+          registered: rawStatistic[rawStatisticCounter++].registered,
+        });
+      }
+      current.setDate(current.getDate() + 1);
     }
 
     current = homeStart;
 
-
-    while (current <= homeEnd){
-      if (current.toLocaleDateString() != rawStatistic[rawStatisticCounter]){
+    while (current <= homeEnd) {
+      if (current.toLocaleDateString() != rawStatistic[rawStatisticCounter]) {
         homeStatistic.push({
-          date : current.toISOString(), 
-          registered : 0
+          date: current.toISOString(),
+          registered: 0,
         });
       } else {
         homeStatistic.push({
-          date : current.toISOString(), 
-          registered : rawStatistic[rawStatisticCounter++].registered
+          date: current.toISOString(),
+          registered: rawStatistic[rawStatisticCounter++].registered,
         });
-      }     
+      }
       current.setDate(current.getDate() + 1);
     }
 
-
     return res.status(200).send({
-      code : 200, 
-      message : "Berhasil mendapatkan statistik registrasi mahasiswa.", 
-      data : {
-          maxTown : maxTownStatistic,
-          home : homeStatistic
-      }
+      code: 200,
+      message: "Berhasil mendapatkan statistik registrasi mahasiswa.",
+      data: {
+        maxTown: maxTownStatistic,
+        home: homeStatistic,
+      },
     });
-
-  } catch(err){
+  } catch (err) {
     return res.status(500).send({
       code: 500,
       message: err.message,
-    });    
+    });
   }
+};
 
- 
-}
-
-// API Client 
+// API Client
 const sendPasswordRecoveryLink = async (req, res) => {
   const { decoded_nim = "" } = req;
 
   const token = randomToken(48);
-}
+};
 
 module.exports = {
   register,
@@ -438,5 +432,5 @@ module.exports = {
   getSpecificStudent,
   updateStudent,
   deleteStudent,
-  getStatistic
+  getStatistic,
 };
