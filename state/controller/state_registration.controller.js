@@ -129,7 +129,7 @@ const readStateRegByStateID = async (req, res) => {
     cekSID = await stateDB.query().where({ stateID: stateID.data }).first();
     if (!cekSID) {
       return res.status(404).send({
-        message: "STATE ID " + stateID + " tidak ditemukan!",
+        message: `STATE ID : ${stateID.data} tidak ditemukan!`,
       });
     }
 
