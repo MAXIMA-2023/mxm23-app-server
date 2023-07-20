@@ -1,9 +1,14 @@
-const stateRegDB = require('../model/state_registration.model')
-const stateDB = require('../model/state_activities.model')
-const MhsDB = require('../../user/model/mahasiswa.model')
+const stateRegDB = require("../model/state_registration.model");
+const stateDB = require("../model/state_activities.model");
+const MhsDB = require("../../user/model/mahasiswa.model");
 const { validateEmptyEntries } = require("../../helpers/FormValidator");
-const { Model, ForeignKeyViolationError } = require('objection');
-const Mahasiswa = require('../../user/model/mahasiswa.model');
+const { Model, ForeignKeyViolationError } = require("objection");
+const Mahasiswa = require("../../user/model/mahasiswa.model");
+const {
+  nimValidator,
+  stateIDValidator,
+  dayValidator,
+} = require("../validation/state_registration.validation");
 
 /*
 NOTE untuk INTERNAL STATE: pendaftaran maba ke state (christo):
@@ -33,530 +38,587 @@ NOTE untuk INTERNAL STATE: pendaftaran maba ke state (christo):
     dan status absen (absen pertama, absen kedua). Yang berarti perlu join table state_activities, dan mahasiswa ke state_registration.
 
 */
-const readAllReg = async (req,res) =>{
-    try {
-        let result = await stateRegDB.query();
-      
-        result = await Promise.all(
-          result.map(async (item) => {
-            const nMhs = await MhsDB.query().select('name').where({ nim: item.nim }).first();
-            const nState = await stateDB.query().where({ stateID: item.stateID }).first();
-      
-            return {
-              ...item,
-              name: nMhs.name,
-              stateName: nState.name,
-              stateLogo: nState.stateLogo,
-            };
-          })
-        );
-      
-        return res.status(200).send(result);
-    } catch (err) {
-        return res.status(500).send({ message: err.message });
+const readAllReg = async (req, res) => {
+  try {
+    let result = await stateRegDB
+      .query()
+      .join("mahasiswa", "state_registration.nim", "=", "mahasiswa.nim")
+      .join(
+        "state_activities",
+        "state_registration.stateID",
+        "=",
+        "state_activities.stateID"
+      )
+      .select(
+        "state_registration.stateID",
+        "mahasiswa.nim",
+        "mahasiswa.token",
+        "mahasiswa.name",
+        "state_registration.created_at",
+        "state_registration.attendanceTime",
+        "state_registration.isFirstAttended",
+        "state_registration.isLastAttended",
+        "state_activities.name as stateName",
+        "state_activities.day"
+      );
+
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mendapatkan data pendaftaran STATE.",
+      data: result,
+    });
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};
+const readSpecificReg = async (req, res) => {
+  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
+  if (!validateNim.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateNim.error,
+    });
+  }
+
+  try {
+    let result = await stateRegDB
+      .query()
+      .where({ "state_registration.nim": validateNim.data })
+      .join("mahasiswa", "state_registration.nim", "=", "mahasiswa.nim")
+      .join(
+        "state_activities",
+        "state_registration.stateID",
+        "=",
+        "state_activities.stateID"
+      )
+      .select(
+        "state_registration.stateID",
+        "mahasiswa.nim",
+        "mahasiswa.token",
+        "mahasiswa.name",
+        "state_registration.created_at",
+        "state_registration.attendanceTime",
+        "state_registration.isFirstAttended",
+        "state_registration.isLastAttended",
+        "state_activities.name as stateName",
+        "state_activities.day"
+      );
+
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil mendapatkan data pendaftaran STATE untuk nim : ${validateNim.data}`,
+      data: result,
+    });
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};
+
+const readStateRegByStateID = async (req, res) => {
+  try {
+    const stateID = await stateIDValidator.safeParseAsync(req.params.stateID);
+    if (!stateID.success) {
+      return res.status(400).send({
+        code: 400,
+        message: "Validasi gagal.",
+        error: stateID.error,
+      });
     }
-}
-const readSpecificReg = async (req,res) =>{
-    const { nim } = req.params
 
-    if(nim === null || nim === ':nim'){
-        return res.status(200).send({
-            message: 'NIM kosong! Harap diisi terlebih dahulu'
-        })
+    cekSID = await stateDB.query().where({ stateID: stateID.data }).first();
+    if (!cekSID) {
+      return res.status(404).send({
+        message: "STATE ID " + stateID + " tidak ditemukan!",
+      });
     }
-    
-    try{
-        let result = await stateRegDB.query().where({ nim })
 
-        for(let i = 0; i < result.length; i++){
-            const nMhs = await MhsDB.query().select('name').where({ nim: result[i].nim })
-            const nState = await stateDB.query().where({ stateID: result[i].stateID })
+    result = await stateRegDB
+      .query()
+      .where({ "state_registration.stateID": stateID.data })
+      .join("mahasiswa", "state_registration.nim", "=", "mahasiswa.nim")
+      .join(
+        "state_activities",
+        "state_registration.stateID",
+        "=",
+        "state_activities.stateID"
+      )
+      .select(
+        "state_registration.stateID",
+        "mahasiswa.nim",
+        "mahasiswa.token",
+        "mahasiswa.name",
+        "state_registration.created_at",
+        "state_registration.attendanceTime",
+        "state_registration.isFirstAttended",
+        "state_registration.isLastAttended",
+        "state_activities.name as stateName",
+        "state_activities.stateLogo",
+        "state_activities.day"
+      );
 
-            result[i].name = nMhs[0].name
-            result[i].stateName = nState[0].name
-            result[i].stateLogo = nState[0].stateLogo
-        }
- 
-        return res.status(200).send(result)  
-    } 
-    catch(err) {
-        return res.status(500).send({ message: err.message })
-    }
-}
-const readStateRegByStateID = async (req,res) =>{
-    try{
-        const { stateID } = req.params
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil mendapatkan data pendaftaran STATE untuk stateID : ${stateID.data}`,
+      data: result,
+    });
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};
 
-        if(stateID === null || stateID === ':stateID'){
-            return res.status(200).send({
-                message: 'STATE ID kosong! Harap diisi terlebih dahulu'
-            })
-        }
+const readStateRegByDay = async (req, res) => {
+  const day = await dayValidator.safeParseAsync(req.params.day);
+  if (!day.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: day.error,
+    });
+  }
 
-        cekSID = await stateDB.query().where({ stateID })
-        if(cekSID.length === 0 || cekSID === []){
-            return res.status(200).send({
-                message: 'STATE ID ' + stateID + ' tidak ditemukan!'
-            })
-        }
+  try {
+    const result = await stateDB
+      .query()
+      .where({ "state_activities.day": day.data })
+      .join(
+        "state_registration",
+        "state_activities.stateID",
+        "=",
+        "state_registration.stateID"
+      )
+      .join("mahasiswa", "state_registration.nim", "=", "mahasiswa.nim")
+      .select(
+        "state_registration.stateID",
+        "mahasiswa.nim",
+        "mahasiswa.token",
+        "mahasiswa.name",
+        "state_registration.created_at",
+        "state_registration.attendanceTime",
+        "state_registration.isFirstAttended",
+        "state_registration.isLastAttended",
+        "state_activities.name as stateName",
+        "state_activities.stateLogo",
+        "state_activities.day"
+      );
 
-        cekRegList = await stateRegDB.query().where({ stateID })
-        if(cekRegList.length === 0 || cekRegList === []){
-            return res.status(200).send({
-                message: 'STATE ID ' + stateID + ' belum ada yang mendaftar'
-            })
-        }
-        const result = await stateRegDB.query().where({ stateID })
-        for(let i = 0; i < result.length; i++){
-            const nMhs = await MhsDB.query().select('name').where({ nim: result[i].nim })
-            const nState = await stateDB.query().where({ stateID: result[i].stateID })            
-        
-            result[i].name = nMhs[0].name
-            result[i].stateName = nState[0].name
-            result[i].stateLogo = nState[0].stateLogo
-        }
-
-        return res.status(200).send(result)
-    }
-    catch (err) {
-        return res.status(500).send({ message: err.message })
-    }
-}
-
-const readStateRegByDay = async (req,res) =>{
-    try{
-        const { day } = req.params
-
-        if(day === null || day === ':day'){
-            return res.status(200).send({
-                message: 'Day kosong! Harap diisi terlebih dahulu'
-            })
-        }
-
-        cekDay = await stateDB.query().where({ day })
-        
-        if(cekDay.length === 0 || cekDay === []){
-            return res.status(200).send({
-                message: 'Day ' + day + ' tidak ditemukan!'
-            })
-        }
-        const Sday = await stateDB.query().select('stateID').where({ day })
-
-        const result = await stateRegDB.query().where({ stateID:Sday[0].stateID })
-        // const result = await stateRegDB.query().where({ stateID })
-        for(let i = 0; i < result.length; i++){
-            const nMhs = await MhsDB.query().select('name').where({ nim: result[i].nim })
-            const nState = await stateDB.query().where({ stateID: result[i].stateID })                 
-
-            result[i].name = nMhs[0].name
-            result[i].stateName = nState[0].name
-            result[i].stateLogo = nState[0].stateLogo
-        }
-        
-        return res.status(200).send(result)
-    }
-    catch (err) {
-        return res.status(500).send({ message: err.message })
-    }
-}
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil mendapatkan data pendaftaran STATE untuk DAY : ${day.data}`,
+      data: result,
+    });
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};
 
 // gak kepake keknya
-const updateRegData = async(req,res)=>{
-    const { stateIDNew } = req.body
-    const {stateID,nim} = req.params
+const updateRegData = async (req, res) => {
+  const { stateIDNew } = req.body;
+  const { stateID, nim } = req.params;
 
-    try{   
-        const divisiID = req.divisiID
-        if(divisiID === "D05"){
-            return res.status(200).send({
-                message: 'Divisi anda tidak punya otoritas yang cukup!'
-            })
-        }
-        //nim kosong?
-        if(nim === null || nim === ':nim'){
-            return res.status(200).send({
-                message: 'NIM anda kosong! Harap diisi terlebih dahulu'
-            })
-        }
-
-        const emptyEntriesValidation = validateEmptyEntries(req.body);
-        if (emptyEntriesValidation.length > 0){
-            return res.status(400).send({
-                message : "Kolom input kosong.",
-                error : emptyEntriesValidation
-            });
-        }
-
-        const cekSTATE = await stateDB.query().where({ stateID:stateIDNew })
-        if(cekSTATE.length === 0 || cekSTATE === []){
-            return res.status(404).send({ 
-                message: 'STATE yang kamu input tidak terdaftar, dicek lagi ya!' 
-            }) 
-        }
-
-        const cekRegister = await stateRegDB.query().where({ nim, stateID }) 
-        if(cekRegister.length === 0 || cekRegister === []){
-            return res.status(403).send({ 
-                message: 'Kamu tidak mendaftar pada STATE ini!' 
-            })
-        }
-
-        const cekReg = await stateRegDB.query().select('stateID').where({ nim, stateID:stateIDNew }) 
-        if(cekReg.length != 0 && cekReg != []){
-            return res.status(403).send({ 
-                message: 'Kamu sudah mendaftar pada STATE ini!' 
-            })
-        }
-
-        await stateRegDB.query().where({stateID}).update({
-            stateID:stateIDNew
-        })
-
-        // const cekDivisi = req.stateID
-        return res.status(200).send({message:  'Data berhasil diupdate'})
-
+  try {
+    const divisiID = req.divisiID;
+    if (divisiID === "D05") {
+      return res.status(200).send({
+        message: "Divisi anda tidak punya otoritas yang cukup!",
+      });
     }
-    catch (err) {
-        return res.status(500).send({ message: 'Halo Maximers, maaf ada kesalahan dari internal '+err })
+    //nim kosong?
+    if (nim === null || nim === ":nim") {
+      return res.status(200).send({
+        message: "NIM anda kosong! Harap diisi terlebih dahulu",
+      });
     }
-}
- 
-const deleteRegData = async(req,res)=>{
-    const { nim } = req.params
-    const nim2 = req.decoded_nim
-    // const ip = address.ip()
 
-    try{      
-        const divisiID = req.divisiID
-        if(divisiID === "D05"){
-            return res.status(200).send({
-                message: 'Divisi anda tidak punya otoritas yang cukup!'
-            })
-        }
-
-        const { stateID } = req.params
-        if(nim === null || nim === ':nim'){
-            return res.status(404).send({
-                message: 'NIM anda kosong! Harap diisi terlebih dahulu'
-            })
-        }
-
-        if(stateID === null || stateID === ':stateID'){
-            return res.status(404).send({
-                message: 'STATE ID kosong! Harap diisi terlebih dahulu'
-            })
-        } 
-
-        if(nim2 != nim) {
-            return res.status(403).send({ 
-                message: 'Kamu tidak dapat menghapus Registered STATE milik akun lain!' 
-            })
-        }
-
-        const cekSTATE = await stateDB.query().where({ stateID })
-        if(cekSTATE.length === 0 || cekSTATE === []){
-            return res.status(404).send({ 
-                message: 'STATE yang kamu input tidak terdaftar, dicek lagi ya!' 
-            }) 
-        }
-
-        const cekRegister = await stateRegDB.query().where({ nim, stateID }) 
-        if(cekRegister.length === 0 || cekRegister === []){
-            return res.status(403).send({ 
-                message: 'Kamu belum mendaftar pada STATE ini!' 
-            })
-        }
-            
-        await stateRegDB.query().delete().where({ nim, stateID })
-        const dbActivities = await stateDB.query().where({ stateID })
-        
-        await stateDB.query()
-        .where('stateID', stateID)
-        .patch({
-            registered: dbActivities[0].registered - 1
-        })
-        
-        return res.status(200).send({ message: 'Registrasi STATE berhasil dihapus' })
+    const emptyEntriesValidation = validateEmptyEntries(req.body);
+    if (emptyEntriesValidation.length > 0) {
+      return res.status(400).send({
+        message: "Kolom input kosong.",
+        error: emptyEntriesValidation,
+      });
     }
-    catch (err) {
-        // logging.cancelStateLog('CancelState', nim, ip, err.message)
-        return res.status(500).send({ message: 'Halo Maximers, maaf ada kesalahan dari internal '+err })
+
+    const cekSTATE = await stateDB.query().where({ stateID: stateIDNew });
+    if (cekSTATE.length === 0 || cekSTATE === []) {
+      return res.status(404).send({
+        message: "STATE yang kamu input tidak terdaftar, dicek lagi ya!",
+      });
     }
-}
+
+    const cekRegister = await stateRegDB.query().where({ nim, stateID });
+    if (cekRegister.length === 0 || cekRegister === []) {
+      return res.status(403).send({
+        message: "Kamu tidak mendaftar pada STATE ini!",
+      });
+    }
+
+    const cekReg = await stateRegDB
+      .query()
+      .select("stateID")
+      .where({ nim, stateID: stateIDNew });
+    if (cekReg.length != 0 && cekReg != []) {
+      return res.status(403).send({
+        message: "Kamu sudah mendaftar pada STATE ini!",
+      });
+    }
+
+    await stateRegDB.query().where({ stateID }).update({
+      stateID: stateIDNew,
+    });
+
+    // const cekDivisi = req.stateID
+    return res.status(200).send({ message: "Data berhasil diupdate" });
+  } catch (err) {
+    return res.status(500).send({
+      message: "Halo Maximers, maaf ada kesalahan dari internal " + err,
+    });
+  }
+};
+
+const deleteRegData = async (req, res) => {
+  const { nim } = req.params;
+  const nim2 = req.decoded_nim;
+  // const ip = address.ip()
+
+  try {
+    const divisiID = req.divisiID;
+    if (divisiID === "D05") {
+      return res.status(200).send({
+        message: "Divisi anda tidak punya otoritas yang cukup!",
+      });
+    }
+
+    const { stateID } = req.params;
+    if (nim === null || nim === ":nim") {
+      return res.status(404).send({
+        message: "NIM anda kosong! Harap diisi terlebih dahulu",
+      });
+    }
+
+    if (stateID === null || stateID === ":stateID") {
+      return res.status(404).send({
+        message: "STATE ID kosong! Harap diisi terlebih dahulu",
+      });
+    }
+
+    if (nim2 != nim) {
+      return res.status(403).send({
+        message: "Kamu tidak dapat menghapus Registered STATE milik akun lain!",
+      });
+    }
+
+    const cekSTATE = await stateDB.query().where({ stateID });
+    if (cekSTATE.length === 0 || cekSTATE === []) {
+      return res.status(404).send({
+        message: "STATE yang kamu input tidak terdaftar, dicek lagi ya!",
+      });
+    }
+
+    const cekRegister = await stateRegDB.query().where({ nim, stateID });
+    if (cekRegister.length === 0 || cekRegister === []) {
+      return res.status(403).send({
+        message: "Kamu belum mendaftar pada STATE ini!",
+      });
+    }
+
+    await stateRegDB.query().delete().where({ nim, stateID });
+    const dbActivities = await stateDB.query().where({ stateID });
+
+    await stateDB
+      .query()
+      .where("stateID", stateID)
+      .patch({
+        registered: dbActivities[0].registered - 1,
+      });
+
+    return res
+      .status(200)
+      .send({ message: "Registrasi STATE berhasil dihapus" });
+  } catch (err) {
+    // logging.cancelStateLog('CancelState', nim, ip, err.message)
+    return res.status(500).send({
+      message: "Halo Maximers, maaf ada kesalahan dari internal " + err,
+    });
+  }
+};
 
 const handleRegistration = async (req, res) => {
-    const {nim, stateID} = req.body;
-    const body = {nim, stateID};
+  const { nim, stateID } = req.body;
+  const body = { nim, stateID };
 
-    // Cek input kosong
-    const emptyEntriesValidation = validateEmptyEntries(body); 
-    if (emptyEntriesValidation.length > 0){
-        return res.status(400).send({
-            code : 400, 
-            message : "Kolom input kosong.",
-            error : emptyEntriesValidation
-        });
-    } 
+  // Cek input kosong
+  const emptyEntriesValidation = validateEmptyEntries(body);
+  if (emptyEntriesValidation.length > 0) {
+    return res.status(400).send({
+      code: 400,
+      message: "Kolom input kosong.",
+      error: emptyEntriesValidation,
+    });
+  }
 
-    const transaction = await Model.startTransaction();    
+  const transaction = await Model.startTransaction();
 
-    try {
-        // Cek total pendaftaran 
-        const registeredState = await stateRegDB.query().where({nim}).withGraphFetched('state_activities');
-        if (registeredState.length >= 3){
-            return res.status(403).send({
-                code : 403,
-                error : "REGISTRATION_LIMIT_EXCEEDED",
-                message : "Anda tidak diperbolehkan mendaftar pada lebih dari 3 state."
-            })            
-        }
-
-        // Cek keberadaan stateID 
-        const state = await stateDB.query().where({stateID}).first();
-        if (!state){
-            return res.status(404).send({
-                code : 404,
-                message : "State tidak terdaftar."
-            })            
-        }
-
-        // Cek apakah sudah pernah mendaftar di state yang sama
-        const duplicateRegistration = registeredState.filter(data => data.stateID == stateID).length;
-        if (duplicateRegistration){
-            return res.status(403).send({
-                code : 403,
-                error : "DUPLICATE_REGISTRATION",
-                message : "Anda telah terdaftar."
-            })             
-        }
-
-        // Cek apakah peserta mendaftar lebih dari 1 state pada 1 hari yang sama
-        const checkSameDayRegistration = [];
-
-        for (let data of registeredState){
-            checkSameDayRegistration.push(data.state_activities.day);             
-            if (checkSameDayRegistration.includes(state.day)) {
-                return res.status(403).send({
-                    code : 403,
-                    error : "SAME_DAY_REGISTRATION",
-                    message : "Anda tidak diperbolehkan mendaftar lebih dari 1 state pada 1 hari yang sama."
-                });
-            }
-           
-        }
-
-        // Cek apakah kuota state penuh
-        if (state.registered >= state.quota){
-            return res.status(403).send({
-                code : 403, 
-                error : "INSUFFICIENT_QUOTA", 
-                message : "Kuota untuk state ini sudah penuh."
-            })
-        }
-
-        // Masukkin record ke database
-        const insert = await stateRegDB.query().insert({
-            stateID, 
-            nim, 
-            attendanceTime : null, 
-            isFirstAttended : false, 
-            isLastAttended : false, 
-            created_at : new Date()
-        }); 
-        if (!insert) throw new Error(); 
-
-        // Update registered quota        
-        const updateQuota = await stateDB.query().where({stateID}).update({
-            registered : state.registered + 1
-        });
-        if (!updateQuota) throw new Error();
-
-        await transaction.commit();
-    
-        return res.status(201).send({
-            code : 201, 
-            message : "Pendaftaran STATE berhasil."
-        })     
-
-    } catch (err){
-        await transaction.rollback();
-        
-        if (err instanceof ForeignKeyViolationError){
-            return res.status(400).send({
-                code : 400, 
-                error : "INVALID_PARTICIPANT_ID",
-                message : "Mahasiswa tidak terdaftar."
-            });
-        }
-
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });        
+  try {
+    // Cek total pendaftaran
+    const registeredState = await stateRegDB
+      .query()
+      .where({ nim })
+      .withGraphFetched("state_activities");
+    if (registeredState.length >= 3) {
+      return res.status(403).send({
+        code: 403,
+        error: "REGISTRATION_LIMIT_EXCEEDED",
+        message: "Anda tidak diperbolehkan mendaftar pada lebih dari 3 state.",
+      });
     }
+
+    // Cek keberadaan stateID
+    const state = await stateDB.query().where({ stateID }).first();
+    if (!state) {
+      return res.status(404).send({
+        code: 404,
+        message: "State tidak terdaftar.",
+      });
+    }
+
+    // Cek apakah sudah pernah mendaftar di state yang sama
+    const duplicateRegistration = registeredState.filter(
+      (data) => data.stateID == stateID
+    ).length;
+    if (duplicateRegistration) {
+      return res.status(403).send({
+        code: 403,
+        error: "DUPLICATE_REGISTRATION",
+        message: "Anda telah terdaftar.",
+      });
+    }
+
+    // Cek apakah peserta mendaftar lebih dari 1 state pada 1 hari yang sama
+    const checkSameDayRegistration = [];
+
+    for (let data of registeredState) {
+      checkSameDayRegistration.push(data.state_activities.day);
+      if (checkSameDayRegistration.includes(state.day)) {
+        return res.status(403).send({
+          code: 403,
+          error: "SAME_DAY_REGISTRATION",
+          message:
+            "Anda tidak diperbolehkan mendaftar lebih dari 1 state pada 1 hari yang sama.",
+        });
+      }
+    }
+
+    // Cek apakah kuota state penuh
+    if (state.registered >= state.quota) {
+      return res.status(403).send({
+        code: 403,
+        error: "INSUFFICIENT_QUOTA",
+        message: "Kuota untuk state ini sudah penuh.",
+      });
+    }
+
+    // Masukkin record ke database
+    const insert = await stateRegDB.query().insert({
+      stateID,
+      nim,
+      attendanceTime: null,
+      isFirstAttended: false,
+      isLastAttended: false,
+      created_at: new Date(),
+    });
+    if (!insert) throw new Error();
+
+    // Update registered quota
+    const updateQuota = await stateDB
+      .query()
+      .where({ stateID })
+      .update({
+        registered: state.registered + 1,
+      });
+    if (!updateQuota) throw new Error();
+
+    await transaction.commit();
+
+    return res.status(201).send({
+      code: 201,
+      message: "Pendaftaran STATE berhasil.",
+    });
+  } catch (err) {
+    await transaction.rollback();
+
+    if (err instanceof ForeignKeyViolationError) {
+      return res.status(400).send({
+        code: 400,
+        error: "INVALID_PARTICIPANT_ID",
+        message: "Mahasiswa tidak terdaftar.",
+      });
+    }
+
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
 };
 
 const cancelRegistration = async (req, res) => {
-    const { stateID = "" }  = req.params;
-    const nim = req.decoded_nim || "";
+  const { stateID = "" } = req.params;
+  const nim = req.decoded_nim || "";
 
-    try {
+  try {
+    const deleteRegistrationData = await stateRegDB
+      .query()
+      .where({
+        nim,
+        stateID,
+      })
+      .delete();
 
-        const deleteRegistrationData = await stateRegDB.query().where({
-            nim, 
-            stateID
-        }).delete();
-
-        if (!deleteRegistrationData){
-            return res.status(404).send({
-                code : 404, 
-                message : 'Data pendaftaran tidak ditemukan.'
-            });            
-        }
-
-        return res.status(200).send({
-            code : 200, 
-            message : "Berhasil menghapus data pendaftaran STATE."
-        })            
-
-    } catch (err) {
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });         
+    if (!deleteRegistrationData) {
+      return res.status(404).send({
+        code: 404,
+        message: "Data pendaftaran tidak ditemukan.",
+      });
     }
-}
+
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil menghapus data pendaftaran STATE.",
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
 const handleFirstAttendance = async (req, res) => {
+  const { token = "", stateID = "" } = req.body;
 
-    const { token = "", stateID = "" } = req.body; 
+  try {
+    const participant = await Mahasiswa.query().where({ token }).first();
 
-
-    try {
-
-        const participant = await Mahasiswa.query().where({token}).first();
-
-        if (!participant){
-            return res.status(404).send({
-                code : 404, 
-                message : "Token tidak valid."
-            })
-        }
-
-        const nim = participant.nim;
-
-        const registration = await stateRegDB.query()
-            .where({stateID, nim})
-            .first()
-    
-        if (!registration){
-            return res.status(404).send({
-                code : 404,
-                message : "Tidak terdaftar pada state ini."
-            })               
-        }    
-
-        if (registration.isFirstAttended){
-            return res.status(409).send({
-                code : 409,
-                message : "Peserta sudah melalui proses absen sebelumnya."
-            })              
-        }        
-
-        const markAttendance = await stateRegDB.query()
-                    .where({stateID, nim})
-                    .update({attendanceTime : new Date(), isFirstAttended : true})
-
-
-        if (!markAttendance) {
-            return res.status(404).send({
-                code : 404,
-                message : "Tidak terdaftar pada state ini."
-            })
-        }        
-
-
-        return res.status(200).send({
-            code : 200, 
-            message : "Berhasil melakukan absensi."
-        })  
-
-    } catch (err) {
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });           
+    if (!participant) {
+      return res.status(404).send({
+        code: 404,
+        message: "Token tidak valid.",
+      });
     }
-}
+
+    const nim = participant.nim;
+
+    const registration = await stateRegDB
+      .query()
+      .where({ stateID, nim })
+      .first();
+
+    if (!registration) {
+      return res.status(404).send({
+        code: 404,
+        message: "Tidak terdaftar pada state ini.",
+      });
+    }
+
+    if (registration.isFirstAttended) {
+      return res.status(409).send({
+        code: 409,
+        message: "Peserta sudah melalui proses absen sebelumnya.",
+      });
+    }
+
+    const markAttendance = await stateRegDB
+      .query()
+      .where({ stateID, nim })
+      .update({ attendanceTime: new Date(), isFirstAttended: true });
+
+    if (!markAttendance) {
+      return res.status(404).send({
+        code: 404,
+        message: "Tidak terdaftar pada state ini.",
+      });
+    }
+
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil melakukan absensi.",
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
 const handleLastAttendance = async (req, res) => {
-    const { token = "", stateID = "" } = req.body; 
-    // const nim = req.decoded_nim;  
-    
+  const { token = "", stateID = "" } = req.body;
+  // const nim = req.decoded_nim;
 
-    try {
+  try {
+    const participant = await Mahasiswa.query().where({ token }).first();
 
-        const participant = await Mahasiswa.query().where({token}).first();
+    if (!participant) {
+      return res.status(404).send({
+        code: 404,
+        message: "Token tidak valid.",
+      });
+    }
 
-        if (!participant){
-            return res.status(404).send({
-                code : 404, 
-                message : "Token tidak valid."
-            })
-        }
+    const nim = participant.nim;
 
-        const nim = participant.nim;        
+    const registration = await stateRegDB
+      .query()
+      .where({ stateID, nim })
+      .first();
 
-        const registration = await stateRegDB.query()
-            .where({stateID, nim})
-            .first()
-        
-        if (!registration){
-            return res.status(404).send({
-                code : 404,
-                message : "Tidak terdaftar pada state ini."
-            })               
-        }
+    if (!registration) {
+      return res.status(404).send({
+        code: 404,
+        message: "Tidak terdaftar pada state ini.",
+      });
+    }
 
-        if (!registration.isFirstAttended){
-            return res.status(403).send({
-                code : 403,
-                type : "ABSENCE",
-                message : "Peserta tidak melalui presensi tahap pertama."
-            })              
-        }
+    if (!registration.isFirstAttended) {
+      return res.status(403).send({
+        code: 403,
+        type: "ABSENCE",
+        message: "Peserta tidak melalui presensi tahap pertama.",
+      });
+    }
 
-        if (registration.isLastAttended){
-            return res.status(403).send({
-                code : 403,
-                type : "DOUBLE_PRESENCE",
-                message : "Peserta sudah melalui presensi tahap kedua."
-            })              
-        }
+    if (registration.isLastAttended) {
+      return res.status(403).send({
+        code: 403,
+        type: "DOUBLE_PRESENCE",
+        message: "Peserta sudah melalui presensi tahap kedua.",
+      });
+    }
 
-        const markAttendance = await stateRegDB.query()
-            .where({stateID, nim})
-            .update({isLastAttended : true})
+    const markAttendance = await stateRegDB
+      .query()
+      .where({ stateID, nim })
+      .update({ isLastAttended: true });
 
-        if (!markAttendance) {
-            return res.status(404).send({
-                code : 404,
-                message : "Tidak terdaftar pada state ini."
-            })
-        }
+    if (!markAttendance) {
+      return res.status(404).send({
+        code: 404,
+        message: "Tidak terdaftar pada state ini.",
+      });
+    }
 
-        return res.status(200).send({
-            code : 200, 
-            message : "Berhasil melakukan absensi."
-        })  
-
-    } catch (err) {
-        return res.status(500).send({
-            code : 500, 
-            message : err.message
-        });           
-    }    
-}
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil melakukan absensi.",
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
 /*
 NOTE untuk maba regis STATE (farel):
@@ -605,14 +667,15 @@ NOTE untuk maba absen STATE:
 
 */
 
-module.exports = { 
-    readAllReg,
-    readSpecificReg, 
-    readStateRegByStateID, 
-    readStateRegByDay,
-    updateRegData,
-    deleteRegData,
-    handleRegistration, 
-    cancelRegistration, 
-    handleFirstAttendance, 
-    handleLastAttendance }
+module.exports = {
+  readAllReg,
+  readSpecificReg,
+  readStateRegByStateID,
+  readStateRegByDay,
+  updateRegData,
+  deleteRegData,
+  handleRegistration,
+  cancelRegistration,
+  handleFirstAttendance,
+  handleLastAttendance,
+};
