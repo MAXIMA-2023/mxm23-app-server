@@ -3,10 +3,12 @@ const {
   login,
   getProfile,
   getAllStudent,
+  getAllStudentWithState,
+  getSpecificStudentWithStateByNim,
   getSpecificStudent,
   updateStudent,
   deleteStudent,
-  getStatistic
+  getStatistic,
 } = require("../controller/mahasiswa.controller");
 const {
   verifyJWT,
@@ -23,10 +25,25 @@ module.exports = (app) => {
 
   //give ispanitia middleware
   app.get("/api/mahasiswa/data", verifyJWT, isPanitia, getAllStudent); // API Internal
+
+  // API Internal
   app.get("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, getSpecificStudent); // API Internal
   app.put("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, updateStudent); // API Internal
   app.delete("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, deleteStudent); // API Internal
 
-  app.get('/api/mahasiswa/statistic', verifyJWT, isPanitia, getStatistic)
+  app.get("/api/mahasiswa/statistic", verifyJWT, isPanitia, getStatistic);
 
+  // with added state
+  app.get(
+    "/api/mahasiswa/dataWithState",
+    verifyJWT,
+    isPanitia,
+    getAllStudentWithState
+  );
+  app.get(
+    "/api/mahasiswa/dataWithState/:nim",
+    verifyJWT,
+    isPanitia,
+    getSpecificStudentWithStateByNim
+  );
 };

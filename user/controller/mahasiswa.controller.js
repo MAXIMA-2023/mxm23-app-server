@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const randomToken = require("random-token");
 const { Model } = require("objection");
 const Mahasiswa = require("../model/mahasiswa.model");
+const stateRegDB = require("../../state/model/state_registration.model");
+
 const {
   registerValidator,
   nimValidator,
@@ -171,6 +173,128 @@ const getAllStudent = async (req, res) => {
       code: 200,
       message: "Berhasil mengambil seluruh data mahasiswa.",
       data: daftarMahasiswa,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
+
+const getAllStudentWithState = async (req, res) => {
+  try {
+    const daftarMahasiswa = await Mahasiswa.query().select(
+      "nim",
+      "name",
+      "email",
+      "whatsapp",
+      "angkatan",
+      "idLine",
+      "prodi",
+      "token"
+    );
+
+    const daftarState = await stateRegDB
+      .query()
+      .join(
+        "state_activities",
+        "state_activities.stateID",
+        "=",
+        "state_registration.stateID"
+      )
+      .orderBy("state_activities.day")
+      .select(
+        "state_registration.stateID",
+        "state_activities.name as stateName",
+        "state_registration.nim",
+        "state_activities.day",
+        "state_registration.attendanceTime",
+        "state_registration.isFirstAttended",
+        "state_registration.isLastAttended"
+      );
+
+    const data = daftarMahasiswa.map((mahasiswa) => {
+      const state = daftarState.filter((state) => state.nim === mahasiswa.nim);
+      return {
+        ...mahasiswa,
+        state,
+      };
+    });
+
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mengambil seluruh data mahasiswa.",
+      data,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
+
+const getSpecificStudentWithStateByNim = async (req, res) => {
+  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
+
+  if (!validateNim.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateNim.error,
+    });
+  }
+
+  try {
+    const dataMahasiswa = await Mahasiswa.query()
+      .where({ nim: validateNim.data })
+      .select(
+        "nim",
+        "name",
+        "email",
+        "whatsapp",
+        "angkatan",
+        "idLine",
+        "prodi",
+        "token"
+      )
+      .first();
+
+    if (!dataMahasiswa) {
+      return res.status(404).send({
+        code: 404,
+        message: `Mahasiswa dengan NIM : ${validateNim.data} tidak ditemukan.`,
+      });
+    }
+
+    const state = await stateRegDB
+      .query()
+      .where({ nim: validateNim.data })
+      .join(
+        "state_activities",
+        "state_activities.stateID",
+        "=",
+        "state_registration.stateID"
+      )
+      .orderBy("state_activities.day")
+      .select(
+        "state_registration.stateID",
+        "state_activities.name as stateName",
+        "state_registration.nim",
+        "state_activities.day",
+        "state_registration.attendanceTime",
+        "state_registration.isFirstAttended",
+        "state_registration.isLastAttended"
+      );
+
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mengambil seluruh data mahasiswa.",
+      data: {
+        ...dataMahasiswa,
+        state,
+      },
     });
   } catch (err) {
     return res.status(500).send({
@@ -429,6 +553,8 @@ module.exports = {
   login,
   getProfile,
   getAllStudent,
+  getAllStudentWithState,
+  getSpecificStudentWithStateByNim,
   getSpecificStudent,
   updateStudent,
   deleteStudent,
