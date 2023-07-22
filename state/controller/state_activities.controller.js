@@ -176,11 +176,30 @@ exports.createState = async (req, res) => {
     // }
 
     //Simple Upload file
-    const uploadedFile = req.files.test_file;
+    let uploadedFile = req.files?.test_file;
+
+    if (!uploadedFile) {
+      return res.status(400).send({
+        code: 400,
+        type : "LOGO_NOT_FOUND",
+        message: "Anda belum memasukkan logo STATE.",
+      });      
+    }
+
     const parseExtension = uploadedFile.name.split(".");
     const extension = parseExtension[parseExtension.length - 1];
+
+    if (!['jpg', 'png', 'jpeg', 'gif'].includes(extension)){
+      return res.status(400).send({
+        code: 400,
+        type : "INVALID_EXTENSION",
+        message: "Format logo tidak valid (harus .jpg, .jpeg, .png, atau .gif).",
+      });  
+    }
+
     uploadedFile.name = uuid() + "." + extension;
     const uploadPathLogo = "./uploadLogo/" + uploadedFile.name;
+   
 
     //menentukan nama dari DB dan nama file
     const { name, day, quota, stateDesc, location } = req.body;
@@ -236,7 +255,9 @@ exports.createState = async (req, res) => {
       if (err) {
         return res.status(500).send({ message: err.messsage });
       }
-    });
+    });      
+
+
     return res.status(200).send({ message: "STATE baru berhasil ditambahkan" });
 
     // stateLogo.mv(uploadPathLogo, async (err) => {
@@ -260,12 +281,7 @@ exports.updateState = async (req, res) => {
     const { stateID } = req.params;
 
     // fix file upload
-    const uploadedFile = req.files.test_file;
-    console.log(uploadedFile);
-    const parseExtension = uploadedFile.name.split(".");
-    const extension = parseExtension[parseExtension.length - 1];
-    uploadedFile.name = uuid() + "." + extension;
-    const uploadPathLogo = "./uploadLogo/" + uploadedFile.name;
+    const uploadedFile = req.files?.test_file;
 
     if (stateID === null || stateID === ":stateID") {
       return res.status(404).send({
@@ -281,6 +297,8 @@ exports.updateState = async (req, res) => {
         message: "STATE ID " + stateID + " tidak ditemukan",
       });
     }
+
+
 
     const cekDay = await dayManDB.query().where({ day });
     if (cekDay.length === 0 || cekDay === []) {
@@ -340,7 +358,32 @@ exports.updateState = async (req, res) => {
     //     return res.status(200).send({ message: 'STATE berhasil diupdate' })
     // }
 
-    await sActDB
+
+    if (uploadedFile){
+      // artinya user upload logo baru , dan apus yg lama
+      // delete old logo
+
+
+      const oldPhoto = cekSTATE[0].stateLogo;
+      const relativePhotoUrl = 'uploadLogo/' + oldPhoto.replace(process.env.APP_URL, '');
+    
+      // upload new logo
+      const parseExtension = uploadedFile.name.split(".");
+      const extension = parseExtension[parseExtension.length - 1];
+
+      if (!['jpg', 'png', 'jpeg', 'gif'].includes(extension)){
+        return res.status(400).send({
+          code: 400,
+          type : "INVALID_EXTENSION",
+          message: "Format logo tidak valid (harus .jpg, .jpeg, .png, atau .gif).",
+        });  
+      }
+
+      uploadedFile.name = uuid() + "." + extension;
+      const uploadPathLogo = "./uploadLogo/" + uploadedFile.name;
+      
+
+      await sActDB
       .query()
       .update({
         name,
@@ -352,14 +395,34 @@ exports.updateState = async (req, res) => {
         stateDecs,
         location,
       })
-      .where({ stateID });
+      .where({ stateID });    
 
-    uploadedFile.mv(uploadPathLogo, async (err) => {
-      if (err) {
-        return res.status(500).send({ message: err.messsage });
-      }
-    });
+      fs.unlink(relativePhotoUrl, err => {
+        if (err) throw new Error(err.message)
+    })        
 
+      uploadedFile.mv(uploadPathLogo, async (err) => {
+        if (err) {
+          return res.status(500).send({ message: err.messsage });
+        }
+      });
+
+    } else {
+      // user ga upload logo baru, artinya stay logo lama 
+      // (ga ngehapus yang sebelumnya)
+      await sActDB
+      .query()
+      .update({
+        name,
+        day,
+        quota,
+        stateDecs,
+        location,
+      })
+      .where({ stateID });       
+    }
+
+    
     return res.status(200).send({ message: "STATE berhasil diupdate" });
   } catch (err) {
     return res.status(500).send({ message: err.message });
@@ -382,6 +445,13 @@ exports.deleteState = async (req, res) => {
         message: "STATE ID " + stateID + " tidak ditemukan",
       });
     }
+
+    const oldPhoto = cekSTATE[0].stateLogo;
+    const relativePhotoUrl = 'uploadLogo/' + oldPhoto.replace(process.env.APP_URL, '');
+  
+    fs.unlink(relativePhotoUrl, err => {
+        if (err) throw new Error(err.message)
+    })          
 
     await sActDB.query().delete().where({ stateID });
     return res.status(200).send({ message: "STATE berhasil dihapus" });
