@@ -9,6 +9,8 @@ const {
   updateStudent,
   deleteStudent,
   getStatistic,
+  sendPasswordRecoveryLink,
+  exchangePasswordRecoveryToken
 } = require("../controller/mahasiswa.controller");
 const {
   verifyJWT,
@@ -22,6 +24,19 @@ module.exports = (app) => {
   app.post("/api/mahasiswa/register", register); // API Client
   app.post("/api/mahasiswa/login", login); // API Client
   app.get("/api/mahasiswa/profile", verifyJWT, isMahasiswa, getProfile); // API Client
+  app.post(
+    "/api/mahasiswa/forgot-password", 
+    verifyJWT,
+    isMahasiswa, 
+    sendPasswordRecoveryLink
+  );
+  app.post(
+    "/api/mahasiswa/forgot-password/validate-token", 
+    verifyJWT,
+    isMahasiswa, 
+    exchangePasswordRecoveryToken
+  );
+
 
   //give ispanitia middleware
   app.get("/api/mahasiswa/data", verifyJWT, isPanitia, getAllStudent); // API Internal
@@ -46,4 +61,6 @@ module.exports = (app) => {
     isPanitia,
     getSpecificStudentWithStateByNim
   );
+
+
 };

@@ -253,7 +253,7 @@ INSERT INTO `technical_toggle` (`id`, `name`, `toggle`) VALUES
 CREATE TABLE `mahasiswa_password_recovery_token` (
   `nim` int(11) NOT NULL,
   `token` varchar(255) NOT NULL,
-  `expires_at` tinyint(1) NOT NULL,
+  `expires_at` DATETIME NOT NULL,
   FOREIGN KEY (`nim`) REFERENCES mahasiswa(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
