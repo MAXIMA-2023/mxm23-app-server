@@ -449,9 +449,9 @@ exports.deleteState = async (req, res) => {
     const oldPhoto = cekSTATE[0].stateLogo;
     const relativePhotoUrl = 'uploadLogo/' + oldPhoto.replace(process.env.APP_URL, '');
   
-    fs.unlink(relativePhotoUrl, err => {
-        if (err) throw new Error(err.message)
-    })          
+    // fs.unlink(relativePhotoUrl, err => {
+    //   if (err) throw new Error(err.message)
+    // })          
 
     await sActDB.query().delete().where({ stateID });
     return res.status(200).send({ message: "STATE berhasil dihapus" });
