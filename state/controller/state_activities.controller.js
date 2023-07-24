@@ -79,18 +79,15 @@ exports.readPublicState = async (req, res) => {
 
 exports.readAllState = async (req, res) => {
   try {
-    const result = await sActDB.query();
-    for (let i = 0; i < result.length; i++) {
-      const dateTime = await dayManDB
-        .query()
-        .select("date")
-        .where({ day: result[i].day });
+    const queryResult = await sActDB
+      .query()
+      .innerJoin('day_management', 'state_activities.day', 'day_management.day')
+      .select('state_activities.*', 'day_management.date');
 
-      let date = new Date(dateTime[0].date).toUTCString();
-      date = date.split(" ").slice(0, 4).join(" ");
-
-      result[i].date = date;
-    }
+    const result = queryResult.map(data => {
+      const date = new Date(data.date).toUTCString();      
+      return {...data, date : date.split(' ').slice(0, 4).join(' ')}
+    });
 
     return res.status(200).send(result);
   } catch (err) {
