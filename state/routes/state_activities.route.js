@@ -20,7 +20,7 @@ module.exports = app => {
 
     app.get(
         '/api/stateAct',
-        user_middleware.verifyJWT, state_middleware.isOrganisatorAndPanitia,
+        // user_middleware.verifyJWT, state_middleware.isOrganisatorAndPanitia,
         sActController.readAllState
     )
 

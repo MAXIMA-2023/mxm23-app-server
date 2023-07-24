@@ -79,15 +79,15 @@ exports.readPublicState = async (req, res) => {
 
 exports.readAllState = async (req, res) => {
   try {
-    const queryResult = await sActDB
+    const result = await sActDB
       .query()
       .innerJoin('day_management', 'state_activities.day', 'day_management.day')
       .select('state_activities.*', 'day_management.date');
 
-    const result = queryResult.map(data => {
-      const date = new Date(data.date).toUTCString();      
-      return {...data, date : date.split(' ').slice(0, 4).join(' ')}
-    });
+    // const result = queryResult.map(data => {
+    //   const date = new Date(data.date).toUTCString();      
+    //   return {...data, date : date.split(' ').slice(0, 4).join(' ')}
+    // });
 
     return res.status(200).send(result);
   } catch (err) {
