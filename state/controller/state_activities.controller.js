@@ -286,7 +286,7 @@ exports.updateState = async (req, res) => {
       });
     }
 
-    const { name, day, quota, stateDecs, location } = req.body;
+    const { name, day, quota, stateDesc, location } = req.body;
 
     const cekSTATE = await sActDB.query().where({ stateID });
     if (cekSTATE.length === 0 || cekSTATE === []) {
@@ -389,7 +389,7 @@ exports.updateState = async (req, res) => {
         stateLogo:
           process.env.APP_URL +
           uploadPathLogo.replace(new RegExp(`^${"./uploadLogo/"}+`), "/"),
-        stateDecs,
+        stateDesc,
         location,
       })
       .where({ stateID });    
@@ -413,7 +413,7 @@ exports.updateState = async (req, res) => {
         name,
         day,
         quota,
-        stateDecs,
+        stateDesc,
         location,
       })
       .where({ stateID });       
@@ -446,9 +446,9 @@ exports.deleteState = async (req, res) => {
     const oldPhoto = cekSTATE[0].stateLogo;
     const relativePhotoUrl = 'uploadLogo/' + oldPhoto.replace(process.env.APP_URL, '');
   
-    fs.unlink(relativePhotoUrl, err => {
-        if (err) throw new Error(err.message)
-    })          
+    // fs.unlink(relativePhotoUrl, err => {
+    //   if (err) throw new Error(err.message)
+    // })          
 
     await sActDB.query().delete().where({ stateID });
     return res.status(200).send({ message: "STATE berhasil dihapus" });
