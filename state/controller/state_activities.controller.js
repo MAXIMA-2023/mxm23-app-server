@@ -64,12 +64,12 @@ exports.readPublicState = async (req, res) => {
       )
       .join("day_management", "day_management.day", "state_activities.day");
 
-    for (let i = 0; i < result.length; i++) {
-      let date = new Date(result[i].date).toUTCString();
-      date = date.split(" ").slice(0, 4).join(" ");
+    // for (let i = 0; i < result.length; i++) {
+    //   let date = new Date(result[i].date).toUTCString();
+    //   date = date.split(" ").slice(0, 4).join(" ");
 
-      result[i].date = date;
-    }
+    //   result[i].date = date;
+    // }
 
     return res.status(200).send(result);
   } catch (err) {
@@ -112,17 +112,36 @@ exports.readSpecificState = async (req, res) => {
       });
     }
 
-    const result = await sActDB.query().where({ stateID });
-    const dateTime = await dayManDB
-      .query()
-      .select("date")
-      .where({ day: result[0].day });
+    // const result = await sActDB.query().where({ stateID });
+    // const dateTime = await dayManDB
+    //   .query()
+    //   .select("date")
+    //   .where({ day: result[0].day });
 
-    let date = new Date(dateTime[0].date).toUTCString();
-    date = date.split(" ").slice(0, 4).join(" ");
-    result[0].date = date;
+    const data = await sActDB.query()
+      .select(
+        "state_activities.*",
+        "day_management.date"
+        )
+      .join('day_management', "day_management.day", '=', "state_activities.day")
+      .first();
 
-    return res.status(200).send(result);
+    if (!data){
+      return res.status(404).send({
+        code : 404, 
+        message : "Gagal mengambil data STATE.", 
+      });      
+    }
+
+    // let date = new Date(dateTime[0].date).toUTCString();
+    // date = date.split(" ").slice(0, 4).join(" ");
+    // result[0].date = date;
+
+    return res.status(200).send({
+      code : 200, 
+      message : "Berhasil mengambil data STATE.", 
+      data
+    });
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
@@ -151,9 +170,9 @@ exports.readStateByDay = async (req, res) => {
       .select("date")
       .where({ day: result[0].day });
 
-    let date = new Date(dateTime[0].date).toUTCString();
-    date = date.split(" ").slice(0, 4).join(" ");
-    result[0].date = date;
+    // let date = new Date(dateTime[0].date).toUTCString();
+    // date = date.split(" ").slice(0, 4).join(" ");
+    // result[0].date = date;
 
     return res.status(200).send(result);
   } catch (err) {
