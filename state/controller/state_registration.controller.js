@@ -344,7 +344,8 @@ const deleteRegData = async (req, res) => {
 };
 
 const handleRegistration = async (req, res) => {
-  const { nim, stateID } = req.body;
+  const { stateID } = req.body;
+  const { decoded_nim : nim } = req;
   const body = { nim, stateID };
 
   // Cek input kosong
@@ -466,6 +467,8 @@ const cancelRegistration = async (req, res) => {
   const { stateID = "" } = req.params;
   const nim = req.decoded_nim || "";
 
+  const transaction = await Model.startTransaction();
+
   try {
     const deleteRegistrationData = await stateRegDB
       .query()
@@ -482,11 +485,19 @@ const cancelRegistration = async (req, res) => {
       });
     }
 
+    const decrementRegisteredQuota = await stateDB 
+      .query()
+      .where({stateID})
+      .decrement('registered', 1);
+      
+    await transaction.commit();
+
     return res.status(200).send({
       code: 200,
       message: "Berhasil menghapus data pendaftaran STATE.",
     });
   } catch (err) {
+    await transaction.rollback();
     return res.status(500).send({
       code: 500,
       message: err.message,
