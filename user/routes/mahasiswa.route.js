@@ -1,20 +1,66 @@
 const {
-    register, 
-    login, 
-    getAllStudent, 
-    getSpecificStudent, 
-    updateStudent, 
-    deleteStudent
+  register,
+  login,
+  getProfile,
+  getAllStudent,
+  getAllStudentWithState,
+  getSpecificStudentWithStateByNim,
+  getSpecificStudent,
+  updateStudent,
+  deleteStudent,
+  getStatistic,
+  sendPasswordRecoveryLink,
+  exchangePasswordRecoveryToken
 } = require("../controller/mahasiswa.controller");
+const {
+  verifyJWT,
+  isPanitia,
+  isMahasiswa,
+} = require("../middleware/middleware");
 
 //import midleware
 
-module.exports = (app) => { 
-    app.post('/api/mahasiswa/register', register);  // API Client
-    app.post('/api/mahasiswa/login', login); // API Client
-    //give ispanitia middleware
-    app.get('/api/mahasiswa', getAllStudent); // API Internal
-    app.get('/api/mahasiswa/:nim', getSpecificStudent); // API Internal
-    app.put('/api/mahasiswa/update/:nim', updateStudent); // API Internal
-    app.delete('/api/mahasiswa/delete/:nim', deleteStudent); // API Internal
-}
+module.exports = (app) => {
+  app.post("/api/mahasiswa/register", register); // API Client
+  app.post("/api/mahasiswa/login", login); // API Client
+  app.get("/api/mahasiswa/profile", verifyJWT, isMahasiswa, getProfile); // API Client
+  app.post(
+    "/api/mahasiswa/forgot-password", 
+    verifyJWT,
+    isMahasiswa, 
+    sendPasswordRecoveryLink
+  );
+  app.post(
+    "/api/mahasiswa/forgot-password/validate-token", 
+    verifyJWT,
+    isMahasiswa, 
+    exchangePasswordRecoveryToken
+  );
+
+
+  //give ispanitia middleware
+  app.get("/api/mahasiswa/data", verifyJWT, isPanitia, getAllStudent); // API Internal
+
+  // API Internal
+  app.get("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, getSpecificStudent); // API Internal
+  app.put("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, updateStudent); // API Internal
+  app.delete("/api/mahasiswa/data/:nim", verifyJWT, isPanitia, deleteStudent); // API Internal
+
+  app.get("/api/mahasiswa/statistic", verifyJWT, isPanitia, getStatistic);
+
+  // with added state
+  app.get(
+    "/api/mahasiswa/dataWithState",
+    verifyJWT,
+    isPanitia,
+    getAllStudentWithState
+  );
+  app.get(
+    "/api/mahasiswa/dataWithState/:nim",
+    verifyJWT,
+    isPanitia,
+    getSpecificStudentWithStateByNim
+  );
+
+
+};

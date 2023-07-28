@@ -1,8 +1,14 @@
--- DATABASE versi 25 JUNI 2023
--- note: database masih mencakup untuk tabel aktivitas user authentication, HoME, dan STATE
---       terdapat beberapa kemungkinan adanya penambahan tabel ataupun data pada suatu tabel sesuai kebutuhan kedepannya
---       klo saat pengerjaan ada yang dirasa kurang dari database, langsung ingpokan aja
-
+-- DATABASE versi 9 JULI 2023
+-- UPDATE:
+-- 1. Data dummy untuk testing di state_registration, state_activities
+-- 2. Penambahan data technical_toggle untuk toggle-toggle yang akan digunakan dalam API
+-- 3. Penambahan data mahasiswa, panitia, organisator (passwordnya semua sama: 12345678)
+-- 4. Penambahan properti di state_activities (stateDesc, location)
+-- 5. farrel dah tambahin properti di mahasiswa (token)
+--
+-- NOTE: 
+--      jika lu pada ada yng nemu error saat import db/updet db/testing, janlup inpokan digrup ae.
+--      dan jika ad yg dirasa ganjal ato salah atopun mau kasih sarang, ingpokan aja digrup.
 
 --  nampung data divisi untuk setiap panitia yang register
 CREATE TABLE `divisi` (
@@ -41,11 +47,14 @@ CREATE TABLE `mahasiswa` (
   `angkatan` year(4) NOT NULL,
   `idLine` varchar(32) NOT NULL,
   `prodi` varchar(32) NOT NULL,
+  `token` varchar(32) NOT NULL,
+  `created_at` datetime DEFAULT NOW(),
   PRIMARY KEY (`nim`) 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `mahasiswa` (`name`, `nim`, `password`, `whatsapp`, `email`, `angkatan`, `idLine`, `prodi`) VALUES
-('Dummy', 88484, 'TdkBisaDipakekBuatLogin', '080809090707', 'tes@student.umn.ac.id', 2023,'dummylineid', 'Informatika');
+INSERT INTO `mahasiswa` (`name`, `nim`, `password`, `whatsapp`, `email`, `angkatan`, `idLine`, `prodi`, `token`) VALUES
+('Dummy', 88484, 'TdkBisaDipakekBuatLogin', '080809090707', 'tes@student.umn.ac.id', 2023,'dummylineid', 'Informatika', 'MXM23-88484'),
+('henry', 66484, '$2a$10$7XBGYMXUE6vsYUv/ohsgr.QrKR1efpEyQ9BnEhJBrrzjg.iorAgIy', '0852', 'gilbert.henry@student.umn.ac.id', 2023,'lineidgilbert', 'Infor', 'MXM23-66484');
 
 -- --------------------------------------------------------
 
@@ -79,19 +88,86 @@ CREATE TABLE `state_activities` (
   `stateID` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `day` varchar(3) NOT NULL, 
-  `stateLogo` varchar(255) NOT NULL, 
+  `stateLogo` varchar(255) NOT NULL,
+  `stateDesc` TEXT NOT NULL, 
+  `location` varchar(255) NOT NULL,
   `quota` int(11) NOT NULL, 
-  `registered` int(11) NOT NULL, 
+  `registered` int(11) NOT NULL,
   PRIMARY KEY (`stateID`),
   FOREIGN KEY (`day`) REFERENCES day_management(`day`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `state_activities` (`stateID`, `name`, `day`, `stateLogo`, `quota`, `registered`) VALUES
-(1, 'Ultima Sonora', 'D1', 'https://storage.googleapis.com/mxm22-bucket-test/Ultima-Sonora_e668a205-ed57-4ae9-a6e4-f899e97d22ef_BPH--LOGO-ULTIMA-SONORA.png', 80, 77);
+INSERT INTO `state_activities`(`name`, `day`, `stateLogo`, `stateDesc`, `location`, `quota`, `registered`)
+VALUES 
+('Ultima Sonora', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Lions Volley', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Ultimagz', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('J-cafe Cosplay', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('J-Cafe Culture', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('J-Cafe Illustration', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('J-Cafe Music', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('J-Cafe Weaponry', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('J-Cafe Visual Novel', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('J-Cafe TCG', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Lions Basket', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UMN Documentation', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UMN Taekwondo', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Street Dance', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Capoiera', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Radar UMN', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UESC Scrabble', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UESC Spelling bee', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UESC Speech', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('CAMVIS', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Lions Tenis Meja', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UMN PC', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Obscura', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UMN TV', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('USO', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Ultima Aikido', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Tracce Reguler', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Tracce Ratoh Jatoe', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('HM Film', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Fortius', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Teater KataK Aktor', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Teater KataK Properti', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Teater KataK Make Up', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Teater KataK Music', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Lions Futsal', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('U-Toys', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('HIMARS', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Kompas Corner', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Duta Anti Narkoba', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Ikatan Bikers', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Spectre', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Skystar venture', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('KSPM', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Mufomic', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UMN Medic', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Nusakara', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Rencang', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Lions Badminton', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Game Development Club', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UMN Robotic Club', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UMN Juice', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('MAPALA', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('U-Biz', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('POPSICLE UMN', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UMN Radio', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Qorie K-Code Boy Group', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Qorie K-Code Girl Group', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Qorie K-Voice', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Qorie Hantalk', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Rumpin', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('Board Games', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('ACES', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('HMDKV', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('UMN Gate', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0),
+('HIMFERA', 'D1', 'logo state', 'deskripsi state', 'di UMN', 50, 0);
 
 -- --------------------------------------------------------
 
---table dari mahasiswa x state_activities (m*n relation), untuk menampung data peserta yang mendaftar state apa
+-- table dari mahasiswa x state_activities (m*n relation), untuk menampung data peserta yang mendaftar state apa
 -- attendanceTime untuk menampung waktu peserta melakukan absen
 -- isFirstAttended untuk menampung apakah peserta sudah absen awal atau belum
 -- isLastAttended untuk menampung apakah peserta sudah absen akhir atau belum
@@ -100,11 +176,19 @@ CREATE TABLE `state_registration` (
   `nim` int(11) NOT NULL,
   `attendanceTime` datetime DEFAULT NULL,
   `isFirstAttended` tinyint(1) NOT NULL,
-  `isLastAttendaned` tinyint(1) NOT NULL,
+  `isLastAttended` tinyint(1) NOT NULL,
+  `created_at` datetime DEFAULT NOW(),  
   PRIMARY KEY (`stateID`, `nim`),
   FOREIGN KEY (`stateID`) REFERENCES state_activities(`stateID`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`nim`) REFERENCES mahasiswa(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `state_registration` (`stateID`, `nim`, `attendanceTime`, `isFirstAttended`, `isLastAttended`) VALUES
+(1, 66484, NULL, 0, 0),
+(8, 66484, NULL, 0, 0),
+(11, 66484, NULL, 0, 0),
+(2, 88484, NULL, 0, 0),
+(9, 88484, NULL, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -123,7 +207,8 @@ CREATE TABLE `organisator` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `organisator` (`nim`, `name`, `email`, `password`, `stateID`, `isverified`) VALUES
-(66484, 'Ketua USO', 'ketua.sonora@student.umn.ac.id', 'TIDAKBISADIPAKEKBUATLOGIN', 1, 1);
+(66484, 'Ketua USO', 'ketua.sonora@student.umn.ac.id', 'TIDAKBISADIPAKEKBUATLOGIN', 1, 0),
+(1111, 'Organisator USO', 'organisator.sonora@student.umn.ac.id', '$2a$08$SvzgBuGR3Ucgfkkw1JFvY.nF8Yd8G/97gouGefRvjwcuQU3CBy7Y6', 1, 1);
 -- --------------------------------------------------------
 
 -- penampungan data untuk panitia/agents MAXIMA 23
@@ -141,7 +226,8 @@ CREATE TABLE `panitia` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `panitia` (`name`, `nim`, `email`, `password`, `divisiID`, `isverified`) VALUES
-('Anonymous', 12345, 'anonymous@gmail.com', 'TIDAKBISADIPAKEKBUATLOGIN', 'D01', 1);
+('Anonymous', 12345, 'anonymous@gmail.com', 'TIDAKBISADIPAKEKBUATLOGIN', 'D01', 1),
+('facio', 11111, 'admin@gmail.com', '$2a$08$qcprXAkouQUbc9mEiFKxoe16d5y7e4gqlN6Ma3ky4X9cos8yXHiHG', 'D01', 1);
 
 -- --------------------------------------------------------
 
@@ -156,4 +242,31 @@ CREATE TABLE `technical_toggle` (
 
 -- sebagai contoh jika signupMahasiswa = 1, maka mahasiswa dapat melakukan signup, jika 0 maka mahasiswa tidak dapat melakukan signup
 INSERT INTO `technical_toggle` (`id`, `name`, `toggle`) VALUES
-(1, 'signupMahasiswa', 1); 
+(1, 'signupMahasiswa', 1),
+(2, 'createState', 1),
+(3, 'updateState', 1),
+(4, 'deleteState', 1),
+(5, 'stateRegistration', 1),
+(6, 'presensi', 1); 
+
+
+CREATE TABLE `mahasiswa_password_recovery_token` (
+  `nim` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` DATETIME NOT NULL,
+  FOREIGN KEY (`nim`) REFERENCES mahasiswa(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `panitia_password_recovery_token` (
+--   `nim` int(11) NOT NULL,
+--   `token` varchar(255) NOT NULL,
+--   `expires_at` tinyint(1) NOT NULL,
+--   FOREIGN KEY (`nim`) REFERENCES panitia(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE `organisator_password_recovery_token` (
+--   `nim` int(11) NOT NULL,
+--   `token` varchar(255) NOT NULL,
+--   `expires_at` tinyint(1) NOT NULL,
+--   FOREIGN KEY (`nim`) REFERENCES organisator(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

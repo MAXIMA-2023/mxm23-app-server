@@ -1,54 +1,77 @@
 const jwt = require("jsonwebtoken");
+const MahasiswaDB = require("../model/mahasiswa.model");
 const PanitiaDB = require("../model/panitia.model");
-const orgDB = require("../model/panitia.model");
+const OrgDB = require("../model/organisator.model");
 
-exports.verifyJWT = async(req, res, next)=>{
-    const token = req.headers['x-access-token']
-    if(!token){
-        return res.status(403).send({ message: "Harap login terlebih dahulu!" })
+exports.verifyJWT = async (req, res, next) => {
+  try {
+    const decoded = jwt.verify(
+      req.headers.authorization.split(" ")[1],
+      process.env.JWT_SECRET
+    );
+    req.decoded_nim = decoded.nim;
+
+    next();
+  } catch (err) {
+    return res.status(403).send({
+      code: 403,
+      message: "Token anda tidak valid, harap login ulang!",
+    });
+  }
+};
+
+exports.isMahasiswa = async (req, res, next) => {
+  try {
+    const nim = req.decoded_nim;
+    const data = await MahasiswaDB.query().where({ nim }).first();
+
+    if (!data) {
+      return res.status(403).send({
+        code: 403,
+        message: "Anda tidak punya hak untuk akses ke halaman ini!",
+      });
     }
 
-    await jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if(err){
-            return res.status(401).send({ message: "Unauthorized!" })
-        }
+    next();
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};
 
-        req.decoded_nim = decoded.nim
-        next()
-    })
-}
+exports.isPanitia = async (req, res, next) => {
+  try {
+    const nim = req.decoded_nim;
+    const data = await PanitiaDB.query().where({ nim }).first();
 
-exports.isPanitia = async(req, res, next)=>{
-    try{
-        const nim = req.decoded_nim
-        const data = await PanitiaDB.query().where({ nim })
-
-        if(data.length === 0){
-            return res.status(200).send({ message: "Anda tidak punya hak untuk akses ke halaman ini!" })
-        }
-
-        req.divisiID = data[0].divisiID 
-        
-        next()
+    if (!data) {
+      return res.status(403).send({
+        code: 403,
+        message: "Anda tidak punya hak untuk akses ke halaman ini!",
+      });
     }
-    catch(err){
-        return res.status(500).send({ message: err.message })
+
+    req.divisiID = data.divisiID;
+
+    next();
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};
+
+exports.isOrganisator = async (req, res, next) => {
+  try {
+    const nim = req.decoded_nim;
+    const data = await OrgDB.query().where({ nim }).first();
+
+    if (!data) {
+      return res.status(403).send({
+        code: 403,
+        message: "Anda tidak punya hak untuk akses ke halaman ini!",
+      });
     }
-}
 
-exports.isOrganisator = async(req, res, next)=>{
-    try{
-        const nim = req.decoded_nim
-        const data = await OrgDB.query().where({ nim })
-
-        if(data.length === 0){
-            return res.status(200).send({ message: "Anda tidak punya hak untuk akses ke halaman ini!" })
-        }
-
-        next()
-    }
-    catch(err){
-        return res.status(500).send({ message: err.message })
-    }
-}
-
+    next();
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};

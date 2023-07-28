@@ -1,44 +1,57 @@
-const organisatorController = require('../controller/organisator.controller');
-const middleware = require('../middleware/middleware')
+const organisatorController = require("../controller/organisator.controller");
+const middleware = require("../middleware/middleware");
 
-module.exports = function(app){
-    
-    app.post(
-        '/api/organisator/register',
-        organisatorController.registerOrganisator
-    )
+module.exports = function (app) {
+  app.post(
+    "/api/organisator/register",
+    organisatorController.registerOrganisator
+  );
+  app.post("/api/organisator/login", organisatorController.loginOrganisator);
+  app.get(
+    "/api/organisator/profile",
+    middleware.verifyJWT,
+    middleware.isOrganisator,
+    organisatorController.getProfile
+  );
 
-    app.post(
-        '/api/organisator/login',
-        organisatorController.loginOrganisator
-    )
+  app.get(
+    "/api/organisator/data",
+    middleware.verifyJWT,
+    middleware.isPanitia,
+    organisatorController.getOrganisator
+  );
+  app.get(
+    "/api/organisator/data/:nim",
+    middleware.verifyJWT,
+    middleware.isPanitia,
+    organisatorController.getOrganisatorspesifik
+  );
 
-    app.get(
-        '/api/organisator/get',
-        organisatorController.getOrganisator
-    )
-    app.get(
-        '/api/organisator/get/:nim',
-        organisatorController.getOrganisatorspesifik
-    )
+  app.put(
+    "/api/organisator/data/:nim",
+    middleware.verifyJWT,
+    middleware.isPanitia,
+    organisatorController.updateOrganisator
+  );
 
-    app.put(
-        '/api/organisator/update/:nim',
-        middleware.verifyJWT, 
-        middleware.isPanitia,
-        organisatorController.getUpdate
-    )
+  app.put(
+    "/api/organisator/verifyAcc/:nim",
+    middleware.verifyJWT,
+    middleware.isPanitia,
+    organisatorController.verifyAcc
+  );
 
-    app.put(
-        '/api/organisator/updateAcc/:nim',
-        middleware.verifyJWT, middleware.isPanitia,
-        organisatorController.updateVerified
-    )
+  app.delete(
+    "/api/organisator/data/:nim",
+    middleware.verifyJWT,
+    middleware.isPanitia,
+    organisatorController.getDelete
+  );
 
-    app.delete(
-        '/api/organisator/delete/:nim',
-        middleware.verifyJWT, 
-        middleware.isPanitia,
-        organisatorController.getDelete
-    )
-}
+  app.get(
+    "/api/organisator/state/statistik/:stateID", 
+    middleware.verifyJWT, 
+    middleware.isOrganisator, 
+    organisatorController.getStatistic
+  );  
+};
