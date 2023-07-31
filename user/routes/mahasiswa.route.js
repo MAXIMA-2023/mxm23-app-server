@@ -24,16 +24,13 @@ module.exports = (app) => {
   app.post("/api/mahasiswa/register", register); // API Client
   app.post("/api/mahasiswa/login", login); // API Client
   app.get("/api/mahasiswa/profile", verifyJWT, isMahasiswa, getProfile); // API Client
+  
   app.post(
     "/api/mahasiswa/forgot-password", 
-    verifyJWT,
-    isMahasiswa, 
     sendPasswordRecoveryLink
   );
   app.post(
     "/api/mahasiswa/forgot-password/validate-token", 
-    verifyJWT,
-    isMahasiswa, 
     exchangePasswordRecoveryToken
   );
 

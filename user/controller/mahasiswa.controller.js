@@ -6,6 +6,7 @@ const { Model } = require("objection");
 const Mahasiswa = require("../model/mahasiswa.model");
 const MahasiswaForgotPasswordTokenStorage = require('../../mail/mahasiswa_forgot_password_token.model');
 const stateRegDB = require("../../state/model/state_registration.model");
+const postmarkClient = require("../../config/postmark");
 
 const {
   registerValidator,
@@ -549,17 +550,17 @@ const getStatistic = async (req, res) => {
 
 // API Client
 const sendPasswordRecoveryLink = async (req, res) => {
-  const { decoded_nim = "" } = req;
-  const nim = decoded_nim;
+  const { nim = "", email = "" } = req.body;
+  // const nim = decoded_nim;
 
   const token = randomToken(48);
   try {
 
-    const user = await Mahasiswa.query().where({nim}).first();
+    const user = await Mahasiswa.query().where({nim, email}).first();
     if (!user){
-      return res.status(401).send({
-        code: 401,
-        message: "Token anda tidak valid, harap login ulang!",
+      return res.status(404).send({
+        code: 404,
+        message: "Data yang kamu masukkan tidak terdaftar.",
       });
     }
 
@@ -575,25 +576,50 @@ const sendPasswordRecoveryLink = async (req, res) => {
       expires_at
     });  
 
+
+    const subject = "MAXIMA UMN - Password Recovery Link";
+    const body = 
+          `
+          <p>Halo, Maximers!</p>
+          <p>Berikut adalah tautan untuk mengubah password akunmu.</p>
+          <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
+          `
+
     mailConfig.sendMail({
       from : process.env.MAIL_ACCOUNT,
       to : user.email, 
-      subject : "MAXIMA UMN - Password Recovery Link",
-      html : 
-      `
-      <h1>MAXIMA UMN - Password Recovery Link</h1>
-      <p>Halo, Maximers!</p>
-      <p>Berikut adalah tautan untuk mengubah password akunmu.</p>
-      <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
-      `        
+      subject,
+      html : body
     }, (err) => {
-      if (err) throw new Error(err)
-
+      if (err) throw new Error(err)  
       return res.status(200).send({
         code : 200, 
         message : "Berhasil mengirim tautan perubahan password melalui email."
-      })              
+      }) 
     })  
+
+    
+    // POSTMARK API
+    // minusnya -> kudu nungu verifikasi dri org sononya (gbisa beda domain klo blm verif)
+    //             ada via2 an nya (jdi sendernya ada tertulis selain sender ori nya (kita))
+    // plusnya  -> gaada limit, cepet
+
+    // const emailData = {
+    //   From : 'farrel.dinarta@student.umn.ac.id', 
+    //   To : user.email,
+    //   Subject : subject, 
+    //   HtmlBody : body
+    // }
+
+
+    // postmarkClient.sendEmail(emailData)      
+    //   .then(response => {
+    //       return res.status(200).send({
+    //         code : 200, 
+    //         message : "Berhasil mengirim tautan perubahan password melalui email."
+    //       })                       
+    //   }).catch(err => {throw new Error(err)});
+      
   
   } catch (err) {
     return res.status(500).send({

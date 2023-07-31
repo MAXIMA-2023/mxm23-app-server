@@ -27,6 +27,7 @@
     "nodemailer": "^6.9.4",
     "nodemon": "^2.0.22",
     "objection": "^3.0.1",
+    "postmark": "^3.0.19",
     "random-token": "^0.0.8",
     "uuid": "^9.0.0",
     "uuidv4": "^6.2.13",
