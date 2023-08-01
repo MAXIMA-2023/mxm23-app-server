@@ -7,6 +7,7 @@ const Mahasiswa = require("../model/mahasiswa.model");
 const MahasiswaForgotPasswordTokenStorage = require('../../mail/mahasiswa_forgot_password_token.model');
 const stateRegDB = require("../../state/model/state_registration.model");
 const postmarkClient = require("../../config/postmark");
+const sendGridClient = require("../../config/sendgrid");
 
 const {
   registerValidator,
@@ -585,18 +586,38 @@ const sendPasswordRecoveryLink = async (req, res) => {
           <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
           `
 
-    mailConfig.sendMail({
-      from : process.env.MAIL_ACCOUNT,
-      to : user.email, 
+    // mailConfig.sendMail({
+    //   from : process.env.MAIL_ACCOUNT,
+    //   to : user.email, 
+    //   subject,
+    //   html : body
+    // }, (err) => {
+    //   if (err) throw new Error(err)  
+    //   return res.status(200).send({
+    //     code : 200, 
+    //     message : "Berhasil mengirim tautan perubahan password melalui email."
+    //   }) 
+    // })  
+    
+    // SENDGRID API
+
+    const emailData = {
+      from: "maxima.umn.website@gmail.com",
+      to : user.email,
       subject,
-      html : body
-    }, (err) => {
-      if (err) throw new Error(err)  
-      return res.status(200).send({
-        code : 200, 
-        message : "Berhasil mengirim tautan perubahan password melalui email."
-      }) 
-    })  
+      html: body,
+    };
+
+    console.log(emailData);
+
+    sendGridClient
+      .send(emailData)
+      .then((response) => {
+        return res.status(200).send({
+          code : 200, 
+          message : "Berhasil mengirim tautan perubahan password melalui email."
+        })  
+      }).catch(err => {throw new Error(err)});
 
     
     // POSTMARK API
