@@ -85,7 +85,7 @@ exports.rateLimit = rateLimiter({
   max : 1, 
   message : {
     code : 429, 
-    message : "Kamu hanya bisa mengirimkan tautan perubahan password setiap 15 menit."
+    message : `Kamu hanya bisa mengirimkan tautan perubahan password setiap ${process.env.EMAIL_RESET_API_CALL_LIMIT} menit.`
   }, 
   standardeHeaders : true, 
   legacyHeaders : false,
