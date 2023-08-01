@@ -16,6 +16,7 @@ const {
   verifyJWT,
   isPanitia,
   isMahasiswa,
+  rateLimit
 } = require("../middleware/middleware");
 
 //import midleware
@@ -27,6 +28,7 @@ module.exports = (app) => {
   
   app.post(
     "/api/mahasiswa/forgot-password", 
+    rateLimit,
     sendPasswordRecoveryLink
   );
   app.post(

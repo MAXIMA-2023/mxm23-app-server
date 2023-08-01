@@ -1,7 +1,10 @@
+const env = require('dotenv').config({path : '../../.env'});
 const jwt = require("jsonwebtoken");
+const rateLimiter = require('express-rate-limit');
 const MahasiswaDB = require("../model/mahasiswa.model");
 const PanitiaDB = require("../model/panitia.model");
 const OrgDB = require("../model/organisator.model");
+
 
 exports.verifyJWT = async (req, res, next) => {
   try {
@@ -75,3 +78,15 @@ exports.isOrganisator = async (req, res, next) => {
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
+
+
+exports.rateLimit = rateLimiter({
+  windowMs : process.env.EMAIL_RESET_API_CALL_LIMIT * 60 * 1000,
+  max : 1, 
+  message : {
+    code : 429, 
+    message : "Kamu hanya bisa mengirimkan tautan perubahan password setiap 15 menit."
+  }, 
+  standardeHeaders : true, 
+  legacyHeaders : false,
+});
