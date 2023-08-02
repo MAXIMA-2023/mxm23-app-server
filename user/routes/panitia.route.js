@@ -23,6 +23,13 @@ module.exports = function (app) {
   );
 
   app.get(
+    "/api/panit/data/stat",
+    middleware.verifyJWT,
+    middleware.isPanitia,
+    PanitController.countAllData
+  )
+
+  app.get(
     "/api/panit/data/:nim",
     middleware.verifyJWT,
     middleware.isPanitia,
@@ -49,4 +56,7 @@ module.exports = function (app) {
     middleware.isPanitia,
     PanitController.deleteData
   );
+
+
+  
 };
