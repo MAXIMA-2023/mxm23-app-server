@@ -20,6 +20,14 @@ module.exports = function (app) {
     middleware.isPanitia,
     organisatorController.getOrganisator
   );
+
+  app.get(
+    "/api/organisator/data/stat", 
+    middleware.verifyJWT, 
+    middleware.isOrganisator, 
+    organisatorController.getCountData
+  );  
+
   app.get(
     "/api/organisator/data/:nim",
     middleware.verifyJWT,
@@ -54,4 +62,6 @@ module.exports = function (app) {
     middleware.isOrganisator, 
     organisatorController.getStatistic
   );  
+
+
 };
