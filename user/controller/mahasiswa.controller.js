@@ -653,7 +653,6 @@ const sendPasswordRecoveryLink = async (req, res) => {
 
 
 const exchangePasswordRecoveryToken = async (req, res) => {
-  const { decoded_nim : nim }  = req;
   const { token = "", password } = req.body;
 
   try {
@@ -680,7 +679,7 @@ const exchangePasswordRecoveryToken = async (req, res) => {
 
 
     const exchangeToken = await MahasiswaForgotPasswordTokenStorage.query()
-      .where({nim, token})
+      .where({token})
       .where('expires_at', '>', new Date().toISOString())
       .delete();
 
