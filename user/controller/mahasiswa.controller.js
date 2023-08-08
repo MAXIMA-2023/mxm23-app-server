@@ -585,7 +585,15 @@ const sendPasswordRecoveryLink = async (req, res) => {
           <p>Berikut adalah tautan untuk mengubah password akunmu.</p>
           <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
           `
+    const highTrafficBody = 
+          `
+          <p>Halo, Maximers!</p>
+          <p>(Traffic saat ini sedang tinggi, maaf kalau pengiriman emailnya lama ya...)</p>
+          <p>Berikut adalah tautan untuk mengubah password akunmu.</p>
+          <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
+          `    
 
+    // kasi message kalo off limit
     // mailConfig.sendMail({
     //   from : process.env.MAIL_ACCOUNT,
     //   to : user.email, 
@@ -617,31 +625,26 @@ const sendPasswordRecoveryLink = async (req, res) => {
           code : 200, 
           message : "Berhasil mengirim tautan perubahan password melalui email."
         })  
-      }).catch(err => {throw new Error(err)});
+      }).catch(err => {
+          mailConfig.sendMail({
+            from : process.env.MAIL_ACCOUNT,
+            to : user.email, 
+            subject,
+            html : highTrafficBody
+          }, (err) => {
+            if (err) {
+              return res.status(500).send({
+                code : 500, 
+                message : err.message
+              });              
+            }
+            return res.status(200).send({
+              code : 200, 
+              message : "Berhasil mengirim tautan perubahan password melalui email."
+            }) 
+          })          
+      });
 
-    
-    // POSTMARK API
-    // minusnya -> kudu nungu verifikasi dri org sononya (gbisa beda domain klo blm verif)
-    //             ada via2 an nya (jdi sendernya ada tertulis selain sender ori nya (kita))
-    // plusnya  -> gaada limit, cepet
-
-    // const emailData = {
-    //   From : 'farrel.dinarta@student.umn.ac.id', 
-    //   To : user.email,
-    //   Subject : subject, 
-    //   HtmlBody : body
-    // }
-
-
-    // postmarkClient.sendEmail(emailData)      
-    //   .then(response => {
-    //       return res.status(200).send({
-    //         code : 200, 
-    //         message : "Berhasil mengirim tautan perubahan password melalui email."
-    //       })                       
-    //   }).catch(err => {throw new Error(err)});
-      
-  
   } catch (err) {
     return res.status(500).send({
       code : 500, 
