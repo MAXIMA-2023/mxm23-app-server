@@ -449,7 +449,7 @@ exports.getStatistic = async (req, res) => {
 
 
       const result = await DayManagementDB.query()
-            .select(Model.raw('DAY(day_management.date) as day'))
+            .select(Model.raw('day_management.date as day'))
             .count('state_registration.stateID as total')
             .leftJoin('state_registration', function(){
               this.on(Model.raw('DAY(day_management.date)'), '=', Model.raw('DAY(state_registration.created_at)'));
