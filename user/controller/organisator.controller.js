@@ -1,5 +1,6 @@
 const OrganisatorDB = require("../model/organisator.model");
 const StateDB = require("../../state/model/state_activities.model");
+const stateRegDB = require("../../state/model/state_registration.model");
 const DayManagementDB = require('../../state/model/day_management.model');
 const { Model } = require('objection');
 const bcrypt = require("bcryptjs");
@@ -448,7 +449,7 @@ exports.getStatistic = async (req, res) => {
 
 
       const result = await DayManagementDB.query()
-            .select(Model.raw('DAY(day_management.date) as day'))
+            .select(Model.raw('day_management.date as day'))
             .count('state_registration.stateID as total')
             .leftJoin('state_registration', function(){
               this.on(Model.raw('DAY(day_management.date)'), '=', Model.raw('DAY(state_registration.created_at)'));
@@ -472,4 +473,28 @@ exports.getStatistic = async (req, res) => {
     }
     
 
+}
+
+exports.getCountData = async (req, res) => {
+  try {
+    const orgStateID = await OrganisatorDB.query()
+      .select("stateID")
+      .where({ nim: req.decoded_nim })
+      .first();
+
+    const totalMaba = await stateRegDB.query()
+    .where({stateID:orgStateID.stateID})
+    .count(" * as total")
+    .first();
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mendapatkan data organisator",
+      data: totalMaba.total
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
 }

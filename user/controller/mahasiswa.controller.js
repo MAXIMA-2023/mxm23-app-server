@@ -6,6 +6,8 @@ const { Model } = require("objection");
 const Mahasiswa = require("../model/mahasiswa.model");
 const MahasiswaForgotPasswordTokenStorage = require('../../mail/mahasiswa_forgot_password_token.model');
 const stateRegDB = require("../../state/model/state_registration.model");
+const postmarkClient = require("../../config/postmark");
+const sendGridClient = require("../../config/sendgrid");
 
 const {
   registerValidator,
@@ -549,17 +551,17 @@ const getStatistic = async (req, res) => {
 
 // API Client
 const sendPasswordRecoveryLink = async (req, res) => {
-  const { decoded_nim = "" } = req;
-  const nim = decoded_nim;
+  const { nim = "", email = "" } = req.body;
+  // const nim = decoded_nim;
 
   const token = randomToken(48);
   try {
 
-    const user = await Mahasiswa.query().where({nim}).first();
+    const user = await Mahasiswa.query().where({nim, email}).first();
     if (!user){
-      return res.status(401).send({
-        code: 401,
-        message: "Token anda tidak valid, harap login ulang!",
+      return res.status(404).send({
+        code: 404,
+        message: "Data yang kamu masukkan tidak terdaftar.",
       });
     }
 
@@ -575,26 +577,74 @@ const sendPasswordRecoveryLink = async (req, res) => {
       expires_at
     });  
 
-    mailConfig.sendMail({
-      from : process.env.MAIL_ACCOUNT,
-      to : user.email, 
-      subject : "MAXIMA UMN - Password Recovery Link",
-      html : 
-      `
-      <h1>MAXIMA UMN - Password Recovery Link</h1>
-      <p>Halo, Maximers!</p>
-      <p>Berikut adalah tautan untuk mengubah password akunmu.</p>
-      <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
-      `        
-    }, (err) => {
-      if (err) throw new Error(err)
 
-      return res.status(200).send({
-        code : 200, 
-        message : "Berhasil mengirim tautan perubahan password melalui email."
-      })              
-    })  
-  
+    const subject = "MAXIMA UMN - Password Recovery Link";
+    const body = 
+          `
+          <p>Halo, Maximers!</p>
+          <p>Berikut adalah tautan untuk mengubah password akunmu.</p>
+          <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
+          `
+    const highTrafficBody = 
+          `
+          <p>Halo, Maximers!</p>
+          <p>(Traffic saat ini sedang tinggi, maaf kalau pengiriman emailnya lama ya...)</p>
+          <p>Berikut adalah tautan untuk mengubah password akunmu.</p>
+          <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
+          `    
+
+    // kasi message kalo off limit
+    // mailConfig.sendMail({
+    //   from : process.env.MAIL_ACCOUNT,
+    //   to : user.email, 
+    //   subject,
+    //   html : body
+    // }, (err) => {
+    //   if (err) throw new Error(err)  
+    //   return res.status(200).send({
+    //     code : 200, 
+    //     message : "Berhasil mengirim tautan perubahan password melalui email."
+    //   }) 
+    // })  
+    
+    // SENDGRID API
+
+    const emailData = {
+      from: "maxima.umn.website@gmail.com",
+      to : user.email,
+      subject,
+      html: body,
+    };
+
+    console.log(emailData);
+
+    sendGridClient
+      .send(emailData)
+      .then((response) => {
+        return res.status(200).send({
+          code : 200, 
+          message : "Berhasil mengirim tautan perubahan password melalui email."
+        })  
+      }).catch(err => {
+          mailConfig.sendMail({
+            from : process.env.MAIL_ACCOUNT,
+            to : user.email, 
+            subject,
+            html : highTrafficBody
+          }, (err) => {
+            if (err) {
+              return res.status(500).send({
+                code : 500, 
+                message : err.message
+              });              
+            }
+            return res.status(200).send({
+              code : 200, 
+              message : "Berhasil mengirim tautan perubahan password melalui email."
+            }) 
+          })          
+      });
+
   } catch (err) {
     return res.status(500).send({
       code : 500, 
@@ -606,7 +656,6 @@ const sendPasswordRecoveryLink = async (req, res) => {
 
 
 const exchangePasswordRecoveryToken = async (req, res) => {
-  const { decoded_nim : nim }  = req;
   const { token = "", password } = req.body;
 
   try {
@@ -633,7 +682,7 @@ const exchangePasswordRecoveryToken = async (req, res) => {
 
 
     const exchangeToken = await MahasiswaForgotPasswordTokenStorage.query()
-      .where({nim, token})
+      .where({token})
       .where('expires_at', '>', new Date().toISOString())
       .delete();
 

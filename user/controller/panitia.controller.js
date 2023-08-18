@@ -1,5 +1,8 @@
 const PanitDB = require("../model/panitia.model");
 const DivisiDB = require("../model/divisi.model");
+const MahasiswaDB = require("../model/mahasiswa.model");
+const OrganisatorDB = require("../model/organisator.model");
+const stateRegDB = require("../../state/model/state_registration.model");
 const { validateEmptyEntries } = require("../../helpers/FormValidator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -398,3 +401,58 @@ exports.deleteData = async (req, res) => {
     });
   }
 };
+
+exports.countAllData = async (req, res) => {
+  try {
+    //total panitia yang sudah daftar dan terverifikasi
+    const panitCount = await PanitDB.query()
+      .where("isverified", 1)
+      .count("* as total")
+      .first();
+
+    //total panitia per divisi
+    const userDivisiID = await PanitDB.query()
+      .select("divisiID")
+      .where({ nim: req.decoded_nim });
+    const panitiaCountPerDivision = await PanitDB.query()
+      .where({ divisiID: userDivisiID[0].divisiID })
+      .count("* as total")
+      .first();
+
+    //total pic organisator yang daftar dan terverifikasi
+    const orgCount = await OrganisatorDB.query()
+      .where("isverified", 1)
+      .count("* as total")
+      .first();
+
+    //total maba yang sdh buat akun
+    const mhsCount = await MahasiswaDB.query()
+      .count("* as total")
+      .first();
+
+    //total maba yang sudah ambil state
+    const mhsStateCount = await stateRegDB.query()
+    .countDistinct('nim as total')
+    .first();
+
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mengambil seluruh data panitia",
+      data: {
+        totalPanit : panitCount.total,
+        totalPanitPerDivisi : panitiaCountPerDivision.total,
+        totalOrg : orgCount.total,
+        totalMaba : mhsCount.total,
+        totalMabaState : mhsStateCount.total,
+
+      }
+    });
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
+
+

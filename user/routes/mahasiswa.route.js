@@ -16,6 +16,7 @@ const {
   verifyJWT,
   isPanitia,
   isMahasiswa,
+  rateLimit
 } = require("../middleware/middleware");
 
 //import midleware
@@ -24,16 +25,14 @@ module.exports = (app) => {
   app.post("/api/mahasiswa/register", register); // API Client
   app.post("/api/mahasiswa/login", login); // API Client
   app.get("/api/mahasiswa/profile", verifyJWT, isMahasiswa, getProfile); // API Client
+  
   app.post(
     "/api/mahasiswa/forgot-password", 
-    verifyJWT,
-    isMahasiswa, 
+    rateLimit,
     sendPasswordRecoveryLink
   );
   app.post(
     "/api/mahasiswa/forgot-password/validate-token", 
-    verifyJWT,
-    isMahasiswa, 
     exchangePasswordRecoveryToken
   );
 
