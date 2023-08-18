@@ -487,9 +487,7 @@ const getStatistic = async (req, res) => {
       date: new Date(data.date).toLocaleDateString(),
     }));
 
-    // current as starting point
     let current = new Date(rundown.maxTown.start);
-
     const maxTownEnd = new Date(rundown.maxTown.end);
     const homeStart = new Date(rundown.home.start);
     const homeEnd = new Date(rundown.home.end);
@@ -500,9 +498,7 @@ const getStatistic = async (req, res) => {
     let rawStatisticCounter = 0;
 
     while (current <= maxTownEnd) {
-      if (
-        current.toLocaleDateString() != rawStatistic[rawStatisticCounter].date
-      ) {
+      if (rawStatisticCounter >= rawStatistic.length || current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date) {
         maxTownStatistic.push({
           date: current.toISOString(),
           registered: 0,
@@ -510,16 +506,17 @@ const getStatistic = async (req, res) => {
       } else {
         maxTownStatistic.push({
           date: current.toISOString(),
-          registered: rawStatistic[rawStatisticCounter++].registered,
+          registered: rawStatistic[rawStatisticCounter].registered,
         });
+        rawStatisticCounter++;
       }
       current.setDate(current.getDate() + 1);
     }
 
-    current = homeStart;
+    current = new Date(rundown.home.start);
 
     while (current <= homeEnd) {
-      if (current.toLocaleDateString() != rawStatistic[rawStatisticCounter]) {
+      if (rawStatisticCounter >= rawStatistic.length || current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date) {
         homeStatistic.push({
           date: current.toISOString(),
           registered: 0,
@@ -527,8 +524,9 @@ const getStatistic = async (req, res) => {
       } else {
         homeStatistic.push({
           date: current.toISOString(),
-          registered: rawStatistic[rawStatisticCounter++].registered,
+          registered: rawStatistic[rawStatisticCounter].registered,
         });
+        rawStatisticCounter++;
       }
       current.setDate(current.getDate() + 1);
     }
@@ -548,6 +546,7 @@ const getStatistic = async (req, res) => {
     });
   }
 };
+
 
 // API Client
 const sendPasswordRecoveryLink = async (req, res) => {
