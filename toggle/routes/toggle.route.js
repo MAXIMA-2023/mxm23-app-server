@@ -12,4 +12,9 @@ module.exports = function(app){
         middleware.verifyJWT, middleware.isPanitia,
         toggle.updateToggleValue
     )
+
+    app.get(
+        '/api/toggle/check/:id',
+        toggle.checktoggle
+    )
 }

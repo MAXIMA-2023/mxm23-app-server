@@ -1,16 +1,6 @@
--- DATABASE versi 9 JULI 2023
+-- DATABASE versi 22 agus 2023
 -- UPDATE:
--- 1. Data dummy untuk testing di state_registration, state_activities
--- 2. Penambahan data technical_toggle untuk toggle-toggle yang akan digunakan dalam API
--- 3. Penambahan data mahasiswa, panitia, organisator (passwordnya semua sama: 12345678)
--- 4. Penambahan properti di state_activities (stateDesc, location)
--- 5. farrel dah tambahin properti di mahasiswa (token)
---
--- NOTE: 
---      jika lu pada ada yng nemu error saat import db/updet db/testing, janlup inpokan digrup ae.
---      dan jika ad yg dirasa ganjal ato salah atopun mau kasih sarang, ingpokan aja digrup.
-
---  nampung data divisi untuk setiap panitia yang register
+-- add home,state,malpun page toggle
 CREATE TABLE `divisi` (
   `divisiID` char(3) NOT NULL, 
   `name` varchar(32) NOT NULL, 
@@ -247,7 +237,11 @@ INSERT INTO `technical_toggle` (`id`, `name`, `toggle`) VALUES
 (3, 'updateState', 1),
 (4, 'deleteState', 1),
 (5, 'stateRegistration', 1),
-(6, 'presensi', 1); 
+(6, 'presensi', 1),
+(7, 'HoME', 1),
+(8, 'STATE', 1), 
+(9, 'Malpun', 1); 
+
 
 
 CREATE TABLE `mahasiswa_password_recovery_token` (

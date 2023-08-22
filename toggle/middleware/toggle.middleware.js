@@ -36,6 +36,21 @@ exports.presensi = async (req, res, next) => {
     next()
 }
 
+exports.homePage = async (req, res, next) => {
+    req.toggleID = 7
+    next()
+}
+
+exports.statepage = async (req, res, next) => {
+    req.toggleID = 8
+    next()
+}
+
+exports.malpunpage = async (req, res, next) => {
+    req.toggleID = 9
+    next()
+}
+
 // exports.malpunMABA = async(req, res, next) => {
 //     req.toggleID = 7
 //     next()

@@ -10,6 +10,16 @@ exports.readAllToggle = async (req,res) =>{
     }
 }
 
+exports.checktoggle = async (req,res) =>{
+    try {
+        const { id } = req.params
+        const result = await toggleDB.query().select('name','toggle').where({ id })
+        return res.status(200).send(result)  
+    } 
+    catch (err) {
+        return res.status(500).send({ message: err.message })
+    }
+}
 
 exports.updateToggleValue = async(req,res)=>{
     try {
