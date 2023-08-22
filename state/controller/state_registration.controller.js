@@ -631,6 +631,50 @@ const handleLastAttendance = async (req, res) => {
   }
 };
 
+const readMabaSpecificReg = async (req, res) => {
+  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
+  if (!validateNim.success) {
+    return res.status(400).send({
+      code: 400,
+      message: "Validasi gagal.",
+      error: validateNim.error,
+    });
+  }
+
+  try {
+    let result = await stateRegDB
+      .query()
+      .where({ "state_registration.nim": validateNim.data })
+      .join("mahasiswa", "state_registration.nim", "=", "mahasiswa.nim")
+      .join(
+        "state_activities",
+        "state_registration.stateID",
+        "=",
+        "state_activities.stateID"
+      )
+      .select(
+        "state_registration.stateID",
+        "mahasiswa.nim",
+        "mahasiswa.token",
+        "mahasiswa.name",
+        "state_registration.created_at",
+        "state_registration.attendanceTime",
+        "state_registration.isFirstAttended",
+        "state_registration.isLastAttended",
+        "state_activities.name as stateName",
+        "state_activities.day"
+      );
+
+    return res.status(200).send({
+      code: 200,
+      message: `Berhasil mendapatkan data pendaftaran STATE untuk nim : ${validateNim.data}`,
+      data: result,
+    });
+  } catch (err) {
+    return res.status(500).send({ code: 500, message: err.message });
+  }
+};
+
 /*
 NOTE untuk maba regis STATE (farel):
 -   Maba maksimal regis 3 state (DONE)
@@ -689,4 +733,5 @@ module.exports = {
   cancelRegistration,
   handleFirstAttendance,
   handleLastAttendance,
+  readMabaSpecificReg,
 };

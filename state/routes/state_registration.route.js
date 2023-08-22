@@ -67,5 +67,12 @@ module.exports = function (app){
         middleware.verifyJWT, 
         middleware.isPanitia,
         stateRegController.handleLastAttendance
-    );    
+    );
+    
+    app.get(
+        '/api/state/regData/:nim',
+        middleware.verifyJWT,
+        middleware.isMahasiswa,
+        stateRegController.readMabaSpecificReg
+    )
 }
