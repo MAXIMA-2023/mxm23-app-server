@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const randomToken = require("random-token");
 const { Model } = require("objection");
 const Mahasiswa = require("../model/mahasiswa.model");
-const MahasiswaForgotPasswordTokenStorage = require('../../mail/mahasiswa_forgot_password_token.model');
+const MahasiswaForgotPasswordTokenStorage = require("../../mail/mahasiswa_forgot_password_token.model");
 const stateRegDB = require("../../state/model/state_registration.model");
 const postmarkClient = require("../../config/postmark");
 const sendGridClient = require("../../config/sendgrid");
@@ -82,7 +82,7 @@ const login = async (req, res) => {
       .first();
 
     if (!mahasiswa) {
-      return res.status(401).json({
+      return res.status(404).json({
         code: 404,
         message: `Tidak dapat menemukan Mahasiswa dengan NIM ${req.body.nim}.`,
       });
@@ -117,7 +117,7 @@ const login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -252,7 +252,6 @@ const getSpecificStudentWithStateByNim = async (req, res) => {
   }
 
   try {
-
     const dataMahasiswa = await Mahasiswa.query()
       .where({ nim: validateNim.data })
       .select(
@@ -266,8 +265,6 @@ const getSpecificStudentWithStateByNim = async (req, res) => {
         "token"
       )
       .first();
-
-
 
     if (!dataMahasiswa) {
       return res.status(404).send({
@@ -498,7 +495,10 @@ const getStatistic = async (req, res) => {
     let rawStatisticCounter = 0;
 
     while (current <= maxTownEnd) {
-      if (rawStatisticCounter >= rawStatistic.length || current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date) {
+      if (
+        rawStatisticCounter >= rawStatistic.length ||
+        current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date
+      ) {
         maxTownStatistic.push({
           date: current.toISOString(),
           registered: 0,
@@ -516,7 +516,10 @@ const getStatistic = async (req, res) => {
     current = new Date(rundown.home.start);
 
     while (current <= homeEnd) {
-      if (rawStatisticCounter >= rawStatistic.length || current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date) {
+      if (
+        rawStatisticCounter >= rawStatistic.length ||
+        current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date
+      ) {
         homeStatistic.push({
           date: current.toISOString(),
           registered: 0,
@@ -547,7 +550,6 @@ const getStatistic = async (req, res) => {
   }
 };
 
-
 // API Client
 const sendPasswordRecoveryLink = async (req, res) => {
   const { nim = "", email = "" } = req.body;
@@ -555,9 +557,8 @@ const sendPasswordRecoveryLink = async (req, res) => {
 
   const token = randomToken(48);
   try {
-
-    const user = await Mahasiswa.query().where({nim, email}).first();
-    if (!user){
+    const user = await Mahasiswa.query().where({ nim, email }).first();
+    if (!user) {
       return res.status(404).send({
         code: 404,
         message: "Data yang kamu masukkan tidak terdaftar.",
@@ -565,52 +566,52 @@ const sendPasswordRecoveryLink = async (req, res) => {
     }
 
     const currentDate = new Date();
-    currentDate.setTime(currentDate.getTime() + process.env.EMAIL_TOKEN_EXPIRATION * 60 * 1000)
+    currentDate.setTime(
+      currentDate.getTime() + process.env.EMAIL_TOKEN_EXPIRATION * 60 * 1000
+    );
     const expires_at = currentDate;
 
-    await MahasiswaForgotPasswordTokenStorage.query().where({nim}).delete();    
+    await MahasiswaForgotPasswordTokenStorage.query().where({ nim }).delete();
 
-    const createToken = await MahasiswaForgotPasswordTokenStorage.query().insert({
-      nim,
-      token, 
-      expires_at
-    });  
-
+    const createToken =
+      await MahasiswaForgotPasswordTokenStorage.query().insert({
+        nim,
+        token,
+        expires_at,
+      });
 
     const subject = "MAXIMA UMN - Password Recovery Link";
-    const body = 
-          `
+    const body = `
           <p>Halo, Maximers!</p>
           <p>Berikut adalah tautan untuk mengubah password akunmu.</p>
           <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
-          `
-    const highTrafficBody = 
-          `
+          `;
+    const highTrafficBody = `
           <p>Halo, Maximers!</p>
           <p>(Traffic saat ini sedang tinggi, maaf kalau pengiriman emailnya lama ya...)</p>
           <p>Berikut adalah tautan untuk mengubah password akunmu.</p>
           <a target="_blank" href='${process.env.CLIENT_URL}/${process.env.EMAIL_CLIENT_REDIRECT_URL}?token=${token}'> Click here</a>
-          `    
+          `;
 
     // kasi message kalo off limit
     // mailConfig.sendMail({
     //   from : process.env.MAIL_ACCOUNT,
-    //   to : user.email, 
+    //   to : user.email,
     //   subject,
     //   html : body
     // }, (err) => {
-    //   if (err) throw new Error(err)  
+    //   if (err) throw new Error(err)
     //   return res.status(200).send({
-    //     code : 200, 
+    //     code : 200,
     //     message : "Berhasil mengirim tautan perubahan password melalui email."
-    //   }) 
-    // })  
-    
+    //   })
+    // })
+
     // SENDGRID API
 
     const emailData = {
       from: "maxima.umn.website@gmail.com",
-      to : user.email,
+      to: user.email,
       subject,
       html: body,
     };
@@ -621,57 +622,58 @@ const sendPasswordRecoveryLink = async (req, res) => {
       .send(emailData)
       .then((response) => {
         return res.status(200).send({
-          code : 200, 
-          message : "Berhasil mengirim tautan perubahan password melalui email."
-        })  
-      }).catch(err => {
-          mailConfig.sendMail({
-            from : process.env.MAIL_ACCOUNT,
-            to : user.email, 
+          code: 200,
+          message: "Berhasil mengirim tautan perubahan password melalui email.",
+        });
+      })
+      .catch((err) => {
+        mailConfig.sendMail(
+          {
+            from: process.env.MAIL_ACCOUNT,
+            to: user.email,
             subject,
-            html : highTrafficBody
-          }, (err) => {
+            html: highTrafficBody,
+          },
+          (err) => {
             if (err) {
               return res.status(500).send({
-                code : 500, 
-                message : err.message
-              });              
+                code: 500,
+                message: err.message,
+              });
             }
             return res.status(200).send({
-              code : 200, 
-              message : "Berhasil mengirim tautan perubahan password melalui email."
-            }) 
-          })          
+              code: 200,
+              message:
+                "Berhasil mengirim tautan perubahan password melalui email.",
+            });
+          }
+        );
       });
-
   } catch (err) {
     return res.status(500).send({
-      code : 500, 
-      message : err.message
+      code: 500,
+      message: err.message,
     });
   }
-
 };
-
 
 const exchangePasswordRecoveryToken = async (req, res) => {
   const { token = "", password } = req.body;
 
   try {
-
-    if (!password){
+    if (!password) {
       return res.status(400).json({
-        code : 400, 
-        message : "Kata sandi tidak boleh kosong."          
-      })
-    }    
+        code: 400,
+        message: "Kata sandi tidak boleh kosong.",
+      });
+    }
 
-    if (password.length < 8){
+    if (password.length < 8) {
       return res.status(400).json({
-        code : 400, 
-        message : "Kata sandi harus lebih panjang dari 8 karakter."          
-      })
-    }       
+        code: 400,
+        message: "Kata sandi harus lebih panjang dari 8 karakter.",
+      });
+    }
 
     // const a = await MahasiswaForgotPasswordTokenStorage.query()
     //   .where({token}).first()
@@ -679,39 +681,35 @@ const exchangePasswordRecoveryToken = async (req, res) => {
     // console.log(a.expires_at, new Date())
     // console.log(a.expires_at > new Date());
 
-
     const exchangeToken = await MahasiswaForgotPasswordTokenStorage.query()
-      .where({token})
-      .where('expires_at', '>', new Date().toISOString())
+      .where({ token })
+      .where("expires_at", ">", new Date().toISOString())
       .delete();
 
-    if (!exchangeToken){
-        return res.status(403).json({
-          code : 403, 
-          message : "Token tidak valid."          
-        })
+    if (!exchangeToken) {
+      return res.status(403).json({
+        code: 403,
+        message: "Token tidak valid.",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await Mahasiswa.query().update({
-      password : hashedPassword
+      password: hashedPassword,
     });
 
     return res.status(200).send({
       code: 200,
       message: "Berhasil mengubah kata sandi.",
-    });    
-    
-  
+    });
   } catch (err) {
     return res.status(500).send({
-      code : 500, 
-      message : err.message
+      code: 500,
+      message: err.message,
     });
   }
-
-}
+};
 
 module.exports = {
   register,
@@ -724,6 +722,6 @@ module.exports = {
   updateStudent,
   deleteStudent,
   getStatistic,
-  sendPasswordRecoveryLink, 
-  exchangePasswordRecoveryToken
+  sendPasswordRecoveryLink,
+  exchangePasswordRecoveryToken,
 };
