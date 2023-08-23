@@ -345,7 +345,7 @@ const deleteRegData = async (req, res) => {
 
 const handleRegistration = async (req, res) => {
   const { stateID } = req.body;
-  const { decoded_nim : nim } = req;
+  const { decoded_nim: nim } = req;
   const body = { nim, stateID };
 
   // Cek input kosong
@@ -485,11 +485,11 @@ const cancelRegistration = async (req, res) => {
       });
     }
 
-    const decrementRegisteredQuota = await stateDB 
+    const decrementRegisteredQuota = await stateDB
       .query()
-      .where({stateID})
-      .decrement('registered', 1);
-      
+      .where({ stateID })
+      .decrement("registered", 1);
+
     await transaction.commit();
 
     return res.status(200).send({
@@ -632,20 +632,10 @@ const handleLastAttendance = async (req, res) => {
 };
 
 const readMabaSpecificReg = async (req, res) => {
-  const validateNim = await nimValidator.safeParseAsync(req.params.nim);
-  if (!validateNim.success) {
-    return res.status(400).send({
-      code: 400,
-      message: "Validasi gagal.",
-      error: validateNim.error,
-    });
-  }
-
   try {
     let result = await stateRegDB
       .query()
-      .where({ "state_registration.nim": validateNim.data })
-      .join("mahasiswa", "state_registration.nim", "=", "mahasiswa.nim")
+      .where({ "state_registration.nim": req.decoded_nim })
       .join(
         "state_activities",
         "state_registration.stateID",
@@ -654,15 +644,17 @@ const readMabaSpecificReg = async (req, res) => {
       )
       .select(
         "state_registration.stateID",
-        "mahasiswa.nim",
-        "mahasiswa.token",
-        "mahasiswa.name",
         "state_registration.created_at",
         "state_registration.attendanceTime",
         "state_registration.isFirstAttended",
         "state_registration.isLastAttended",
-        "state_activities.name as stateName",
-        "state_activities.day"
+        "state_activities.day",
+        "state_activities.name",
+        "state_activities.stateLogo",
+        "state_activities.stateDesc",
+        "state_activities.location",
+        "state_activities.registered",
+        "state_activities.quota"
       );
 
     return res.status(200).send({
