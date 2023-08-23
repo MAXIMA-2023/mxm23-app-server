@@ -642,6 +642,7 @@ const readMabaSpecificReg = async (req, res) => {
         "=",
         "state_activities.stateID"
       )
+      .join("day_management", "state_activities.day", "=", "day_management.day")
       .select(
         "state_registration.stateID",
         "state_registration.created_at",
@@ -650,6 +651,7 @@ const readMabaSpecificReg = async (req, res) => {
         "state_registration.isLastAttended",
         "state_activities.day",
         "state_activities.name",
+        "day_management.date",
         "state_activities.stateLogo",
         "state_activities.stateDesc",
         "state_activities.location",
