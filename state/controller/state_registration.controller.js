@@ -659,7 +659,7 @@ const readMabaSpecificReg = async (req, res) => {
 
     return res.status(200).send({
       code: 200,
-      message: `Berhasil mendapatkan data pendaftaran STATE untuk nim : ${validateNim.data}`,
+      message: `Berhasil mendapatkan data pendaftaran STATE untuk nim : ${req.decoded_nim}`,
       data: result,
     });
   } catch (err) {
