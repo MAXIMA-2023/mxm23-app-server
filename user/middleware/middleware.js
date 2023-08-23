@@ -1,10 +1,9 @@
-const env = require('dotenv').config({path : '../../.env'});
+const env = require("dotenv").config({ path: "../../.env" });
 const jwt = require("jsonwebtoken");
-const rateLimiter = require('express-rate-limit');
+const rateLimiter = require("express-rate-limit");
 const MahasiswaDB = require("../model/mahasiswa.model");
 const PanitiaDB = require("../model/panitia.model");
 const OrgDB = require("../model/organisator.model");
-
 
 exports.verifyJWT = async (req, res, next) => {
   try {
@@ -16,8 +15,8 @@ exports.verifyJWT = async (req, res, next) => {
 
     next();
   } catch (err) {
-    return res.status(403).send({
-      code: 403,
+    return res.status(401).send({
+      code: 401,
       message: "Token anda tidak valid, harap login ulang!",
     });
   }
@@ -79,14 +78,13 @@ exports.isOrganisator = async (req, res, next) => {
   }
 };
 
-
 exports.rateLimit = rateLimiter({
-  windowMs : process.env.EMAIL_RESET_API_CALL_LIMIT * 60 * 1000,
-  max : 1, 
-  message : {
-    code : 429, 
-    message : `Kamu hanya bisa mengirimkan tautan perubahan password setiap ${process.env.EMAIL_RESET_API_CALL_LIMIT} menit.`
-  }, 
-  standardeHeaders : true, 
-  legacyHeaders : false,
+  windowMs: process.env.EMAIL_RESET_API_CALL_LIMIT * 60 * 1000,
+  max: 1,
+  message: {
+    code: 429,
+    message: `Kamu hanya bisa mengirimkan tautan perubahan password setiap ${process.env.EMAIL_RESET_API_CALL_LIMIT} menit.`,
+  },
+  standardeHeaders: true,
+  legacyHeaders: false,
 });
