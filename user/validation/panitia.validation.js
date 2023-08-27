@@ -3,8 +3,8 @@ const z = require("zod");
 const registerValidator = z.object({
   nim: z
     .number()
-    .min(1000, "NIM harus 5 sampai 6 digit")
-    .max(999999, "NIM tidak boleh lebih besar dari 6 digit"),
+    .min(1000, "NIM harus 5 digit")
+    .max(99999, "NIM harus 5 digit"),
   name: z.string(),
   password: z.string().min(8, "Password harus lebih dari 8 karakter"),
   email: z
