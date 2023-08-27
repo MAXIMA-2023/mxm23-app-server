@@ -6,7 +6,7 @@ const registerValidator = z.object({
   nim: z
     .number()
     .min(10000, "NIM harus 5 digit")
-    .max(99999, "NIM harus 5 digit"),
+    .max(999999, "NIM tidak boleh lebih besar dari 6 digit"),
   name: z.string(),
   email: z
     .string()
