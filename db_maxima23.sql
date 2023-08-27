@@ -1,6 +1,10 @@
--- DATABASE versi 22 agus 2023
+-- DATABASE dev versi 25 agus 2023
 -- UPDATE:
--- add home,state,malpun page toggle
+-- add external table
+-- add property alfagiftid untuk maba dan external
+-- add isAttendedMalpun untuk maba dan external
+-- add ticketClaimed untuk maba
+-- add ticketBuyed untuk external
 CREATE TABLE `divisi` (
   `divisiID` char(3) NOT NULL, 
   `name` varchar(32) NOT NULL, 
@@ -39,6 +43,9 @@ CREATE TABLE `mahasiswa` (
   `prodi` varchar(32) NOT NULL,
   `token` varchar(32) NOT NULL,
   `created_at` datetime DEFAULT NOW(),
+  `alfagiftID` varchar(16) DEFAULT NULL,
+  `ticketClaimed` tinyint(1) DEFAULT NULL,
+  `isAttendedMalpun` tinyint DEFAULT 0,
   PRIMARY KEY (`nim`) 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -47,6 +54,22 @@ INSERT INTO `mahasiswa` (`name`, `nim`, `password`, `whatsapp`, `email`, `angkat
 ('henry', 66484, '$2a$10$7XBGYMXUE6vsYUv/ohsgr.QrKR1efpEyQ9BnEhJBrrzjg.iorAgIy', '0852', 'gilbert.henry@student.umn.ac.id', 2023,'lineidgilbert', 'Infor', 'MXM23-66484');
 
 -- --------------------------------------------------------
+
+CREATE TABLE `external` (
+  `name` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `whatsapp` varchar(15) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `token` varchar(32) NOT NULL,
+  `created_at` datetime DEFAULT NOW(),
+  `alfagiftID` varchar(16) DEFAULT NULL,
+  `ticketBuyed` tinyint(1) DEFAULT NULL,
+  `isAttendedMalpun` tinyint DEFAULT 0,
+  PRIMARY KEY (`nim`) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ------------------------------------------------------------
 
 -- untuk menampung data berupa tgl dan waktu kapan suatu state dilaksanakan
 -- dibuat tabel ini agar jika ingin mengedit jam pada satu hari, tidak perlu mengedit satu persatu pada tabel state_activities
@@ -238,11 +261,9 @@ INSERT INTO `technical_toggle` (`id`, `name`, `toggle`) VALUES
 (4, 'deleteState', 1),
 (5, 'stateRegistration', 1),
 (6, 'presensi', 1),
-(7, 'HoME', 1),
-(8, 'STATE', 1), 
-(9, 'Malpun', 1); 
-
-
+(7, 'HoMEpage', 1),
+(8, 'STATEpage', 1), 
+(9, 'Malpunpage', 1); 
 
 CREATE TABLE `mahasiswa_password_recovery_token` (
   `nim` int(11) NOT NULL,
