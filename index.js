@@ -21,6 +21,9 @@ require("./state/routes/day_management.route")(app);
 require("./state/routes/state_activities.route")(app);
 require("./state/routes/state_registration.route")(app);
 
+// malpun
+require('./malpun/routes/midtrans.route')(app);
+
 // auth
 require("./user/routes/auth.route")(app);
 
