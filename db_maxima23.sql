@@ -56,7 +56,6 @@ INSERT INTO `mahasiswa` (`name`, `nim`, `password`, `whatsapp`, `email`, `angkat
 -- --------------------------------------------------------
 
 CREATE TABLE `external` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `whatsapp` varchar(15) NOT NULL,
@@ -66,7 +65,7 @@ CREATE TABLE `external` (
   `alfagiftID` varchar(16) DEFAULT NULL,
   `ticketBuyed` tinyint(1) DEFAULT NULL,
   `isAttendedMalpun` tinyint DEFAULT 0,
-  PRIMARY KEY (`id`) 
+  PRIMARY KEY (`nim`) 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -286,3 +285,15 @@ CREATE TABLE `mahasiswa_password_recovery_token` (
 --   `expires_at` tinyint(1) NOT NULL,
 --   FOREIGN KEY (`nim`) REFERENCES organisator(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `malpun_transaction` (
+  `id` VARCHAR(255), -- ORDER ID
+  `nim` INT(11),  -- IF EXTERNAL THEN NULL, ELSE MAHASISWA, 
+  `status` VARCHAR(255),
+  `created_at` datetime DEFAULT NOW(),  
+  `updated_at` datetime DEFAULT NOW(),    
+  FOREIGN KEY (`nim`) REFERENCES mahasiswa(`nim`) ON DELETE NULL ON UPDATE CASCADE
+  PRIMARY KEY (`id`)  
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
