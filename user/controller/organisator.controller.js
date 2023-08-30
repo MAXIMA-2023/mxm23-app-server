@@ -454,7 +454,7 @@ exports.getStatistic = async (req, res) => {
             .leftJoin('state_registration', function(){
               this.on(Model.raw('DAY(day_management.date)'), '=', Model.raw('DAY(state_registration.created_at)'));
             })
-            .groupBy(Model.raw('DAY(day_management.date)'),Model.raw('day_management.date'));      
+            .groupBy(Model.raw('DAY(day_management.date), day_management.date'));      
 
       return res.status(200).send({
           code: 200,
