@@ -8,6 +8,7 @@ class Mahasiswa extends Model {
 
     static get relationMappings(){
         const StateRegistration = require('../../state/model/state_registration.model');
+        const MalpunTransaction = require('../../malpun/model/malpun_transaction.model');
         return {
             state_registration : {
                 relation : Model.HasManyRelation, 
@@ -16,6 +17,14 @@ class Mahasiswa extends Model {
                     from : 'mahasiswa.nim', 
                     to : 'state_registration.nim'
                 }
+            }, 
+            malpun_transaction : {
+                relation : Model.HasManyRelation, 
+                modelClass : MalpunTransaction, 
+                join : {
+                    from : 'mahasiswa.nim', 
+                    to : 'malpun_transaction.nim'
+                }                
             }
         }
     }
