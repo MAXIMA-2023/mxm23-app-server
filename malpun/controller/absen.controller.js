@@ -1,5 +1,5 @@
 const Mahasiswa = require("../../user/model/mahasiswa.model");
-
+const External = require("../model/external.model");
 
 exports.absenmalpuninternal = async (req, res) => {
 
