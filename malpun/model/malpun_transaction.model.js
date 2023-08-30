@@ -8,19 +8,7 @@ class MalpunTransaction extends Model{
         return 'malpun_transaction';
     }
 
-    static get relationMappings(){ 
-        const Mahasiswa = require('../../user/model/mahasiswa.model');
-        return {
-            mahasiswa :{
-                relation: Model.BelongsToOneRelation,
-                modelClass: Mahasiswa,
-                join:{
-                    from: 'malpun_transaction.nim',
-                    to: 'mahasiswa.nim'
-                }
-            }
-        }
-    }
+    static get relationMappings(){}
 }
 
 module.exports = MalpunTransaction;
