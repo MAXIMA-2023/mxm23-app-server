@@ -302,3 +302,15 @@ CREATE TABLE `mahasiswa_password_recovery_token` (
 --   `expires_at` tinyint(1) NOT NULL,
 --   FOREIGN KEY (`nim`) REFERENCES organisator(`nim`) ON DELETE CASCADE ON UPDATE CASCADE
 -- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `malpun_transaction` (
+  `id` VARCHAR(255), -- ORDER ID
+  `nim` INT(11),  -- IF EXTERNAL THEN NULL, ELSE MAHASISWA, 
+  `status` VARCHAR(255),
+  `created_at` datetime DEFAULT NOW(),  
+  `updated_at` datetime DEFAULT NOW(),    
+  FOREIGN KEY (`nim`) REFERENCES mahasiswa(`nim`) ON DELETE NULL ON UPDATE CASCADE
+  PRIMARY KEY (`id`)  
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
