@@ -15,6 +15,7 @@ require("./user/routes/divisi.route")(app);
 require("./user/routes/mahasiswa.route")(app);
 require("./user/routes/organisator.route")(app);
 require("./user/routes/panitia.route")(app);
+require("./user/routes/external.route")(app);
 
 //state
 require("./state/routes/day_management.route")(app);

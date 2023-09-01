@@ -61,12 +61,4 @@ module.exports = (app) => {
     isPanitia,
     getSpecificStudentWithStateByNim
   ); 
-
-  app.post('/api/mahasiswa/malpun/checkout', 
-  // verifyJWT, 
-  // isMahasiswa, 
-  ticketCheckout
-  );
-
-
 };
