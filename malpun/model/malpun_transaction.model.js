@@ -8,7 +8,6 @@ class MalpunTransaction extends Model{
         return 'malpun_transaction';
     }
 
-    static get relationMappings(){}
 }
 
 module.exports = MalpunTransaction;

@@ -1,7 +1,9 @@
-const { Model } = require('objection')
+const { Model } = require('objection');
+const knex = require('../../config/knex')
 
-class External extends Model {
+Model.knex(knex)
 
+class External extends Model{
     static get tableName(){
         return 'external';
     }

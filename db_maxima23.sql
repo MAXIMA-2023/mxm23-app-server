@@ -60,30 +60,14 @@ INSERT INTO `mahasiswa` (`name`, `nim`, `password`, `whatsapp`, `email`, `angkat
 ('henry', 66484, '$2a$10$7XBGYMXUE6vsYUv/ohsgr.QrKR1efpEyQ9BnEhJBrrzjg.iorAgIy', '0852', 'gilbert.henry@student.umn.ac.id', 2023,'lineidgilbert', 'Infor', 'MXM23-66484');
 
 -- --------------------------------------------------------
-CREATE TABLE `dummytransaction`(
-  `transactionID` int(11) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY(`transactionID`)
-)Engine=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- CREATE TABLE `dummytransaction`(
+--   `transactionID` int(11) NOT NULL AUTO_INCREMENT,
+--   PRIMARY KEY(`transactionID`)
+-- )Engine=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `dummytransaction` (`transactionID`) VALUES
-(1);
+-- INSERT INTO `dummytransaction` (`transactionID`) VALUES
+-- (1);
 
-CREATE TABLE `external` (
-  `transactionID` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `whatsapp` varchar(15) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `token` varchar(32) NOT NULL,
-  `created_at` datetime DEFAULT NOW(),
-  `alfagiftID` varchar(16) DEFAULT 0,
-  `ticketBuyed` tinyint(1) DEFAULT 0,
-  `isAttendedMalpun` tinyint(1) DEFAULT 0,
-  PRIMARY KEY (`transactionID`),
-  FOREIGN KEY (`transactionID`) REFERENCES dummytransaction(`transactionID`) ON DELETE CASCADE ON UPDATE CASCADE 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-INSERT INTO `external`( `transactionID`, `name`, `whatsapp`, `email`, `token`) VALUES
-(1, 'Dummy External', '080809090707', 'external@gmail.com', 'MXM23-1');
 
 
 -- ------------------------------------------------------------
@@ -306,11 +290,26 @@ CREATE TABLE `mahasiswa_password_recovery_token` (
 
 CREATE TABLE `malpun_transaction` (
   `id` VARCHAR(255), -- ORDER ID
-  `nim` INT(11),  -- IF EXTERNAL THEN NULL, ELSE MAHASISWA, 
   `status` VARCHAR(255),
   `created_at` datetime DEFAULT NOW(),  
   `updated_at` datetime DEFAULT NOW(),    
-  FOREIGN KEY (`nim`) REFERENCES mahasiswa(`nim`) ON DELETE NULL ON UPDATE CASCADE
   PRIMARY KEY (`id`)  
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `external` (
+  `transactionID` VARCHAR(255),
+  `name` varchar(255) NOT NULL,
+  `whatsapp` varchar(15) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `token` varchar(32) NOT NULL,
+  `created_at` datetime DEFAULT NOW(),
+  `alfagiftID` varchar(16) DEFAULT 0,
+  `ticketBuyed` tinyint(1) DEFAULT 0,
+  `isAttendedMalpun` tinyint(1) DEFAULT 0,
+  -- PRIMARY KEY (`transactionID`),
+  FOREIGN KEY (`transactionID`) REFERENCES malpun_transaction(`id`) ON DELETE SET NULL ON UPDATE CASCADE 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- INSERT INTO `external`( `transactionID`, `name`, `whatsapp`, `email`, `token`) VALUES
+-- (1, 'Dummy External', '080809090707', 'external@gmail.com', 'MXM23-1');

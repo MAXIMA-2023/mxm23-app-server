@@ -3,10 +3,10 @@ const externalController = require("../controller/external.controller");
 
 module.exports = function (app) {
 
-    // app.post(
-    //     "/api/external/register",
-    //     externalController.registerexternal
-    // );
+    app.post(
+        "/api/external/register",
+        externalController.registerexternal
+    );
     
     // app.post(
     //     "/api/external/login", 
