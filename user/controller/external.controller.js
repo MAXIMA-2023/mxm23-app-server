@@ -57,14 +57,7 @@ const registerexternal = async (req, res) => {
 const ticketCheckout = async (req, res) => {
 
 
-    try {
-
-
-
-
-    // if external data inputs are valid then enable midtrans modal
-    
-    
+    try {    
       const transactionTokenExchangeURL = process.env.MIDTRANS_TRANSACTION_TOKEN_URL;
       const serverKey = process.env.MIDTRANS_SERVER_KEY;  
   
