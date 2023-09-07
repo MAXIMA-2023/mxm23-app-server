@@ -683,7 +683,7 @@ const exchangePasswordRecoveryToken = async (req, res) => {
 
     const exchangeToken = await MahasiswaForgotPasswordTokenStorage.query()
       .where({ token })
-      .where("expires_at", ">", new Date().toISOString())
+      .where("expires_at", ">", new Date())
       .delete();
 
     if (!exchangeToken) {
