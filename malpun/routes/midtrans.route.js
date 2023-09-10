@@ -9,5 +9,5 @@ const {
 
 
 module.exports = (app) => {
-    app.post('/api/mahasiswa/malpun/payment', paymentCallback);
+    app.post('/api/malpun/payment', paymentCallback);
 }

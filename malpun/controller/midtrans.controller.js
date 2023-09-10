@@ -3,7 +3,8 @@ const { midtransCore, midtransSnap } = require('../../config/midtrans');
 
 
 const paymentCallback = async (req, res) => {
-
+    console.log("__CALLBACK__");
+    console.log(req.body);
     // wait for input alfagift ID
     // tanya ini API input alfagift sama sponsor pisah apa gabung
     const payload = req.body; 

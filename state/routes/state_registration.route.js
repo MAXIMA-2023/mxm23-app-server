@@ -72,6 +72,7 @@ module.exports = function (app) {
     middleware.isPanitia,
     stateRegController.handleLastAttendance
   );
+  
 
   // mahasiswa routes
   app.get(
