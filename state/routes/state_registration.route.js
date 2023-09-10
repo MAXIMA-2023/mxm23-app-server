@@ -14,7 +14,7 @@ module.exports = function (app) {
   app.get(
     "/api/state/data/:nim",
     middleware.verifyJWT,
-    state_middleware.isOrganisatorAndPanitiaSpesifik,
+    state_middleware.isOrganisatorAndPanitiaInspice,
     stateRegController.readSpecificReg
   );
   //untuk organisator
@@ -62,14 +62,14 @@ module.exports = function (app) {
   app.post(
     "/api/state/attendance/first",
     middleware.verifyJWT,
-    middleware.isPanitia,
+    state_middleware.isOrganisatorAndPanitiaInspice,
     stateRegController.handleFirstAttendance
   );
 
   app.post(
     "/api/state/attendance/last",
     middleware.verifyJWT,
-    middleware.isPanitia,
+    state_middleware.isOrganisatorAndPanitiaInspice,
     stateRegController.handleLastAttendance
   );
   

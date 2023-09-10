@@ -4,8 +4,8 @@ const nimValidator = z.preprocess(
   (a) => parseInt(z.string().parse(a)),
   z
     .number("NIM kosong! Harap diisi terlebih dahulu")
-    .min(10000, "NIM harus 5 digit")
-    .max(99999, "NIM harus 5 digit")
+    .min(10000, "NIM harus 5 sampai 6 digit")
+    .max(999999, "NIM tidak boleh lebih besar dari 6 digit")
 );
 
 const stateIDValidator = z.preprocess(
