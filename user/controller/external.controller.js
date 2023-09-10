@@ -21,8 +21,7 @@ const registerexternal = async (req, res) => {
             error: validateBody.error,
           });
         }
-        console.log(External, 'e'), 
-        console.log(MalpunTransaction);
+        
         const transactionData = await MalpunTransaction.query()
             .insert({
                 id : transactionID, 
@@ -40,11 +39,10 @@ const registerexternal = async (req, res) => {
         // midtrans snap token exchange
         // nanti kasitau frontend buat siap2in midtrans di FE nya yg
         // nyimpen tombol bwt call API ini
-        const orderID = randomToken(32);
   
         const body = {
           "transaction_details": {
-              "order_id" : orderID,
+              "order_id" : transactionID,
               "gross_amount": 20000 // harga tiket malpun
           },
           "credit_card":{
@@ -111,11 +109,14 @@ const ticketCheckout = async (req, res) => {
             "quantity": 1,
             "name": "Tiket Malam Puncak MAXIMA UMN 2023"
         }],       
+        // TESTER
+        "customer_details": {
+            "name" : "blawg",
+            "email": "maxima.umn@ac.id",
+            "whatsapp" : "081383556677"
+        }        
       }     
-        // "customer_details": {
-        //     "username" : req.userAcc.username,
-        //     "email": req.userAcc.email,
-        // }
+
   
         midtransSnap.createTransactionToken(body)
           .then(async token => { 
