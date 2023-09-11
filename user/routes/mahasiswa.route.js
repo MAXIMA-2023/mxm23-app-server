@@ -10,8 +10,7 @@ const {
   deleteStudent,
   getStatistic,
   sendPasswordRecoveryLink,
-  exchangePasswordRecoveryToken, 
-  ticketCheckout
+  exchangePasswordRecoveryToken
 } = require("../controller/mahasiswa.controller");
 const {
   verifyJWT,
@@ -60,5 +59,11 @@ module.exports = (app) => {
     verifyJWT,
     isPanitia,
     getSpecificStudentWithStateByNim
+<<<<<<< HEAD
   ); 
+=======
+  );
+
+
+>>>>>>> main
 };

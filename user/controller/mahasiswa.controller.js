@@ -8,7 +8,6 @@ const MahasiswaForgotPasswordTokenStorage = require("../../mail/mahasiswa_forgot
 const stateRegDB = require("../../state/model/state_registration.model");
 const postmarkClient = require("../../config/postmark");
 const sendGridClient = require("../../config/sendgrid");
-const { midtransCore, midtransSnap } = require('../../config/midtrans');
 
 const {
   registerValidator,
@@ -682,9 +681,15 @@ const exchangePasswordRecoveryToken = async (req, res) => {
     // console.log(a.expires_at, new Date())
     // console.log(a.expires_at > new Date());
 
+
+    const getToken = await MahasiswaForgotPasswordTokenStorage.query()
+      .where({token})
+      .first();    
+
+    const nim = getToken?.nim || '';      
+
     const exchangeToken = await MahasiswaForgotPasswordTokenStorage.query()
       .where({ token })
-      .where("expires_at", ">", new Date())
       .delete();
 
     if (!exchangeToken) {
@@ -696,9 +701,9 @@ const exchangePasswordRecoveryToken = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await Mahasiswa.query().update({
-      password: hashedPassword,
-    });
+    await Mahasiswa.query()  
+      .where({nim})      
+      .update({ password: hashedPassword })      
 
     return res.status(200).send({
       code: 200,
@@ -711,9 +716,6 @@ const exchangePasswordRecoveryToken = async (req, res) => {
     });
   }
 };
-
-
-
 
 module.exports = {
   register,

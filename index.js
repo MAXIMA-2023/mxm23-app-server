@@ -22,12 +22,15 @@ require("./state/routes/day_management.route")(app);
 require("./state/routes/state_activities.route")(app);
 require("./state/routes/state_registration.route")(app);
 
+<<<<<<< HEAD
 // malpun
 require('./malpun/routes/midtrans.route')(app);
 require('./malpun/routes/absen.route')(app);
 require('./malpun/routes/data.route')(app);
 require('./malpun/routes/ticket.route')(app);
 
+=======
+>>>>>>> main
 // auth
 require("./user/routes/auth.route")(app);
 
