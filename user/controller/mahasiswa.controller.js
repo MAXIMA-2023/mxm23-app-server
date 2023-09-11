@@ -681,9 +681,15 @@ const exchangePasswordRecoveryToken = async (req, res) => {
     // console.log(a.expires_at, new Date())
     // console.log(a.expires_at > new Date());
 
+
+    const getToken = await MahasiswaForgotPasswordTokenStorage.query()
+      .where({token})
+      .first();    
+
+    const nim = getToken?.nim || '';      
+
     const exchangeToken = await MahasiswaForgotPasswordTokenStorage.query()
       .where({ token })
-      .where("expires_at", ">", new Date())
       .delete();
 
     if (!exchangeToken) {
@@ -695,15 +701,9 @@ const exchangePasswordRecoveryToken = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await Mahasiswa.query()
-      .join('mahasiswa_password_recovery_token', 'mahasiswa_password_recovery_token.nim', '=', 'mahasiswa.nim')
-      .where({
-        'mahasiswa_password_recovery_token.token' : token
-      })
-      .update({
-        password: hashedPassword,
-      })
-
+    await Mahasiswa.query()  
+      .where({nim})      
+      .update({ password: hashedPassword })      
 
     return res.status(200).send({
       code: 200,
