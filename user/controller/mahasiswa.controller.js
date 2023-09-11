@@ -695,9 +695,15 @@ const exchangePasswordRecoveryToken = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await Mahasiswa.query().update({
-      password: hashedPassword,
-    });
+    await Mahasiswa.query()
+      .join('mahasiswa_password_recovery_token', 'mahasiswa_password_recovery_token.nim', '=', 'mahasiswa.nim')
+      .where({
+        'mahasiswa_password_recovery_token.token' : token
+      })
+      .update({
+        password: hashedPassword,
+      })
+
 
     return res.status(200).send({
       code: 200,
