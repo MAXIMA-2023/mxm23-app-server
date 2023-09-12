@@ -448,13 +448,21 @@ exports.getStatistic = async (req, res) => {
       }      
 
 
-      const result = await DayManagementDB.query()
-            .select(Model.raw('day_management.date as day'))
+      // const result = await DayManagementDB.query()
+      //       .select(Model.raw('day_management.date as day'))
+      //       .count('state_registration.stateID as total')
+      //       .leftJoin('state_registration', function(){
+      //         this.on(Model.raw('DAY(day_management.date)'), '=', Model.raw('DAY(state_registration.created_at)'));
+      //       })
+      //       .where({'state_registration.stateID' : stateID})
+      //       .groupBy(Model.raw('DAY(day_management.date), day_management.date'));      
+
+      const result = await stateRegDB.query()
+            .select('state_registration.created_at as day')
             .count('state_registration.stateID as total')
-            .leftJoin('state_registration', function(){
-              this.on(Model.raw('DAY(day_management.date)'), '=', Model.raw('DAY(state_registration.created_at)'));
-            })
-            .groupBy(Model.raw('DAY(day_management.date), day_management.date'));      
+            .where({'state_registration.stateID' : stateID})
+            .groupBy(Model.raw('date(state_registration.created_at)'));
+            
 
       return res.status(200).send({
           code: 200,
