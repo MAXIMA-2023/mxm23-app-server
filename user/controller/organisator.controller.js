@@ -461,7 +461,7 @@ exports.getStatistic = async (req, res) => {
             .select('state_registration.created_at as day')
             .count('* as total')
             .where({'state_registration.stateID' : stateID})
-            .groupBy(Model.raw('date(state_registration.created_at, state_registration.created_at)'));
+            .groupBy(Model.raw('date(state_registration.created_at), state_registration.created_at)'));
             
 
       return res.status(200).send({
