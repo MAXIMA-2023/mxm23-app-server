@@ -459,9 +459,9 @@ exports.getStatistic = async (req, res) => {
 
       const result = await stateRegDB.query()
             .select('state_registration.created_at as day')
-            .count('state_registration.stateID as total')
+            .count('* as total')
             .where({'state_registration.stateID' : stateID})
-            .groupBy(Model.raw('date(state_registration.created_at)'));
+            .groupBy(Model.raw('date(state_registration.created_at )'));
             
 
       return res.status(200).send({
