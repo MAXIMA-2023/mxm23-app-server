@@ -460,7 +460,7 @@ exports.getStatistic = async (req, res) => {
           code: 200,
           message: "Berhasil mendapatkan statistik state.",
           data : {
-              name : state.name, 
+              state : state.name, 
               statistic : result
           }
       });             
