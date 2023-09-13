@@ -467,12 +467,12 @@ exports.getStatistic = async (req, res) => {
     //       .where({'state_registration.stateID' : stateID})
     //       .groupBy(Model.raw('DAY(day_management.date), day_management.date'));
 
-    const result = await stateRegDB
-      .query()
-      .select("state_registration.created_at as day")
-      .count("* as total")
-      .where({ "state_registration.stateID": stateID })
-      .groupBy(Model.raw("date(state_registration.created_at )"));
+      const result = await stateRegDB.query()
+            .select('state_registration.created_at as day')
+            .count('* as total')
+            .where({'state_registration.stateID' : stateID})
+            .groupBy(Model.raw('DAY(state_registration.created_at), DAY(state_registration.created_at)'));
+            
 
     return res.status(200).send({
       code: 200,
