@@ -240,14 +240,14 @@ const updateRegData = async (req, res) => {
     }
 
     const cekSTATE = await stateDB.query().where({ stateID: stateIDNew });
-    if (cekSTATE.length === 0 || cekSTATE === []) {
+    if (cekSTATE.length === 0 || cekSTATE === null) {
       return res.status(404).send({
         message: "STATE yang kamu input tidak terdaftar, dicek lagi ya!",
       });
     }
 
     const cekRegister = await stateRegDB.query().where({ nim, stateID });
-    if (cekRegister.length === 0 || cekRegister === []) {
+    if (cekRegister.length === 0 || cekRegister === null) {
       return res.status(403).send({
         message: "Kamu tidak mendaftar pada STATE ini!",
       });
@@ -309,14 +309,14 @@ const deleteRegData = async (req, res) => {
     }
 
     const cekSTATE = await stateDB.query().where({ stateID });
-    if (cekSTATE.length === 0 || cekSTATE === []) {
+    if (cekSTATE.length === 0 || cekSTATE === null) {
       return res.status(404).send({
         message: "STATE yang kamu input tidak terdaftar, dicek lagi ya!",
       });
     }
 
     const cekRegister = await stateRegDB.query().where({ nim, stateID });
-    if (cekRegister.length === 0 || cekRegister === []) {
+    if (cekRegister.length === 0 || cekRegister === null) {
       return res.status(403).send({
         message: "Kamu belum mendaftar pada STATE ini!",
       });
@@ -357,8 +357,6 @@ const handleRegistration = async (req, res) => {
       error: emptyEntriesValidation,
     });
   }
-
-  const transaction = await Model.startTransaction();
 
   try {
     // Cek total pendaftaran
@@ -439,14 +437,11 @@ const handleRegistration = async (req, res) => {
       });
     if (!updateQuota) throw new Error();
 
-    await transaction.commit();
-
     return res.status(201).send({
       code: 201,
       message: "Pendaftaran STATE berhasil.",
     });
   } catch (err) {
-    await transaction.rollback();
 
     if (err instanceof ForeignKeyViolationError) {
       return res.status(400).send({
@@ -466,8 +461,6 @@ const handleRegistration = async (req, res) => {
 const cancelRegistration = async (req, res) => {
   const { stateID = "" } = req.params;
   const nim = req.decoded_nim || "";
-
-  const transaction = await Model.startTransaction();
 
   try {
     const deleteRegistrationData = await stateRegDB
@@ -490,14 +483,12 @@ const cancelRegistration = async (req, res) => {
       .where({ stateID })
       .decrement("registered", 1);
 
-    await transaction.commit();
 
     return res.status(200).send({
       code: 200,
       message: "Berhasil menghapus data pendaftaran STATE.",
     });
   } catch (err) {
-    await transaction.rollback();
     return res.status(500).send({
       code: 500,
       message: err.message,
