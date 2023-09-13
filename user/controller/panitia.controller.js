@@ -68,6 +68,7 @@ exports.register = async (req, res) => {
     });
   } catch (err) {
     // logging.registerLog('Register/Panitia', nim, ip, err.message)
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -138,6 +139,7 @@ exports.login = async (req, res) => {
     });
   } catch (err) {
     // logging.loginLog('Login/Panitia', nim, ip, err.message)
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -173,6 +175,7 @@ exports.getProfile = async (req, res) => {
       data: panitia,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -198,6 +201,7 @@ exports.readAllData = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -241,6 +245,7 @@ exports.readSpecificData = async (req, res) => {
       data: panitia,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -306,6 +311,7 @@ exports.updateData = async (req, res) => {
       message: "Data berhasil diupdate",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
@@ -354,6 +360,7 @@ exports.verifyAcc = async (req, res) => {
       message: "Data berhasil diupdate",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
@@ -395,6 +402,7 @@ exports.deleteData = async (req, res) => {
       message: `Berhasil menghapus data mahasiswa dengan NIM ${validateNim.data}.`,
     });
   } catch (error) {
+    console.error(error);
     return res.status(500).send({
       code: 500,
       message: "Terjadi kesalahan pada server.",
@@ -426,33 +434,30 @@ exports.countAllData = async (req, res) => {
       .first();
 
     //total maba yang sdh buat akun
-    const mhsCount = await MahasiswaDB.query()
-      .count("* as total")
-      .first();
+    const mhsCount = await MahasiswaDB.query().count("* as total").first();
 
     //total maba yang sudah ambil state
-    const mhsStateCount = await stateRegDB.query()
-    .countDistinct('nim as total')
-    .first();
+    const mhsStateCount = await stateRegDB
+      .query()
+      .countDistinct("nim as total")
+      .first();
 
     return res.status(200).send({
       code: 200,
       message: "Berhasil mengambil seluruh data panitia",
       data: {
-        totalPanit : panitCount.total,
-        totalPanitPerDivisi : panitiaCountPerDivision.total,
-        totalOrg : orgCount.total,
-        totalMaba : mhsCount.total,
-        totalMabaState : mhsStateCount.total,
-
-      }
+        totalPanit: panitCount.total,
+        totalPanitPerDivisi: panitiaCountPerDivision.total,
+        totalOrg: orgCount.total,
+        totalMaba: mhsCount.total,
+        totalMabaState: mhsStateCount.total,
+      },
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
     });
   }
 };
-
-

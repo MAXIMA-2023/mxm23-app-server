@@ -9,6 +9,7 @@ exports.getDivisi = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,

@@ -36,6 +36,7 @@ exports.isMahasiswa = async (req, res, next) => {
 
     next();
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
@@ -56,6 +57,7 @@ exports.isPanitia = async (req, res, next) => {
 
     next();
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
@@ -74,6 +76,7 @@ exports.isOrganisator = async (req, res, next) => {
 
     next();
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
