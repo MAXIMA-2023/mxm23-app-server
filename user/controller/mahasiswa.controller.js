@@ -119,7 +119,6 @@ const login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
     console.error(err);
     return res.status(500).send({
       code: 500,
@@ -627,7 +626,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
       html: body,
     };
 
-    console.log(emailData);
+    // console.log(emailData);
 
     sendGridClient
       .send(emailData)

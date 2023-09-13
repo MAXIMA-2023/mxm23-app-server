@@ -47,7 +47,7 @@ exports.absenmalpuninternal = async (req, res) => {
       message: "Berhasil melakukan absensi.",
     });
   } catch (err) {
-        console.error(err)
+    console.error(err)
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -96,7 +96,7 @@ exports.absenmalpuninternal = async (req, res) => {
 //       .update({ ticketClaimed: true});
 //   } catch (err) {
 //         console.error(err)
-    return res.status(500).send({
+// return res.status(500).send({
 //       code: 500,
 //       message: err.message,
 //     });
