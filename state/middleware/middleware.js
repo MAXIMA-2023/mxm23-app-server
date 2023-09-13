@@ -15,6 +15,7 @@ exports.isOrganisatorAndPanitia = async (req, res, next) => {
 
     next();
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };
@@ -52,6 +53,7 @@ exports.isOrganisatorAndPanitiaSpesifik = async (req, res, next) => {
     req.divisiID = panitia.length > 0 ? panitia[0].divisiID : 0;
     next();
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };
@@ -89,6 +91,7 @@ exports.isOrganisatorAndPanitiaInspice = async (req, res, next) => {
     req.divisiID = panitia.length > 0 ? panitia[0].divisiID : 0;
     next();
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };

@@ -8,7 +8,7 @@ const MahasiswaForgotPasswordTokenStorage = require("../../mail/mahasiswa_forgot
 const stateRegDB = require("../../state/model/state_registration.model");
 const postmarkClient = require("../../config/postmark");
 const sendGridClient = require("../../config/sendgrid");
-const { midtransCore, midtransSnap } = require('../../config/midtrans');
+const { midtransCore, midtransSnap } = require("../../config/midtrans");
 
 const {
   registerValidator,
@@ -56,6 +56,7 @@ const register = async (req, res) => {
       message: "Pendaftaran berhasil.",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -119,6 +120,7 @@ const login = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -154,6 +156,7 @@ const getProfile = async (req, res) => {
       data: mahasiswa,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -181,6 +184,7 @@ const getAllStudent = async (req, res) => {
       data: daftarMahasiswa,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -234,6 +238,7 @@ const getAllStudentWithState = async (req, res) => {
       data,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -303,6 +308,7 @@ const getSpecificStudentWithStateByNim = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -349,6 +355,7 @@ const getSpecificStudent = async (req, res) => {
       data: mahasiswa,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -409,6 +416,7 @@ const updateStudent = async (req, res) => {
       message: `Berhasil mengubah data mahasiswa dengan NIM : ${validateNim.data}`,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -444,6 +452,7 @@ const deleteStudent = async (req, res) => {
       message: `Berhasil menghapus data mahasiswa dengan NIM : ${validateNim.data}`,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -544,6 +553,7 @@ const getStatistic = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -637,6 +647,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
           },
           (err) => {
             if (err) {
+              console.error(err);
               return res.status(500).send({
                 code: 500,
                 message: err.message,
@@ -651,6 +662,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
         );
       });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -705,15 +717,13 @@ const exchangePasswordRecoveryToken = async (req, res) => {
       message: "Berhasil mengubah kata sandi.",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
     });
   }
 };
-
-
-
 
 module.exports = {
   register,

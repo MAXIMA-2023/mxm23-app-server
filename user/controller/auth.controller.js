@@ -69,6 +69,7 @@ exports.loginpanitorganisator = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
