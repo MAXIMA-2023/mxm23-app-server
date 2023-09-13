@@ -471,76 +471,30 @@ const getStatistic = async (req, res) => {
   };
 
   try {
-    let rawStatistic = await Mahasiswa.query()
+    const maxTownStatistic = await Mahasiswa.query()
+      // .whereBetween("created_at", [rundown.maxTown.start, rundown.maxTown.end])
+      .whereRaw("DATE(created_at) BETWEEN ? AND ?", [
+        rundown.maxTown.start,
+        rundown.maxTown.end,
+      ])
+      .groupByRaw("DATE(created_at)")
+      .orderByRaw("DATE(created_at)")
       .select(
-        Model.raw("DATE(mahasiswa.created_at) AS date"),
-        Model.raw("COUNT(mahasiswa.created_at) AS registered")
-      )
-      .where(
-        Model.raw("mahasiswa.created_at >= ?", rundown.maxTown.start),
-        Model.raw("mahasiswa.created_at <= ?", rundown.maxTown.end)
-      )
-      .orWhere(
-        Model.raw("mahasiswa.created_at >= ?", rundown.home.start),
-        Model.raw("mahasiswa.created_at <= ?", rundown.home.end)
-      )
-      .groupByRaw("DATE(mahasiswa.created_at)")
-      .orderByRaw("DATE(mahasiswa.created_at)");
+        Model.raw("DATE(created_at) as date"),
+        Model.raw("COUNT(*) as registered")
+      );
 
-    rawStatistic = rawStatistic.map((data) => ({
-      ...data,
-      date: new Date(data.date).toLocaleDateString(),
-    }));
-
-    let current = new Date(rundown.maxTown.start);
-    const maxTownEnd = new Date(rundown.maxTown.end);
-    const homeStart = new Date(rundown.home.start);
-    const homeEnd = new Date(rundown.home.end);
-
-    const homeStatistic = [];
-    const maxTownStatistic = [];
-
-    let rawStatisticCounter = 0;
-
-    while (current <= maxTownEnd) {
-      if (
-        rawStatisticCounter >= rawStatistic.length ||
-        current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date
-      ) {
-        maxTownStatistic.push({
-          date: current.toISOString(),
-          registered: 0,
-        });
-      } else {
-        maxTownStatistic.push({
-          date: current.toISOString(),
-          registered: rawStatistic[rawStatisticCounter].registered,
-        });
-        rawStatisticCounter++;
-      }
-      current.setDate(current.getDate() + 1);
-    }
-
-    current = new Date(rundown.home.start);
-
-    while (current <= homeEnd) {
-      if (
-        rawStatisticCounter >= rawStatistic.length ||
-        current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date
-      ) {
-        homeStatistic.push({
-          date: current.toISOString(),
-          registered: 0,
-        });
-      } else {
-        homeStatistic.push({
-          date: current.toISOString(),
-          registered: rawStatistic[rawStatisticCounter].registered,
-        });
-        rawStatisticCounter++;
-      }
-      current.setDate(current.getDate() + 1);
-    }
+    const homeStatistic = await Mahasiswa.query()
+      .whereRaw("DATE(created_at) BETWEEN ? AND ?", [
+        rundown.home.start,
+        rundown.home.end,
+      ])
+      .groupByRaw("DATE(created_at)")
+      .orderByRaw("DATE(created_at)")
+      .select(
+        Model.raw("DATE(created_at) as date"),
+        Model.raw("COUNT(*) as registered")
+      );
 
     return res.status(200).send({
       code: 200,
