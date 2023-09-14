@@ -369,14 +369,14 @@ exports.updateState = async (req, res) => {
     //     stateLogo.mv(uploadPathLogo, async (err) => {
     //         if (err)
     //                 console.error(err)
-    return res.status(500).send({ message: err.messsage });
+    // return res.status(500).send({ message: err.messsage });
 
     //         await storage.bucket(bucketName).upload(uploadPathLogo)
 
     //         fs.unlink(uploadPathLogo, (err) => {
     //             if (err)
     //                     console.error(err)
-    return res.status(500).send({ message: err.messsage });
+    // return res.status(500).send({ message: err.messsage });
     //         })
     //     })
 
