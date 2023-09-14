@@ -46,6 +46,7 @@ exports.readState = async (req, res) => {
     const result = await sActDB.query().select("stateID", "name");
     return res.status(200).send(result);
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };
@@ -68,6 +69,7 @@ exports.readPublicState = async (req, res) => {
 
     return res.status(200).send(result);
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };
@@ -86,6 +88,7 @@ exports.readAllState = async (req, res) => {
 
     return res.status(200).send(result);
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };
@@ -137,6 +140,7 @@ exports.readSpecificState = async (req, res) => {
       data,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };
@@ -170,6 +174,7 @@ exports.readStateByDay = async (req, res) => {
 
     return res.status(200).send(result);
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };
@@ -263,6 +268,7 @@ exports.createState = async (req, res) => {
 
     uploadedFile.mv(uploadPathLogo, async (err) => {
       if (err) {
+        console.error(err);
         return res.status(500).send({ message: err.messsage });
       }
     });
@@ -271,16 +277,19 @@ exports.createState = async (req, res) => {
 
     // stateLogo.mv(uploadPathLogo, async (err) => {
     //     if (err)
-    //         return res.status(500).send({ message: err.messsage })
+    //             console.error(err)
+    return res.status(500).send({ message: err.messsage });
 
     //     await storage.bucket(bucketName).upload(uploadPathLogo)
     //     fs.unlink(uploadPathLogo, (err) => {
     //         if (err) {
-    //             return res.status(500).send({ message: err.messsage })
+    //                 console.error(err)
+    return res.status(500).send({ message: err.messsage });
     //         }
     //     })
     // })
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };
@@ -352,13 +361,15 @@ exports.updateState = async (req, res) => {
 
     //     stateLogo.mv(uploadPathLogo, async (err) => {
     //         if (err)
-    //             return res.status(500).send({ message: err.messsage })
+    //                 console.error(err)
+    return res.status(500).send({ message: err.messsage });
 
     //         await storage.bucket(bucketName).upload(uploadPathLogo)
 
     //         fs.unlink(uploadPathLogo, (err) => {
     //             if (err)
-    //                 return res.status(500).send({ message: err.messsage })
+    //                     console.error(err)
+    return res.status(500).send({ message: err.messsage });
     //         })
     //     })
 
@@ -409,6 +420,7 @@ exports.updateState = async (req, res) => {
 
       uploadedFile.mv(uploadPathLogo, async (err) => {
         if (err) {
+          console.error(err);
           return res.status(500).send({ message: err.messsage });
         }
       });
@@ -429,6 +441,7 @@ exports.updateState = async (req, res) => {
 
     return res.status(200).send({ message: "STATE berhasil diupdate" });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };
@@ -461,6 +474,7 @@ exports.deleteState = async (req, res) => {
     await sActDB.query().delete().where({ stateID });
     return res.status(200).send({ message: "STATE berhasil dihapus" });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ message: err.message });
   }
 };

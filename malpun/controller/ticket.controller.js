@@ -97,6 +97,7 @@ const sendEmail = async (req, res) => {
       message: "Tiket berhasil di-klaim, silahkan cek email",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).json({
       code: 500,
       message: err.message,
@@ -133,6 +134,7 @@ const updateAlphagift = async (req, res) => {
       message: "berhasil input alfagiftID",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).json({
       code: 500,
       message: err.message,

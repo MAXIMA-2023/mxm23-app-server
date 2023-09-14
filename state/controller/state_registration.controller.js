@@ -68,6 +68,7 @@ const readAllReg = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
@@ -111,6 +112,7 @@ const readSpecificReg = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
@@ -163,6 +165,7 @@ const readStateRegByStateID = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
@@ -208,6 +211,7 @@ const readStateRegByDay = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };
@@ -240,14 +244,14 @@ const updateRegData = async (req, res) => {
     }
 
     const cekSTATE = await stateDB.query().where({ stateID: stateIDNew });
-    if (cekSTATE.length === 0 || cekSTATE === []) {
+    if (cekSTATE.length === 0 || cekSTATE === null) {
       return res.status(404).send({
         message: "STATE yang kamu input tidak terdaftar, dicek lagi ya!",
       });
     }
 
     const cekRegister = await stateRegDB.query().where({ nim, stateID });
-    if (cekRegister.length === 0 || cekRegister === []) {
+    if (cekRegister.length === 0 || cekRegister === null) {
       return res.status(403).send({
         message: "Kamu tidak mendaftar pada STATE ini!",
       });
@@ -270,6 +274,7 @@ const updateRegData = async (req, res) => {
     // const cekDivisi = req.stateID
     return res.status(200).send({ message: "Data berhasil diupdate" });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       message: "Halo Maximers, maaf ada kesalahan dari internal " + err,
     });
@@ -309,14 +314,14 @@ const deleteRegData = async (req, res) => {
     }
 
     const cekSTATE = await stateDB.query().where({ stateID });
-    if (cekSTATE.length === 0 || cekSTATE === []) {
+    if (cekSTATE.length === 0 || cekSTATE === null) {
       return res.status(404).send({
         message: "STATE yang kamu input tidak terdaftar, dicek lagi ya!",
       });
     }
 
     const cekRegister = await stateRegDB.query().where({ nim, stateID });
-    if (cekRegister.length === 0 || cekRegister === []) {
+    if (cekRegister.length === 0 || cekRegister === null) {
       return res.status(403).send({
         message: "Kamu belum mendaftar pada STATE ini!",
       });
@@ -337,6 +342,7 @@ const deleteRegData = async (req, res) => {
       .send({ message: "Registrasi STATE berhasil dihapus" });
   } catch (err) {
     // logging.cancelStateLog('CancelState', nim, ip, err.message)
+    console.error(err);
     return res.status(500).send({
       message: "Halo Maximers, maaf ada kesalahan dari internal " + err,
     });
@@ -357,8 +363,6 @@ const handleRegistration = async (req, res) => {
       error: emptyEntriesValidation,
     });
   }
-
-  const transaction = await Model.startTransaction();
 
   try {
     // Cek total pendaftaran
@@ -439,15 +443,11 @@ const handleRegistration = async (req, res) => {
       });
     if (!updateQuota) throw new Error();
 
-    await transaction.commit();
-
     return res.status(201).send({
       code: 201,
       message: "Pendaftaran STATE berhasil.",
     });
   } catch (err) {
-    await transaction.rollback();
-
     if (err instanceof ForeignKeyViolationError) {
       return res.status(400).send({
         code: 400,
@@ -456,6 +456,7 @@ const handleRegistration = async (req, res) => {
       });
     }
 
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -466,8 +467,6 @@ const handleRegistration = async (req, res) => {
 const cancelRegistration = async (req, res) => {
   const { stateID = "" } = req.params;
   const nim = req.decoded_nim || "";
-
-  const transaction = await Model.startTransaction();
 
   try {
     const deleteRegistrationData = await stateRegDB
@@ -490,14 +489,12 @@ const cancelRegistration = async (req, res) => {
       .where({ stateID })
       .decrement("registered", 1);
 
-    await transaction.commit();
-
     return res.status(200).send({
       code: 200,
       message: "Berhasil menghapus data pendaftaran STATE.",
     });
   } catch (err) {
-    await transaction.rollback();
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -556,6 +553,7 @@ const handleFirstAttendance = async (req, res) => {
       message: "Berhasil melakukan absensi.",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -624,6 +622,7 @@ const handleLastAttendance = async (req, res) => {
       message: "Berhasil melakukan absensi.",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -665,6 +664,7 @@ const readMabaSpecificReg = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({ code: 500, message: err.message });
   }
 };

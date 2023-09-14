@@ -1,8 +1,8 @@
 const OrganisatorDB = require("../model/organisator.model");
 const StateDB = require("../../state/model/state_activities.model");
 const stateRegDB = require("../../state/model/state_registration.model");
-const DayManagementDB = require('../../state/model/day_management.model');
-const { Model } = require('objection');
+const DayManagementDB = require("../../state/model/day_management.model");
+const { Model } = require("objection");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validateEmptyEntries } = require("../../helpers/FormValidator");
@@ -64,6 +64,7 @@ exports.registerOrganisator = async (req, res) => {
       massage: "Akun berhasil terdaftar!",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -130,6 +131,7 @@ exports.loginOrganisator = async (req, res) => {
       data: { token: JWTtoken, expiresIn: 86400 },
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -163,6 +165,7 @@ exports.getProfile = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -194,6 +197,7 @@ exports.getOrganisator = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -244,6 +248,7 @@ exports.getOrganisatorspesifik = async (req, res) => {
       data: organisator,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -319,6 +324,7 @@ exports.updateOrganisator = async (req, res) => {
       message: "Data berhasil diupdate",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -375,6 +381,7 @@ exports.verifyAcc = async (req, res) => {
       message: "Data berhasil diupdate",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -419,6 +426,7 @@ exports.getDelete = async (req, res) => {
       message: "Data berhasil dihapus",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -426,54 +434,62 @@ exports.getDelete = async (req, res) => {
   }
 };
 
-
 exports.getStatistic = async (req, res) => {
-    const { decoded_nim } = req;
-    const { stateID = "" } = req.params;
+  const { decoded_nim } = req;
+  const { stateID = "" } = req.params;
 
-    try {
+  try {
+    const state = await StateDB.query()
+      .where({ "state_activities.stateID": stateID })
+      .where({ "organisator.nim": decoded_nim })
+      .join("organisator", function () {
+        this.on(
+          Model.raw("organisator.stateID"),
+          "=",
+          Model.raw("state_activities.stateID")
+        );
+      })
+      .first();
 
-      const state = await StateDB.query()    
-              .where({'state_activities.stateID' : stateID})
-              .where({'organisator.nim' : decoded_nim})
-              .join('organisator', function(){
-                  this.on(Model.raw('organisator.stateID'), '=', Model.raw('state_activities.stateID'))
-              }).first()
-
-      if (!state){
-        return res.status(404).send({
-          code: 404,
-          message: "State tidak ditemukan.",
-        });      
-      }      
-
-
-      const result = await DayManagementDB.query()
-            .select(Model.raw('day_management.date as day'))
-            .count('state_registration.stateID as total')
-            .leftJoin('state_registration', function(){
-              this.on(Model.raw('DAY(day_management.date)'), '=', Model.raw('DAY(state_registration.created_at)'));
-            })
-            .groupBy(Model.raw('DAY(day_management.date), day_management.date'));      
-
-      return res.status(200).send({
-          code: 200,
-          message: "Berhasil mendapatkan statistik state.",
-          data : {
-              name : state.name, 
-              statistic : result
-          }
-      });             
-
-    } catch (err) {
-      return res.status(500).send({
-        code: 500,
-        message: err.message,
-      });      
+    if (!state) {
+      return res.status(404).send({
+        code: 404,
+        message: "State tidak ditemukan.",
+      });
     }
-    
 
-}
+    // const result = await DayManagementDB.query()
+    //       .select(Model.raw('day_management.date as day'))
+    //       .count('state_registration.stateID as total')
+    //       .leftJoin('state_registration', function(){
+    //         this.on(Model.raw('DAY(day_management.date)'), '=', Model.raw('DAY(state_registration.created_at)'));
+    //       })
+    //       .where({'state_registration.stateID' : stateID})
+    //       .groupBy(Model.raw('DAY(day_management.date), day_management.date'));
+
+      const result = await stateRegDB.query()
+            .select('state_registration.created_at as day')
+            .count('* as total')
+            .where({'state_registration.stateID' : stateID})
+            .groupBy(Model.raw('DAY(state_registration.created_at), DAY(state_registration.created_at)'));
+            
+
+    return res.status(200).send({
+      code: 200,
+      message: "Berhasil mendapatkan statistik state.",
+      data: {
+        state: state.name,
+        statistic: result,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+};
 
 exports.getCountData = async (req, res) => {
   try {
@@ -482,19 +498,21 @@ exports.getCountData = async (req, res) => {
       .where({ nim: req.decoded_nim })
       .first();
 
-    const totalMaba = await stateRegDB.query()
-    .where({stateID:orgStateID.stateID})
-    .count(" * as total")
-    .first();
+    const totalMaba = await stateRegDB
+      .query()
+      .where({ stateID: orgStateID.stateID })
+      .count(" * as total")
+      .first();
     return res.status(200).send({
       code: 200,
       message: "Berhasil mendapatkan data organisator",
-      data: totalMaba.total
+      data: totalMaba.total,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
     });
   }
-}
+};

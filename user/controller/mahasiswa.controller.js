@@ -8,6 +8,7 @@ const MahasiswaForgotPasswordTokenStorage = require("../../mail/mahasiswa_forgot
 const stateRegDB = require("../../state/model/state_registration.model");
 const postmarkClient = require("../../config/postmark");
 const sendGridClient = require("../../config/sendgrid");
+const { midtransCore, midtransSnap } = require("../../config/midtrans");
 
 const {
   registerValidator,
@@ -55,6 +56,7 @@ const register = async (req, res) => {
       message: "Pendaftaran berhasil.",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -117,7 +119,7 @@ const login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -153,6 +155,7 @@ const getProfile = async (req, res) => {
       data: mahasiswa,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -180,6 +183,7 @@ const getAllStudent = async (req, res) => {
       data: daftarMahasiswa,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -233,6 +237,7 @@ const getAllStudentWithState = async (req, res) => {
       data,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -302,6 +307,7 @@ const getSpecificStudentWithStateByNim = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -348,6 +354,7 @@ const getSpecificStudent = async (req, res) => {
       data: mahasiswa,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -408,6 +415,7 @@ const updateStudent = async (req, res) => {
       message: `Berhasil mengubah data mahasiswa dengan NIM : ${validateNim.data}`,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -443,6 +451,7 @@ const deleteStudent = async (req, res) => {
       message: `Berhasil menghapus data mahasiswa dengan NIM : ${validateNim.data}`,
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -463,76 +472,30 @@ const getStatistic = async (req, res) => {
   };
 
   try {
-    let rawStatistic = await Mahasiswa.query()
+    const maxTownStatistic = await Mahasiswa.query()
+      // .whereBetween("created_at", [rundown.maxTown.start, rundown.maxTown.end])
+      .whereRaw("DATE(created_at) BETWEEN ? AND ?", [
+        rundown.maxTown.start,
+        rundown.maxTown.end,
+      ])
+      .groupByRaw("DATE(created_at)")
+      .orderByRaw("DATE(created_at)")
       .select(
-        Model.raw("DATE(mahasiswa.created_at) AS date"),
-        Model.raw("COUNT(mahasiswa.created_at) AS registered")
-      )
-      .where(
-        Model.raw("mahasiswa.created_at >= ?", rundown.maxTown.start),
-        Model.raw("mahasiswa.created_at <= ?", rundown.maxTown.end)
-      )
-      .orWhere(
-        Model.raw("mahasiswa.created_at >= ?", rundown.home.start),
-        Model.raw("mahasiswa.created_at <= ?", rundown.home.end)
-      )
-      .groupByRaw("DATE(mahasiswa.created_at)")
-      .orderByRaw("DATE(mahasiswa.created_at)");
+        Model.raw("DATE(created_at) as date"),
+        Model.raw("COUNT(*) as registered")
+      );
 
-    rawStatistic = rawStatistic.map((data) => ({
-      ...data,
-      date: new Date(data.date).toLocaleDateString(),
-    }));
-
-    let current = new Date(rundown.maxTown.start);
-    const maxTownEnd = new Date(rundown.maxTown.end);
-    const homeStart = new Date(rundown.home.start);
-    const homeEnd = new Date(rundown.home.end);
-
-    const homeStatistic = [];
-    const maxTownStatistic = [];
-
-    let rawStatisticCounter = 0;
-
-    while (current <= maxTownEnd) {
-      if (
-        rawStatisticCounter >= rawStatistic.length ||
-        current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date
-      ) {
-        maxTownStatistic.push({
-          date: current.toISOString(),
-          registered: 0,
-        });
-      } else {
-        maxTownStatistic.push({
-          date: current.toISOString(),
-          registered: rawStatistic[rawStatisticCounter].registered,
-        });
-        rawStatisticCounter++;
-      }
-      current.setDate(current.getDate() + 1);
-    }
-
-    current = new Date(rundown.home.start);
-
-    while (current <= homeEnd) {
-      if (
-        rawStatisticCounter >= rawStatistic.length ||
-        current.toLocaleDateString() !== rawStatistic[rawStatisticCounter].date
-      ) {
-        homeStatistic.push({
-          date: current.toISOString(),
-          registered: 0,
-        });
-      } else {
-        homeStatistic.push({
-          date: current.toISOString(),
-          registered: rawStatistic[rawStatisticCounter].registered,
-        });
-        rawStatisticCounter++;
-      }
-      current.setDate(current.getDate() + 1);
-    }
+    const homeStatistic = await Mahasiswa.query()
+      .whereRaw("DATE(created_at) BETWEEN ? AND ?", [
+        rundown.home.start,
+        rundown.home.end,
+      ])
+      .groupByRaw("DATE(created_at)")
+      .orderByRaw("DATE(created_at)")
+      .select(
+        Model.raw("DATE(created_at) as date"),
+        Model.raw("COUNT(*) as registered")
+      );
 
     return res.status(200).send({
       code: 200,
@@ -543,6 +506,7 @@ const getStatistic = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -616,7 +580,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
       html: body,
     };
 
-    console.log(emailData);
+    // console.log(emailData);
 
     sendGridClient
       .send(emailData)
@@ -636,6 +600,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
           },
           (err) => {
             if (err) {
+              console.error(err);
               return res.status(500).send({
                 code: 500,
                 message: err.message,
@@ -650,6 +615,7 @@ const sendPasswordRecoveryLink = async (req, res) => {
         );
       });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
@@ -710,6 +676,7 @@ const exchangePasswordRecoveryToken = async (req, res) => {
       message: "Berhasil mengubah kata sandi.",
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).send({
       code: 500,
       message: err.message,
