@@ -463,7 +463,7 @@ const handleRegistration = async (req, res) => {
       return res.status(400).send({
         code: 400, 
         error : "DUPLICATE_ENTRY",
-        message: "NIM kamu telah terdaftar sebelumnya.",
+        message: "Kamu baru saja mendaftar.",
       });
     }    
     return res.status(500).send({
