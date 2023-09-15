@@ -35,6 +35,7 @@ const register = async (req, res) => {
     if (mahasiswa) {
       return res.status(400).send({
         code: 400,
+        error : "DUPLICATE_ENTRY",        
         message: "NIM kamu telah terdaftar sebelumnya.",
       });
     }
@@ -57,6 +58,15 @@ const register = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+
+    if (err instanceof UniqueViolationError) {
+      return res.status(400).send({
+        code: 400, 
+        error : "DUPLICATE_ENTRY",
+        message: "NIM kamu telah terdaftar sebelumnya.",
+      });
+    }
+
     return res.status(500).send({
       code: 500,
       message: err.message,
