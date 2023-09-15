@@ -25,7 +25,7 @@ const paymentCallback = async (req, res) => {
         const token = "MXM23-" + randomToken(32);
         const updateTransactionStatus = await MalpunTransaction.query()
           .where({
-            id: "8ij3txnc9b5w5bikn7ufd05e58pwfcn6",
+            id: "8ij3txnc9b5w5bikn7ufd05e58pwfcn1",
           })
           .update({
             status: "settlement",
@@ -33,7 +33,7 @@ const paymentCallback = async (req, res) => {
         // on external table, update ticketBuyed to 1
         const external = await External.query()
           .where({
-            transactionID: "8ij3txnc9b5w5bikn7ufd05e58pwfcn6",
+            transactionID: "8ij3txnc9b5w5bikn7ufd05e58pwfcn1",
           })
           .update({
             ticketBuyed: true,
@@ -45,7 +45,7 @@ const paymentCallback = async (req, res) => {
         const externalAccount = await External.query()
           .join('malpun_transaction', 'malpun_transaction.id', '=', 'external.transactionID')
           .where({
-            transactionID: "8ij3txnc9b5w5bikn7ufd05e58pwfcn6",
+            transactionID: "8ij3txnc9b5w5bikn7ufd05e58pwfcn1",
           })
           .first() || {};
  
@@ -117,38 +117,33 @@ const paymentCallback = async (req, res) => {
           type: "PAYMENT_SETTLEMENT",
           code: 200,
           message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
-        });
-      })
-      .catch((err) => {
-        console.log("NODMAILER");
-        mailConfig.sendMail(
-          {
-            from: process.env.MAIL_ACCOUNT,
-            to: externalAccount?.email || "",
-            subject,
-            html: htmlBody,
-          },
-          (err) => {
-            if (err) {
-              console.error(err);
-              return res.status(500).send({
-                code: 500,
-                message: err.message,
-              });
-            }
-            return res.status(200).json({
-              status: "SUCCESS",
-              type: "PAYMENT_SETTLEMENT",
-              code: 200,
-              message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
-            });
+        }, error => {
+          console.error(error)
+
+          if (error.response){
+            console.log("NODMAILER");
+            mailConfig.sendMail(
+              emailData,
+              (err) => {
+                if (err) {
+                  console.error(err);
+                  return res.status(500).send({
+                    code: 500,
+                    message: err.message,
+                  });
+                }
+                return res.status(200).json({
+                  status: "SUCCESS",
+                  type: "PAYMENT_SETTLEMENT",
+                  code: 200,
+                  message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
+                });
+              }
+            );
           }
-        );
-      });
 
-
-
-        
+        });
+      })        
     
         return res.status(200).json({
           status: "SUCCESS",
@@ -163,7 +158,7 @@ const paymentCallback = async (req, res) => {
         // edit payment status to pending
         const updateTransactionStatus = await MalpunTransaction.query()
           .where({
-            id: "8ij3txnc9b5w5bikn7ufd05e58pwfcn6",
+            id: "8ij3txnc9b5w5bikn7ufd05e58pwfcn1",
           })
           .update({
             status: "pending",

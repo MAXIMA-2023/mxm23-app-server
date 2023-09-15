@@ -75,7 +75,7 @@ const ticketCheckout = async (req, res) => {
     const externalAccount = await External.query()
       .join('malpun_transaction', 'external.transactionID', '=', 'malpun_transaction.id')
       // .where('malpun_transaction.id', transaction_id)
-      .where('malpun_transaction.id', '8ij3txnc9b5w5bikn7ufd05e58pwfcn6')
+      .where('malpun_transaction.id', '8ij3txnc9b5w5bikn7ufd05e58pwfcn1')
       .first();
 
 
@@ -90,7 +90,7 @@ const ticketCheckout = async (req, res) => {
     const body = {
       transaction_details: {
         // order_id: transaction_id,
-        order_id : '8ij3txnc9b5w5bikn7ufd05e58pwfcn6',
+        order_id : '8ij3txnc9b5w5bikn7ufd05e58pwfcn1',
         gross_amount: 20000, // harga tiket malpun
       },
       credit_card: {
