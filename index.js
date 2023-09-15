@@ -23,10 +23,10 @@ require("./state/routes/state_activities.route")(app);
 require("./state/routes/state_registration.route")(app);
 
 // malpun
-require('./malpun/routes/midtrans.route')(app);
-require('./malpun/routes/absen.route')(app);
-require('./malpun/routes/data.route')(app);
-require('./malpun/routes/ticket.route')(app);
+// require('./malpun/routes/midtrans.route')(app);
+// require('./malpun/routes/absen.route')(app);
+// require('./malpun/routes/data.route')(app);
+// require('./malpun/routes/ticket.route')(app);
 
 
 // auth
