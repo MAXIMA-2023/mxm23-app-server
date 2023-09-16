@@ -17,7 +17,8 @@ const paymentCallback = async (req, res) => {
 
     Model.transaction(async trx => {
       const payload = req.body;
-      const { transaction_status, transaction_id } = payload;
+      const { transaction_status, transaction_id, order_id } = payload;
+      console.log(payload);
   
       // paid
       if (transaction_status == "settlement") {
@@ -25,7 +26,7 @@ const paymentCallback = async (req, res) => {
         const token = "MXM23-" + randomToken(32);
         const updateTransactionStatus = await MalpunTransaction.query()
           .where({
-            id: "8ij3txnc9b5w5bikn7ufd05e58pwfcn1",
+            id: order_id,
           })
           .update({
             status: "settlement",
@@ -33,7 +34,7 @@ const paymentCallback = async (req, res) => {
         // on external table, update ticketBuyed to 1
         const external = await External.query()
           .where({
-            transactionID: "8ij3txnc9b5w5bikn7ufd05e58pwfcn1",
+            transactionID: order_id,
           })
           .update({
             ticketBuyed: true,
@@ -45,7 +46,7 @@ const paymentCallback = async (req, res) => {
         const externalAccount = await External.query()
           .join('malpun_transaction', 'malpun_transaction.id', '=', 'external.transactionID')
           .where({
-            transactionID: "8ij3txnc9b5w5bikn7ufd05e58pwfcn1",
+            transactionID: order_id,
           })
           .first() || {};
  
@@ -158,7 +159,7 @@ const paymentCallback = async (req, res) => {
         // edit payment status to pending
         const updateTransactionStatus = await MalpunTransaction.query()
           .where({
-            id: "8ij3txnc9b5w5bikn7ufd05e58pwfcn1",
+            id: order_id,
           })
           .update({
             status: "pending",
