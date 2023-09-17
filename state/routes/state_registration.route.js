@@ -14,7 +14,7 @@ module.exports = function (app) {
   app.get(
     "/api/state/data/:nim",
     middleware.verifyJWT,
-    state_middleware.isOrganisatorAndPanitiaInspice,
+    state_middleware.isOrganisatorAndPanitiaInspiceandNuntium,
     stateRegController.readSpecificReg
   );
   //untuk organisator
