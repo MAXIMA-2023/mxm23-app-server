@@ -62,14 +62,14 @@ module.exports = function (app) {
   app.post(
     "/api/state/attendance/first",
     middleware.verifyJWT,
-    state_middleware.isOrganisatorAndPanitiaInspice,
+    state_middleware.isOrganisatorPanitiaInspiceandNuntium,
     stateRegController.handleFirstAttendance
   );
 
   app.post(
     "/api/state/attendance/last",
     middleware.verifyJWT,
-    state_middleware.isOrganisatorAndPanitiaInspice,
+    state_middleware.isOrganisatorPanitiaInspiceandNuntium,
     stateRegController.handleLastAttendance
   );
   
