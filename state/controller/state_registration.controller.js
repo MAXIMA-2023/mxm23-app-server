@@ -664,7 +664,8 @@ const readMabaSpecificReg = async (req, res) => {
         "state_activities.stateDesc",
         "state_activities.location",
         "state_activities.registered",
-        "state_activities.quota"
+        "state_activities.quota",
+        "state_activities.perlengkapan"
       );
 
     return res.status(200).send({
