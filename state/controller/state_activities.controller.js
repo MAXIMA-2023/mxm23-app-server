@@ -63,7 +63,8 @@ exports.readPublicState = async (req, res) => {
         "state_activities.quota",
         "state_activities.registered",
         "day_management.date",
-        "state_activities.location"
+        "state_activities.location",
+        "state_activities.perlengkapan"
       )
       .join("day_management", "day_management.day", "state_activities.day");
 
