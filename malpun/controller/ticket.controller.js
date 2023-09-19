@@ -33,60 +33,69 @@ const sendEmail = async (req, res) => {
 
     //mail options
     const emailHTML = `
-      <html>
+    <!DOCTYPE html>
+    <html lang="en">
       <head>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            background-color: #ffffff;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-          }
-          .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-          }
-          .header {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-          }
-          .body-text {
-            font-size: 16px;
-            margin-bottom: 20px;
-          }
-          .qr-code {
-            display: block;
-            margin: 0 auto;
-          }
-        </style>
+        <meta charset="UTF-8" />
       </head>
-      <body>
-        <div class="container">
-          <div class="header">Malpun Ticket</div>
-          <div class="body-text">
-            Berikut adalah barcode tiket kamu. Tunjukkan barcode ini kepada panitia di hari-H.
-            Jangan lupa datang ya di tanggal 7 Oktober.
-          </div>
-          <img class="qr-code" src="${qrCodeImage}" alt="QR Code" width="300" height="300"/>
-        </div>
-      </body>
-      </html>
+      <table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ededed; ">
+        <tr>
+          <td align="center" valign="middle">
+            <table width="500" cellspacing="0" cellpadding="20" border="0" style="background-color: #ffffff;min-width:auto;max-width:600px; border-radius: 0.7em; box-shadow: 0 2px 10px rgba(0.4, 0.4, 0.4, 0.4);">
+              <tr>
+                <td align="center">
+                  <!-- Image -->
+                  <img src="cid:mxmlogo@maxima" alt="mxmLogo" width="226" height="62" style="width: 226px; height: 62px;" />
+                </td>
+              </tr>
+              <tr>
+                <td style="font-family: 'Nunito Sans', sans-serif; font-size: 15px; text-align: left; text-shadow: 0 2px 10px rgba(0.4, 0.4, 0.4, 0.4); margin-left: 1em; margin-right: 1em;">
+                  <!-- Text Container -->
+                  <p>
+                    Hi, <b>${mahasiswa.name}</b>. Selamat datang di
+                    <b>Malam Puncak MAXIMA 2023</b>. Ini ada ticket buat kamu biar bisa
+                    nikmatin <b> Malam Puncak MAXIMA 2023</b> bersama <b>Maxi </b>dan
+                    <b>Xima</b> dan teman-teman kamu!!!
+                  </p>
+                  <p><b>Jangan lupa ticketnya dibawa ya</b>!!!!</p>
+                </td>
+              </tr>
+              <tr>
+                <td align="center">
+                  <!-- QR Code Image -->
+                  <img src="${qrCodeImage}" alt="Your Image" width="200" height="200" style="width: 200px; height: 200px;" />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </html>
     `;
-
-    let message = {
+    // Define email options
+    const mailOptions = {
       from: process.env.MAIL_ACCOUNT,
       to: mahasiswa.email,
       subject: "Ticket To Malam Puncak",
       attachDataUrls: true,
       html: emailHTML,
+      attachments: [
+        {
+          filename: "MaximaLogo.webp",
+          path: "./public/assets/MaximaLogo.webp",
+          cid: "mxmlogo@maxima",
+        },
+      ],
     };
-    await transporter.sendMail(message);
-
-    const mhs = await Mahasiswa.query()
+    const info = await transporter.sendMail(mailOptions);
+    if (!info) {
+      return res.status(404).send({
+        code: 404,
+        message: "gagal send email",
+      });
+    }
+    
+    await Mahasiswa.query()
       .where({ nim: nimMhs })
       .update({ ticketClaimed: 1 })
       .first();
