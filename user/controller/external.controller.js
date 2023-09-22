@@ -38,12 +38,36 @@ const registerexternal = async (req, res) => {
   
       // midtrans snap token exchange
       // nanti kasitau frontend buat siap2in midtrans di FE nya yg
-      // nyimpen tombol bwt call API ini
+      // nyimpen tombol bwt call API ini 
+
+
+      const body = {
+        transaction_details: {
+          // order_id: transaction_id,
+          order_id : transactionID,
+          gross_amount: 75000, // harga tiket malpun
+        },
+        credit_card: {
+          secure: true,
+        },
+        item_details: [
+          {
+            id: "MXM23-MALPUN-TICKET",
+            price: 75000,
+            quantity: 1,
+            name: "Tiket Malam Puncak MAXIMA UMN 2023",
+          },
+        ],
+        // TESTER
+        customer_details: externalData
+      };
+  
+      const token = await midtransSnap.createTransactionToken(body);      
   
       return res.status(201).send({
         code: 201,
         message: "Pendaftaran berhasil.",
-        data : {...externalData, transaction_id : transactionID}  // tokennya disimpen di state frontend
+        data : {...externalData, transaction_id : transactionID, token}  // tokennya disimpen di state frontend
       });
     }).catch (err => {
       console.error(err);
