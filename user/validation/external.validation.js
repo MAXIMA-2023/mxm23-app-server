@@ -12,7 +12,7 @@ const registerValidator = z.object({
   alfagiftID : z
     .string()
     .startsWith('99900')
-    .length(10)
+    .length(16, 'ID Alfagift tidak valid.')
 });
 
 module.exports = {
