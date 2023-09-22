@@ -45,7 +45,7 @@ const registerexternal = async (req, res) => {
         transaction_details: {
           // order_id: transaction_id,
           order_id : transactionID,
-          gross_amount: 75000, // harga tiket malpun
+          gross_amount: 35000, // harga tiket malpun
         },
         credit_card: {
           secure: true,
@@ -53,7 +53,7 @@ const registerexternal = async (req, res) => {
         item_details: [
           {
             id: "MXM23-MALPUN-TICKET",
-            price: 75000,
+            price: 35000,
             quantity: 1,
             name: "Tiket Malam Puncak MAXIMA UMN 2023",
           },
