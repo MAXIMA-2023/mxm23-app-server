@@ -127,40 +127,36 @@ const paymentCallback = async (req, res) => {
       sendGridClient
       .send(emailData)
       .then((response) => {
-        console.log("SUCCESS");
+        // console.log("SUCCESS");
         return res.status(200).json({
           status: "SUCCESS",
           type: "PAYMENT_SETTLEMENT",
           code: 200,
           message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
-        }, error => {
-          console.error(error)
-
-          if (error.response){
-            console.log("NODMAILER");
-            mailConfig.sendMail(
-              emailData,
-              (err) => {
-                if (err) {
-                  console.error(err);
-                  return res.status(500).send({
-                    code: 500,
-                    message: err.message,
-                  });
-                }
-                return res.status(200).json({
-                  status: "SUCCESS",
-                  type: "PAYMENT_SETTLEMENT",
-                  code: 200,
-                  message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
+        });
+      }).catch(error => {
+        // if (error){
+          mailConfig.sendMail(
+            emailData,
+            (err) => {
+              if (err) {
+                console.error(err);
+                return res.status(500).send({
+                  code: 500,
+                  message: err.message,
                 });
               }
-            );
-          }
+              return res.status(200).json({
+                status: "SUCCESS",
+                type: "PAYMENT_SETTLEMENT",
+                code: 200,
+                message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
+              });
+            }
+          );
+        // }
+      })
 
-        });
-      })        
-    
         return res.status(200).json({
           status: "SUCCESS",
           type: "PAYMENT_SETTLEMENT",
