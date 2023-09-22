@@ -157,9 +157,39 @@ const ticketCheckout = async (req, res) => {
       message: err.message,
     });
   }
-};
+}; 
+
+
+const getPaymentDetail = async (req, res) => {
+  try {
+
+    const { order_id = '' } = req.body; 
+
+    const externalAccount = await External.query()
+      .where('transactionID', order_id)
+      .first();    
+
+
+    return res.status(200).json({
+        status: "SUCCESS",
+        code: 200,
+        message: "Berhasil mendapatkan data external",
+        data : externalAccount
+    })      
+
+
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+}
+
+
 
 module.exports = {
   ticketCheckout,
   registerexternal,
+  getPaymentDetail
 };

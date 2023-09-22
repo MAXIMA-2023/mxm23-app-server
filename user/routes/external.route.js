@@ -17,4 +17,9 @@ module.exports = function (app) {
         "/api/external/ticketCheckout", 
         externalController.ticketCheckout
     );    
+
+    app.post(
+        "/api/external/get_token", 
+        externalController.getPaymentDetail
+    );    
 }
