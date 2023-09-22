@@ -2,6 +2,7 @@ const env = require("dotenv").config({ path: "../../.env" });
 const randomToken = require("random-token");
 const { Model } = require("objection");
 const External = require("../../malpun/model/external.model");
+const Mahasiswa = require('../../user/model/mahasiswa.model');
 const MalpunTransaction = require("../../malpun/model/malpun_transaction.model");
 const { midtransCore, midtransSnap } = require("../../config/midtrans");
 const { registerValidator } = require("../validation/external.validation");
