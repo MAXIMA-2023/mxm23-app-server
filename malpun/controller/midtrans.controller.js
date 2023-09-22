@@ -20,6 +20,21 @@ const paymentCallback = async (req, res) => {
       const { transaction_status, transaction_id, order_id } = payload;
       console.log(payload);
   
+      const transactionData = await MalpunTransaction.query()
+        .where({
+          transactionID : order_id,
+          ticketBuyed : true 
+        }).first()
+
+      if (transactionData) {
+          return res.status(208).json({
+            status: "SUCCESS",
+            type: "PAID",
+            code: 208,
+            message: "Pembayaran telah dilakukan.",
+          });            
+      }
+
       // paid
       if (transaction_status == "settlement") {
         // edit payment status on db
