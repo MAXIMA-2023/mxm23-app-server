@@ -197,8 +197,58 @@ const getPaymentDetail = async (req, res) => {
 
 
 
+const getPaymentDetailByToken = async (req, res) => {
+  try {
+
+    const { token = '' } = req.params;
+
+    const internalAccount = await Mahasiswa.query()
+      .where('token', token)
+      .first();    
+
+    if (internalAccount){
+        return res.status(200).json({
+          status: "SUCCESS",
+          code: 200,
+          message: "Berhasil mendapatkan data external",
+          data : {isInternal : true, ...internalAccount}
+      })        
+    }
+
+    const externalAccount = await External.query()
+      .where('token', token)
+      .first();    
+
+
+    if (!externalAccount){
+      return res.status(404).json({
+        status: "FAIL",
+        code: 404,
+        message: "Tidak menemukan riwayat pembayaran. Silahkan kontak admin MAXIMA untuk penanganan lebih lanjut.",
+      })        
+    }    
+
+
+    return res.status(200).json({
+        status: "SUCCESS",
+        code: 200,
+        message: "Berhasil mendapatkan data external",
+        data : {isInternal : false, ...externalAccount}
+    })      
+
+
+  } catch (err) {
+    return res.status(500).send({
+      code: 500,
+      message: err.message,
+    });
+  }
+}
+
+
 module.exports = {
   ticketCheckout,
   registerexternal,
-  getPaymentDetail
+  getPaymentDetail, 
+  getPaymentDetailByToken
 };
