@@ -20,7 +20,7 @@ const paymentCallback = async (req, res) => {
       const { transaction_status, transaction_id, order_id } = payload;
       console.log(payload);
   
-      const transactionData = await MalpunTransaction.query()
+      const transactionData = await External.query()
         .where({
           transactionID : order_id,
           ticketBuyed : true 
