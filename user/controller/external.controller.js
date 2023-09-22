@@ -170,6 +170,15 @@ const getPaymentDetail = async (req, res) => {
       .first();    
 
 
+    if (!externalAccount){
+      return res.status(404).json({
+        status: "FAIL",
+        code: 404,
+        message: "Tidak menemukan riwayat pembayaran. Silahkan kontak admin MAXIMA untuk penanganan lebih lanjut.",
+      })        
+    }
+
+
     return res.status(200).json({
         status: "SUCCESS",
         code: 200,
