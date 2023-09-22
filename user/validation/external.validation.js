@@ -9,6 +9,10 @@ const registerValidator = z.object({
     .string()
     .min(10, "Nomor Whatsapp harus diatas 10 digit")
     .max(15, "Nomor Whatsapp harus dibawah 15 digit"),   
+  alfagiftID : z
+    .string()
+    .startsWith('99900')
+    .length(10)
 });
 
 module.exports = {
