@@ -22,4 +22,9 @@ module.exports = function (app) {
         "/api/external/get_token", 
         externalController.getPaymentDetail
     );    
+
+    app.post(
+        "/api/malpun/get_tiket_by_token/:token", 
+        externalController.getPaymentDetail
+    );
 }
