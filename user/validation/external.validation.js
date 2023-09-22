@@ -4,7 +4,8 @@ const registerValidator = z.object({
   name: z.string(),
   email: z
     .string()
-    .email("Format email tidak valid"), 
+    .email("Format email tidak valid"),
+  whatsapp: z.string(),    
 });
 
 module.exports = {
