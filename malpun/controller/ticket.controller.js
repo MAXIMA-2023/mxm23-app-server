@@ -79,15 +79,12 @@ const sendEmail = async (req, res) => {
       ],
     };
 
-    mailConfig
-      .sendMail(mailOptions)
-      .then(async (res) => {
-        await Mahasiswa.query()
-          .where({ nim: nimMhs })
-          .update({ ticketClaimed: 1, tokenMalpun })
-          .first();
-      })
-      .catch((err) => console.log(err));
+    await Mahasiswa.query()
+      .where({ nim: nimMhs })
+      .update({ ticketClaimed: 1, tokenMalpun })
+      .first();
+
+    mailConfig.sendMail(mailOptions).catch((err) => console.error(new Date(), err));
 
     return res.status(200).send({
       code: 200,

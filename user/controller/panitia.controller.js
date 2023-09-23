@@ -434,7 +434,7 @@ exports.countAllData = async (req, res) => {
       .first();
 
     //total maba yang sdh buat akun
-    const mhsCount = await MahasiswaDB.query().count("* as total").first();
+    const mhsCount = await MahasiswaDB.query().where("ticketClaimed", 1).count("* as total").first();
 
     //total maba yang sudah ambil state
     const mhsStateCount = await stateRegDB
@@ -451,6 +451,7 @@ exports.countAllData = async (req, res) => {
         totalOrg: orgCount.total,
         totalMaba: mhsCount.total,
         totalMabaState: mhsStateCount.total,
+        totalMabaMalpun : mhsCount.total
       },
     });
   } catch (err) {
