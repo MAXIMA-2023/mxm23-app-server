@@ -2,34 +2,23 @@ const nodemailer = require("nodemailer");
 const Mahasiswa = require("../../user/model/mahasiswa.model");
 const env = require("dotenv").config();
 const QRCode = require("qrcode");
+// const transporter = require("../../config/mail");
+const mailConfig = require("../../config/mail");
+const randomstring = require("randomstring");
 
 const sendEmail = async (req, res) => {
   try {
+    const tokenMalpun = "MXM23-" + randomstring.generate(32);
     const nimMhs = req.decoded_nim;
-
     const mahasiswa = await Mahasiswa.query().where({ nim: nimMhs }).first();
 
-    //return if ticket already claimed
+    // return if ticket already claimed
     if (mahasiswa.ticketClaimed) {
       return res.status(404).send({
         code: 404,
         message: "kamu sudah meng-klaim tiket, silahkan cek email kamu",
       });
     }
-
-    //generate the qr code
-    let qrCodeImage = await QRCode.toDataURL(mahasiswa.token);
-
-    //transporter setup
-    let transporter = nodemailer.createTransport({
-      service: "gmail",
-      // host: process.env.MAIL_HOST,
-      // port: process.env.MAIL_PORT,
-      auth: {
-        user: process.env.MAIL_ACCOUNT,
-        pass: process.env.MAIL_PASSWORD,
-      },
-    });
 
     //mail options
     const emailHTML = `
@@ -63,8 +52,9 @@ const sendEmail = async (req, res) => {
               <tr>
                 <td align="center">
                   <!-- QR Code Image -->
-                  <img src="${qrCodeImage}" alt="Your Image" width="200" height="200" style="width: 200px; height: 200px;" />
-                </td>
+                  <a href="https://maxima.umn.ac.id/malpun/tiket/${tokenMalpun}" style="text-decoration: none; background-color: #F7B70C; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block;">Claim Your Ticket</a>
+
+                  </td>
               </tr>
             </table>
           </td>
@@ -72,6 +62,7 @@ const sendEmail = async (req, res) => {
       </table>
     </html>
     `;
+
     // Define email options
     const mailOptions = {
       from: process.env.MAIL_ACCOUNT,
@@ -87,22 +78,20 @@ const sendEmail = async (req, res) => {
         },
       ],
     };
-    const info = await transporter.sendMail(mailOptions);
-    if (!info) {
-      return res.status(404).send({
-        code: 404,
-        message: "gagal send email",
-      });
-    }
-    
-    await Mahasiswa.query()
-      .where({ nim: nimMhs })
-      .update({ ticketClaimed: 1 })
-      .first();
 
-    // return res.status(200).send(qrCodeImage);
+    mailConfig
+      .sendMail(mailOptions)
+      .then(async (res) => {
+        await Mahasiswa.query()
+          .where({ nim: nimMhs })
+          .update({ ticketClaimed: 1, tokenMalpun })
+          .first();
+      })
+      .catch((err) => console.log(err));
+
     return res.status(200).send({
       code: 200,
+      data: tokenMalpun,
       message: "Tiket berhasil di-klaim, silahkan cek email",
     });
   } catch (err) {
