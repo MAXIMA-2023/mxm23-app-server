@@ -82,7 +82,7 @@ const paymentCallback = async (req, res) => {
                     <tr>
                       <td align="center">
                         <!-- Image -->
-                        <img src="https://storage.googleapis.com/mxm23-app-client/webps/webps/public/assets/MaximaLogo_Desktop.webp" alt="mxmLogo" width="226" height="62" style="width: 226px; height: 62px;" />
+                        <img src="https://storage.googleapis.com/mxm23-app-client/webps/webps/public/assets/MaximaLogoEmail.webp" alt="mxmLogo" width="226" height="62" style="width: 226px; height: 62px;" />
                       </td>
                     </tr>
                     <tr>
@@ -120,29 +120,9 @@ const paymentCallback = async (req, res) => {
           html: emailHTML,
         };
 
-        sendGridClient
-          .send(mailOptions)
-          .then((response) => {
-            // console.log("SUCCESS");
-            return res.status(200).json({
-              status: "SUCCESS",
-              type: "PAYMENT_SETTLEMENT",
-              code: 200,
-              message:
-                "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
-            });
-          })
-          .catch((error) => {
-            // if (error){
-            mailConfig.sendMail(mailOptions);
-            return res.status(200).json({
-              status: "SUCCESS",
-              type: "PAYMENT_SETTLEMENT",
-              code: 200,
-              message:
-                "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
-            });
-          });
+        sendGridClient.send(mailOptions).catch((error) => {
+          mailConfig.sendMail(mailOptions);
+        });
 
         return res.status(200).json({
           status: "SUCCESS",
