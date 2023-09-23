@@ -13,26 +13,25 @@ const paymentCallback = async (req, res) => {
   // tanya ini API input alfagift sama sponsor pisah apa gabung
 
   try {
-
-
-    Model.transaction(async trx => {
+    Model.transaction(async (trx) => {
       const payload = req.body;
       const { transaction_status, transaction_id, order_id } = payload;
       console.log(payload);
-  
+
       const transactionData = await External.query()
         .where({
-          transactionID : order_id,
-          ticketBuyed : true 
-        }).first()
+          transactionID: order_id,
+          ticketBuyed: true,
+        })
+        .first();
 
       if (transactionData) {
-          return res.status(208).json({
-            status: "SUCCESS",
-            type: "PAID",
-            code: 208,
-            message: "Pembayaran telah dilakukan.",
-          });            
+        return res.status(208).json({
+          status: "SUCCESS",
+          type: "PAID",
+          code: 208,
+          message: "Pembayaran telah dilakukan.",
+        });
       }
 
       // paid
@@ -53,92 +52,89 @@ const paymentCallback = async (req, res) => {
           })
           .update({
             ticketBuyed: true,
-            token : token
+            token: token,
           });
         // send email to user (according to token)
 
-
         const externalAccount = await External.query()
-          .join('malpun_transaction', 'malpun_transaction.id', '=', 'external.transactionID')
+          .join(
+            "malpun_transaction",
+            "malpun_transaction.id",
+            "=",
+            "external.transactionID"
+          )
           .where({
             transactionID: order_id,
           })
-          .first() || {};
- 
+          .first();
 
-        let qrCodeImage = await QRCode.toDataURL(token);
+        //mail options
+        const emailHTML = `
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+            </head>
+            <table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ededed; ">
+              <tr>
+                <td align="center" valign="middle">
+                  <table width="500" cellspacing="0" cellpadding="20" border="0" style="background-color: #ffffff;min-width:auto;max-width:600px; border-radius: 0.7em; box-shadow: 0 2px 10px rgba(0.4, 0.4, 0.4, 0.4);">
+                    <tr>
+                      <td align="center">
+                        <!-- Image -->
+                        <img src="https://storage.googleapis.com/mxm23-app-client/webps/webps/public/assets/MaximaLogo_Desktop.webp" alt="mxmLogo" width="226" height="62" style="width: 226px; height: 62px;" />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="font-family: 'Nunito Sans', sans-serif; font-size: 15px; text-align: left; text-shadow: 0 2px 10px rgba(0.4, 0.4, 0.4, 0.4); margin-left: 1em; margin-right: 1em;">
+                        <!-- Text Container -->
+                        <p>
+                          Hi, <b>${externalAccount.name}</b>. Selamat datang di
+                          <b>Malam Puncak MAXIMA 2023</b>. Ini ada ticket buat kamu biar bisa
+                          nikmatin <b> Malam Puncak MAXIMA 2023</b> bersama <b>Maxi </b>dan
+                          <b>Xima</b> dan teman-teman kamu!!!
+                        </p>
+                        <p><b>Jangan lupa ticketnya dibawa ya</b>!!!!</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center">
+                        <!-- QR Code Image -->
+                        <a href="https://maxima.umn.ac.id/malpun/tiket/${token}" style="text-decoration: none; background-color: #F7B70C; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block;">Claim Your Ticket</a>
 
-        const htmlBody = `
-        <html>
-        <head>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              background-color: #ffffff;
-              text-align: center;
-              margin: 0;
-              padding: 0;
-            }
-            .container {
-              width: 100%;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            .header {
-              font-size: 24px;
-              font-weight: bold;
-              margin-bottom: 20px;
-            }
-            .body-text {
-              font-size: 16px;
-              margin-bottom: 20px;
-            }
-            .qr-code {
-              display: block;
-              margin: 0 auto;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">Malpun Ticket</div>
-            <div class="body-text">
-              Berikut adalah barcode tiket kamu. Tunjukkan barcode ini kepada panitia di hari-H.
-              Jangan lupa datang ya di tanggal 7 Oktober.
-            </div>
-            <img class="qr-code" src="${qrCodeImage}" alt="QR Code" width="300" height="300"/>
-          </div>
-        </body>
-        </html>
-      `;
+                        </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </html>
+        `;
 
-      const subject = "MAXIMA 2023 - Klaim Tiket Malam Puncak";
-      const emailData = {
-        from : process.env.MAIL_ACCOUNT, 
-        to : externalAccount?.email || "", 
-        subject, 
-        attachDataUrls : true,
-        html : htmlBody
-      }
+        // Define email options
+        const mailOptions = {
+          from: process.env.MAIL_ACCOUNT,
+          to: mahasiswa.email,
+          subject: "Ticket To Malam Puncak",
+          attachDataUrls: true,
+          html: emailHTML,
+        };
 
-
-
-      sendGridClient
-      .send(emailData)
-      .then((response) => {
-        // console.log("SUCCESS");
-        return res.status(200).json({
-          status: "SUCCESS",
-          type: "PAYMENT_SETTLEMENT",
-          code: 200,
-          message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
-        });
-      }).catch(error => {
-        // if (error){
-          mailConfig.sendMail(
-            emailData,
-            (err) => {
+        sendGridClient
+          .send(emailData)
+          .then((response) => {
+            // console.log("SUCCESS");
+            return res.status(200).json({
+              status: "SUCCESS",
+              type: "PAYMENT_SETTLEMENT",
+              code: 200,
+              message:
+                "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
+            });
+          })
+          .catch((error) => {
+            // if (error){
+            mailConfig.sendMail(emailData, (err) => {
               if (err) {
                 console.error(err);
                 return res.status(500).send({
@@ -150,21 +146,21 @@ const paymentCallback = async (req, res) => {
                 status: "SUCCESS",
                 type: "PAYMENT_SETTLEMENT",
                 code: 200,
-                message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
+                message:
+                  "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
               });
-            }
-          );
-        // }
-      })
+            });
+            // }
+          });
 
         return res.status(200).json({
           status: "SUCCESS",
           type: "PAYMENT_SETTLEMENT",
           code: 200,
           message: "Pembayaran berhasil dilakukan.",
-        });  
+        });
       }
-  
+
       // pending (user had chosen a payment method)
       if (transaction_status == "pending") {
         // edit payment status to pending
@@ -175,8 +171,7 @@ const paymentCallback = async (req, res) => {
           .update({
             status: "pending",
           });
-  
-  
+
         return res.status(200).json({
           status: "SUCCESS",
           type: "PAYMENT_PENDING",
@@ -185,7 +180,7 @@ const paymentCallback = async (req, res) => {
             "Pembayaran sedang dalam status pending / menunggu aksi dari user.",
         });
       }
-  
+
       return res.status(200).json({
         status: "SUCCESS",
         code: 200,
@@ -193,15 +188,13 @@ const paymentCallback = async (req, res) => {
           "Berhasil melakukan pemrosesan pada payment dengan status " +
           transaction_status,
       });
-    }).catch(err => {
+    }).catch((err) => {
       console.error(err);
       return res.status(500).send({
         code: 500,
         message: err.message,
       });
-    })
-
-
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).send({
