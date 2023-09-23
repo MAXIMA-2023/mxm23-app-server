@@ -1,4 +1,3 @@
-const env = require("dotenv").config({ path: "../.env" });
 const nodemailer = require("nodemailer");
 
 const service = process.env.MAIL_SERVICE;
