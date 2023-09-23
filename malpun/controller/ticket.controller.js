@@ -34,7 +34,7 @@ const sendEmail = async (req, res) => {
               <tr>
                 <td align="center">
                   <!-- Image -->
-                  <img src="cid:mxmlogo@maxima" alt="mxmLogo" width="226" height="62" style="width: 226px; height: 62px;" />
+                  <img src="https://storage.googleapis.com/mxm23-app-client/webps/webps/public/assets/MaximaLogoEmail.webp" alt="mxmLogo" width="226" height="62" style="width: 226px; height: 62px;" />
                 </td>
               </tr>
               <tr>
@@ -68,15 +68,7 @@ const sendEmail = async (req, res) => {
       from: process.env.MAIL_ACCOUNT,
       to: mahasiswa.email,
       subject: "Ticket To Malam Puncak",
-      attachDataUrls: true,
       html: emailHTML,
-      attachments: [
-        {
-          filename: "MaximaLogo.webp",
-          path: "./public/assets/MaximaLogo.webp",
-          cid: "mxmlogo@maxima",
-        },
-      ],
     };
 
     await Mahasiswa.query()
