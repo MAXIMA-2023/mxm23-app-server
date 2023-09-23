@@ -114,7 +114,7 @@ const paymentCallback = async (req, res) => {
         // Define email options
         const mailOptions = {
           from: process.env.MAIL_ACCOUNT,
-          to: mahasiswa.email,
+          to: externalAccount.email,
           subject: "Ticket To Malam Puncak",
           attachDataUrls: true,
           html: emailHTML,
