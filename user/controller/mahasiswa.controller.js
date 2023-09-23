@@ -150,7 +150,8 @@ const getProfile = async (req, res) => {
         "angkatan",
         "idLine",
         "prodi",
-        "token"
+        "token",
+        "ticketClaimed"
       );
     if (!mahasiswa) {
       return res.status(404).send({
