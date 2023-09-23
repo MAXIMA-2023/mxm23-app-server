@@ -116,12 +116,12 @@ const paymentCallback = async (req, res) => {
           from: process.env.MAIL_ACCOUNT,
           to: externalAccount.email,
           subject: "Ticket To Malam Puncak",
-          attachDataUrls: true,
+          // attachDataUrls: true,
           html: emailHTML,
         };
 
         sendGridClient
-          .send(emailData)
+          .send(mailOptions)
           .then((response) => {
             // console.log("SUCCESS");
             return res.status(200).json({
@@ -134,23 +134,14 @@ const paymentCallback = async (req, res) => {
           })
           .catch((error) => {
             // if (error){
-            mailConfig.sendMail(emailData, (err) => {
-              if (err) {
-                console.error(err);
-                return res.status(500).send({
-                  code: 500,
-                  message: err.message,
-                });
-              }
-              return res.status(200).json({
-                status: "SUCCESS",
-                type: "PAYMENT_SETTLEMENT",
-                code: 200,
-                message:
-                  "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
-              });
+            mailConfig.sendMail(mailOptions);
+            return res.status(200).json({
+              status: "SUCCESS",
+              type: "PAYMENT_SETTLEMENT",
+              code: 200,
+              message:
+                "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
             });
-            // }
           });
 
         return res.status(200).json({
