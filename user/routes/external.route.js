@@ -17,4 +17,14 @@ module.exports = function (app) {
         "/api/external/ticketCheckout", 
         externalController.ticketCheckout
     );    
+
+    app.post(
+        "/api/external/get_token", 
+        externalController.getPaymentDetail
+    );    
+
+    app.get(
+        "/api/malpun/get_tiket_by_token/:token", 
+        externalController.getPaymentDetailByToken
+    );
 }

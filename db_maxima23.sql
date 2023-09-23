@@ -302,7 +302,7 @@ CREATE TABLE `external` (
   `name` varchar(255) NOT NULL,
   `whatsapp` varchar(15) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `token` varchar(32) NOT NULL,
+  `token` varchar(40),
   `created_at` datetime DEFAULT NOW(),
   `alfagiftID` varchar(16) DEFAULT 0,
   `ticketBuyed` tinyint(1) DEFAULT 0,

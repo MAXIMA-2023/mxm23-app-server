@@ -20,6 +20,21 @@ const paymentCallback = async (req, res) => {
       const { transaction_status, transaction_id, order_id } = payload;
       console.log(payload);
   
+      const transactionData = await External.query()
+        .where({
+          transactionID : order_id,
+          ticketBuyed : true 
+        }).first()
+
+      if (transactionData) {
+          return res.status(208).json({
+            status: "SUCCESS",
+            type: "PAID",
+            code: 208,
+            message: "Pembayaran telah dilakukan.",
+          });            
+      }
+
       // paid
       if (transaction_status == "settlement") {
         // edit payment status on db
@@ -112,40 +127,36 @@ const paymentCallback = async (req, res) => {
       sendGridClient
       .send(emailData)
       .then((response) => {
-        console.log("SUCCESS");
+        // console.log("SUCCESS");
         return res.status(200).json({
           status: "SUCCESS",
           type: "PAYMENT_SETTLEMENT",
           code: 200,
           message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
-        }, error => {
-          console.error(error)
-
-          if (error.response){
-            console.log("NODMAILER");
-            mailConfig.sendMail(
-              emailData,
-              (err) => {
-                if (err) {
-                  console.error(err);
-                  return res.status(500).send({
-                    code: 500,
-                    message: err.message,
-                  });
-                }
-                return res.status(200).json({
-                  status: "SUCCESS",
-                  type: "PAYMENT_SETTLEMENT",
-                  code: 200,
-                  message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
+        });
+      }).catch(error => {
+        // if (error){
+          mailConfig.sendMail(
+            emailData,
+            (err) => {
+              if (err) {
+                console.error(err);
+                return res.status(500).send({
+                  code: 500,
+                  message: err.message,
                 });
               }
-            );
-          }
+              return res.status(200).json({
+                status: "SUCCESS",
+                type: "PAYMENT_SETTLEMENT",
+                code: 200,
+                message: "Pembayaran berhasil dilakukan. Silahkan cek email untuk mengklaim tiket.",
+              });
+            }
+          );
+        // }
+      })
 
-        });
-      })        
-    
         return res.status(200).json({
           status: "SUCCESS",
           type: "PAYMENT_SETTLEMENT",
