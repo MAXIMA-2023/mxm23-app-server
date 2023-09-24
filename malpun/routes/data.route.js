@@ -12,20 +12,20 @@ const {
 module.exports = (app) => {
 
     app.get("/api/malpun/purchase",
-        // verifyJWT, 
-        // isPanitia,
+        verifyJWT, 
+        isPanitia,
         getAllPurchase
     );    
 
     app.get("/api/malpun/purchase/paid",
-        // verifyJWT, 
-        // isPanitia,
+        verifyJWT, 
+        isPanitia,
         getAllPaidPurchase
     );
 
     app.get("/api/malpun/purchase/unpaid",
-        // verifyJWT, 
-        // isPanitia,
+        verifyJWT, 
+        isPanitia,
         getAllUnpaidPurchase
     );    
 }
