@@ -1,4 +1,5 @@
 const OrganisatorDB = require("../model/organisator.model");
+const MahasiswaDB = require("../model/mahasiswa.model");
 const StateDB = require("../../state/model/state_activities.model");
 const stateRegDB = require("../../state/model/state_registration.model");
 const DayManagementDB = require("../../state/model/day_management.model");
@@ -507,10 +508,18 @@ exports.getCountData = async (req, res) => {
       .where({ stateID: orgStateID.stateID })
       .count(" * as total")
       .first();
+    const mhsCount = await MahasiswaDB.query()
+      .where("ticketClaimed", 1)
+      .count("* as total")
+      .first();
+
     return res.status(200).send({
       code: 200,
       message: "Berhasil mendapatkan data organisator",
-      data: totalMaba.total,
+      data: {
+        totalMabaOrg: totalMaba.total,
+        totalMabaMalpun : mhsCount.total
+      },
     });
   } catch (err) {
     console.error(err);

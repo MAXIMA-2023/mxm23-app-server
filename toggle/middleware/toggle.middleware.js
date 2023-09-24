@@ -51,15 +51,16 @@ exports.malpunpage = async (req, res, next) => {
   next();
 };
 
-// exports.malpunMABA = async(req, res, next) => {
-//     req.toggleID = 7
-//     next()
-// }
+exports.MabaClaimTicket = async (req, res, next) => {
+  req.toggleID = 10;
+  next();
+};
 
-// exports.malpunOUTSIDER = async(req, res, next) => {
-//     req.toggleID = 8
-//     next()
-// }
+exports.ExternalBuyTicket = async (req, res, next) => {
+  req.toggleID = 11;
+  next();
+};
+
 
 // dari value toggleID yang diset, akan dicek disini apakah aktif atau nonaktif
 exports.checkToggle = async (req, res, next) => {

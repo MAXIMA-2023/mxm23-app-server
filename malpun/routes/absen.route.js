@@ -4,10 +4,10 @@ const middleware = require('../../user/middleware/middleware')
 module.exports= (app) => {   
 
     app.post(
-        '/api/abseninternal/:nim',
+        '/api/maplun/absen/',
         middleware.verifyJWT,
         middleware.isPanitia,
-        absenController.absenmalpuninternal
+        absenController.absenmalpun
     );
 
     // app.put(
