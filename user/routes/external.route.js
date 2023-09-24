@@ -1,10 +1,15 @@
 const externalController = require("../controller/external.controller");
-
+const {
+    ExternalBuyTicket,
+    checkToggle
+} = require('../../toggle/middleware/toggle.middleware')
 
 module.exports = function (app) {
 
     app.post(
         "/api/external/register",
+        ExternalBuyTicket,
+        checkToggle,
         externalController.registerexternal
     );
     
