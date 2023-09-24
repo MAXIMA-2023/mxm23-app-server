@@ -59,7 +59,5 @@ module.exports = (app) => {
     verifyJWT,
     isPanitia,
     getSpecificStudentWithStateByNim
-  );
-
-
+  ); 
 };

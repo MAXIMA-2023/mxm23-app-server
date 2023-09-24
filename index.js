@@ -15,6 +15,7 @@ require("./user/routes/divisi.route")(app);
 require("./user/routes/mahasiswa.route")(app);
 require("./user/routes/organisator.route")(app);
 require("./user/routes/panitia.route")(app);
+require("./user/routes/external.route")(app);
 
 //state
 require("./state/routes/day_management.route")(app);
@@ -22,10 +23,11 @@ require("./state/routes/state_activities.route")(app);
 require("./state/routes/state_registration.route")(app);
 
 // malpun
-// require('./malpun/routes/midtrans.route')(app);
-// require('./malpun/routes/absen.route')(app);
-// require('./malpun/routes/data.route')(app);
-// require('./malpun/routes/ticket.route')(app);
+require('./malpun/routes/midtrans.route')(app);
+require('./malpun/routes/absen.route')(app);
+require('./malpun/routes/data.route')(app);
+require('./malpun/routes/ticket.route')(app);
+
 
 // auth
 require("./user/routes/auth.route")(app);

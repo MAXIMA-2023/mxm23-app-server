@@ -8,6 +8,7 @@ const MahasiswaForgotPasswordTokenStorage = require("../../mail/mahasiswa_forgot
 const stateRegDB = require("../../state/model/state_registration.model");
 const postmarkClient = require("../../config/postmark");
 const sendGridClient = require("../../config/sendgrid");
+const { midtransCore, midtransSnap } = require("../../config/midtrans");
 
 const {
   registerValidator,
@@ -34,7 +35,7 @@ const register = async (req, res) => {
     if (mahasiswa) {
       return res.status(400).send({
         code: 400,
-        error : "DUPLICATE_ENTRY",        
+        error: "DUPLICATE_ENTRY",
         message: "NIM kamu telah terdaftar sebelumnya.",
       });
     }
@@ -60,8 +61,8 @@ const register = async (req, res) => {
 
     if (err instanceof UniqueViolationError) {
       return res.status(400).send({
-        code: 400, 
-        error : "DUPLICATE_ENTRY",
+        code: 400,
+        error: "DUPLICATE_ENTRY",
         message: "Kamu baru saja mendaftar.",
       });
     }
@@ -149,7 +150,9 @@ const getProfile = async (req, res) => {
         "angkatan",
         "idLine",
         "prodi",
-        "token"
+        "token",
+        "ticketClaimed",
+        "tokenMalpun"
       );
     if (!mahasiswa) {
       return res.status(404).send({
@@ -656,12 +659,11 @@ const exchangePasswordRecoveryToken = async (req, res) => {
     // console.log(a.expires_at, new Date())
     // console.log(a.expires_at > new Date());
 
-
     const getToken = await MahasiswaForgotPasswordTokenStorage.query()
-      .where({token})
-      .first();    
+      .where({ token })
+      .first();
 
-    const nim = getToken?.nim || '';      
+    const nim = getToken?.nim || "";
 
     const exchangeToken = await MahasiswaForgotPasswordTokenStorage.query()
       .where({ token })
@@ -676,9 +678,7 @@ const exchangePasswordRecoveryToken = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await Mahasiswa.query()  
-      .where({nim})      
-      .update({ password: hashedPassword })      
+    await Mahasiswa.query().where({ nim }).update({ password: hashedPassword });
 
     return res.status(200).send({
       code: 200,

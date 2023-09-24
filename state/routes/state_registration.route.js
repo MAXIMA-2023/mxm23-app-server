@@ -72,6 +72,7 @@ module.exports = function (app) {
     state_middleware.isOrganisatorPanitiaInspiceandNuntium,
     stateRegController.handleLastAttendance
   );
+  
 
   // mahasiswa routes
   app.get(

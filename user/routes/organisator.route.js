@@ -6,9 +6,12 @@ module.exports = function (app) {
     "/api/organisator/register",
     organisatorController.registerOrganisator
   );
-  app.post("/api/organisator/login", organisatorController.loginOrganisator);
-  app.get(
-    "/api/organisator/profile",
+
+  app.post("/api/organisator/login", 
+    organisatorController.loginOrganisator
+  );
+
+  app.get("/api/organisator/profile",
     middleware.verifyJWT,
     middleware.isOrganisator,
     organisatorController.getProfile
@@ -62,6 +65,5 @@ module.exports = function (app) {
     middleware.isOrganisator, 
     organisatorController.getStatistic
   );  
-
 
 };

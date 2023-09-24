@@ -68,13 +68,6 @@ exports.readPublicState = async (req, res) => {
       )
       .join("day_management", "day_management.day", "state_activities.day");
 
-    // for (let i = 0; i < result.length; i++) {
-    //   let date = new Date(result[i].date).toUTCString();
-    //   date = date.split(" ").slice(0, 4).join(" ");
-
-    //   result[i].date = date;
-    // }
-
     return res.status(200).send(result);
   } catch (err) {
     console.error(err);
