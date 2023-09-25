@@ -5,6 +5,7 @@ const QRCode = require("qrcode");
 // const transporter = require("../../config/mail");
 const mailConfig = require("../../config/mail");
 const randomstring = require("randomstring");
+const { empty } = require("uuidv4");
 
 const sendEmail = async (req, res) => {
   try {
@@ -109,6 +110,7 @@ const updateAlphagift = async (req, res) => {
       .where({ nim: nimMhs })
       .update({ alfagiftID: alfaID })
       .first();
+
     if (!mahasiswa) {
       return res.status(404).send({
         code: 404,
@@ -129,7 +131,37 @@ const updateAlphagift = async (req, res) => {
   }
 };
 
+const mabamalpunlist = async (req, res) => {
+  try {
+    const mahasiswa = await Mahasiswa.query()
+    .select("name", "nim", "ticketClaimed", "isAttendedMalpun", "tokenMalpun")
+    .where({ ticketClaimed: 1 });
+
+    if (!mahasiswa|| mahasiswa.length === 0) {
+      return res.status(404).send({
+        code: 404,
+        message: "Gagal mendapatkan list",
+      });
+    }
+
+    return res.status(200).send({
+      code: 200,
+      data: mahasiswa,
+      message: "berhasil mendapatkan list",
+    });
+       
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      code: 500,
+      message: err.message,
+    });
+  }
+}
+
 module.exports = {
   sendEmail,
   updateAlphagift,
+  mabamalpunlist,
 };

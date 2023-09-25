@@ -1,18 +1,16 @@
-const absenController = require('../controller/absen.controller')
-const middleware = require('../../user/middleware/middleware')
+const absenController = require("../controller/absen.controller");
+const middleware = require("../../user/middleware/middleware");
 
-module.exports= (app) => {   
+module.exports = (app) => {
+  app.post(
+    "/api/malpun/absen/",
+    middleware.verifyJWT,
+    middleware.isPanitia,
+    absenController.absenmalpun
+  );
 
-    app.post(
-        '/api/maplun/absen/',
-        middleware.verifyJWT,
-        middleware.isPanitia,
-        absenController.absenmalpun
-    );
-
-    // app.put(
-    //     '/api/absenexternal/:nim',
-    //     absenController.absenmalpunexternal
-    // )
-
+  // app.put(
+  //     '/api/absenexternal/:nim',
+  //     absenController.absenmalpunexternal
+  // )
 };
