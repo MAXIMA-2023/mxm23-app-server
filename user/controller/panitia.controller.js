@@ -3,6 +3,7 @@ const DivisiDB = require("../model/divisi.model");
 const MahasiswaDB = require("../model/mahasiswa.model");
 const OrganisatorDB = require("../model/organisator.model");
 const stateRegDB = require("../../state/model/state_registration.model");
+const External = require("../model/external.model");
 const { validateEmptyEntries } = require("../../helpers/FormValidator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -434,12 +435,24 @@ exports.countAllData = async (req, res) => {
       .first();
 
     //total maba yang sdh buat akun
-    const mhsCount = await MahasiswaDB.query().where("ticketClaimed", 1).count("* as total").first();
+    const mhsCount = await MahasiswaDB.query().count("* as total").first();
 
     //total maba yang sudah ambil state
     const mhsStateCount = await stateRegDB
       .query()
       .countDistinct("nim as total")
+      .first();
+
+    //total maba yang sudah claim tiket malpun
+    const mhsMalpunCount = await MahasiswaDB.query()
+      .where("ticketClaimed", 1)
+      .count("* as total")
+      .first();
+
+    // total pembelian tiket malpun
+    const extMalpunCount = await External.query()
+      .where("ticketBuyed", 1)
+      .count("* as total")
       .first();
 
     return res.status(200).send({
@@ -451,7 +464,8 @@ exports.countAllData = async (req, res) => {
         totalOrg: orgCount.total,
         totalMaba: mhsCount.total,
         totalMabaState: mhsStateCount.total,
-        totalMabaMalpun : mhsCount.total
+        totalMabaMalpun : mhsMalpunCount.total,
+        totalExtMalpun: extMalpunCount.total
       },
     });
   } catch (err) {
