@@ -5,13 +5,15 @@ exports.absenmalpun = async (req, res) => {
   const { token = "" } = req.body;
 
   try {
-    const participantInternal = await Mahasiswa.query().where({ token_malpun: token }).first();
+    const participantInternal = await Mahasiswa.query()
+      .where({ tokenMalpun: token })
+      .first();
     const participantExternal = await External.query().where({ token }).first();
 
     if (!participantInternal && !participantExternal) {
       return res.status(404).send({
         code: 404,
-        message: "Token tidak valid.",
+        message: `Tidak dapat menemukan peserta dengan token ${token}.`,
       });
     }
 
@@ -31,7 +33,9 @@ exports.absenmalpun = async (req, res) => {
       await Mahasiswa.query().where({ nim }).update({ isAttendedMalpun: true });
     } else {
       const transactionID = participantExternal.transactionID;
-      await External.query().where({ transactionID }).update({ isAttendedMalpun: true });
+      await External.query()
+        .where({ transactionID })
+        .update({ isAttendedMalpun: true });
     }
 
     return res.status(200).send({

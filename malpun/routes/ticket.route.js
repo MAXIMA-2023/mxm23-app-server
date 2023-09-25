@@ -15,4 +15,11 @@ module.exports = (app) => {
     middleware.verifyJWT,
     ticketController.updateAlphagift
   );
+
+  app.get(
+    '/api/malpun/mabatiket/data',
+    middleware.verifyJWT,
+    middleware.isPanitia,
+    ticketController.mabamalpunlist
+  )
 };
