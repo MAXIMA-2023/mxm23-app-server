@@ -5,7 +5,7 @@ exports.absenmalpun = async (req, res) => {
   const { token = "" } = req.body;
 
   try {
-    const participantInternal = await Mahasiswa.query().where({ token_malpun: token }).first();
+    const participantInternal = await Mahasiswa.query().where({ tokenMalpun: token }).first();
     const participantExternal = await External.query().where({ token }).first();
 
     if (!participantInternal && !participantExternal) {
