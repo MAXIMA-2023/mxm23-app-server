@@ -21,5 +21,10 @@ module.exports = (app) => {
     middleware.verifyJWT,
     middleware.isPanitia,
     ticketController.mabamalpunlist
-  )
+  );
+  
+  // app.get(
+  //   '/api/malpun/mabatiket/claim',
+  //   ticketController.ResendEmail
+  // )
 };
