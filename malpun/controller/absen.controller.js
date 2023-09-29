@@ -22,7 +22,7 @@ exports.getMalpunDataByToken = async (req, res) => {
     return res.status(200).send({
       code: 200,
       message: "Berhasil mendapatkan data peserta.",
-      UserMalpun: participantInternal ? {
+      data: participantInternal ? {
         name: participantInternal.name,
         nim: participantInternal.nim,
         ticketClaimed: participantInternal.ticketClaimed,
