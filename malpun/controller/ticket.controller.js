@@ -133,9 +133,8 @@ const sendEmail = async (req, res) => {
               <tr>
                 <td align="center">
                   <!-- QR Code Image -->
-                  <a href="https://maxima.umn.ac.id/malpun/tiket/${tokenMalpun}" style="text-decoration: none; background-color: #F7B70C; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block;">Claim Your Ticket</a><br><br>
-                  <a href="https://maximaumn.com/malpun/tiket/${tokenMalpun}" style="text-decoration: none; background-color: #F7B70C; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block;">Alternative Ticket Claim</a>
-
+                  <a href="https://maximaumn.com/malpun/tiket/${tokenMalpun}" style="text-decoration: none; background-color: #F7B70C; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block;">Claim Your Ticket</a><br><br>
+                  <a href="https://maxima.umn.ac.id/malpun/tiket/${tokenMalpun}" style="text-decoration: none; background-color: #F7B70C; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block;">Alternative Ticket Claim</a>
                   </td>
               </tr>
             </table>
@@ -149,7 +148,7 @@ const sendEmail = async (req, res) => {
     const mailOptions = {
       from: process.env.MAIL_ACCOUNT,
       to: mahasiswa.email,
-      subject: "Ticket To Malam Puncak",
+      subject: "[ MAXIMA: Ticket To Malam Puncak ]",
       html: emailHTML,
     };
 
