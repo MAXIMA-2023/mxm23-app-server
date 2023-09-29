@@ -61,6 +61,11 @@ exports.ExternalBuyTicket = async (req, res, next) => {
   next();
 };
 
+exports.alfagift = async (req, res, next) => {
+  req.toggleID = 12;
+  next();
+};
+
 // dari value toggleID yang diset, akan dicek disini apakah aktif atau nonaktif
 exports.checkToggle = async (req, res, next) => {
   try {
