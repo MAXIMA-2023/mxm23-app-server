@@ -98,11 +98,44 @@ const paymentCallback = async (req, res) => {
                       </td>
                     </tr>
                     <tr>
+                      <td>
+                        <!-- Table -->
+                        <table width="100%" cellpadding="10" cellspacing="0" border="0">
+                          <tr>
+                            <td style="width: 33%; padding: 10px; text-align: justify;">Buyers Name</td>
+                            <td style="width: 33%; padding: 10px; text-align: justify;">Buyers Email</td>
+                            <td style="width: 33%; padding: 10px; text-align: justify;">Ticket Cost</td>
+                          </tr>
+                          <tr>
+                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">${externalAccount.name}</td>
+                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">${externalAccount.email}</td>
+                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">35.000,00</td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <!-- Table -->
+                        <table width="100%" cellpadding="10" cellspacing="0" border="0">
+                          <tr>
+                            <td style="width: 33%;  padding: 10px; text-align: justify;">No. Transaction</td>
+                            <td style="width: 33%;  padding: 10px; text-align: justify;">Place</td>
+                            <td style="width: 33%;  padding: 10px; text-align: justify;">Event Date</td>
+                          </tr>
+                          <tr>
+                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">${externalAccount.transactionID}</td>
+                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">Universitas Multimedia Nusantara</td>
+                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">07-10-2023</td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
                       <td align="center">
                         <!-- QR Code Image -->
-                        <a href="https://maxima.umn.ac.id/malpun/tiket/${token}" style="text-decoration: none; background-color: #F7B70C; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block;">Claim Your Ticket</a>
-
-                        </td>
+                        <a href="https://maximaumn.com/malpun/tiket/${token}" style="text-decoration: none; background-color: #F7B70C; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block;">Claim Your Ticket</a><br><br>
+                      </td>
                     </tr>
                   </table>
                 </td>
