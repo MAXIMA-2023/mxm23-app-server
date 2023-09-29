@@ -91,10 +91,10 @@ const paymentCallback = async (req, res) => {
                         <p>
                           Hi, <b>${externalAccount.name}</b>. Selamat datang di
                           <b>Malam Puncak MAXIMA 2023</b>. Ini ada ticket buat kamu biar bisa
-                          nikmatin <b> Malam Puncak MAXIMA 2023</b> bersama <b>Maxi </b>dan
-                          <b>Xima</b> dan teman-teman kamu!!!
+                          nikmatin <b> Malam Puncak MAXIMA 2023</b> bersama <b>Maxi </b>,
+                          <b>Xima</b> dan teman-teman kamu!
                         </p>
-                        <p><b>Jangan lupa ticketnya dibawa ya</b>!!!!</p>
+                        <p><b>Jangan lupa ticketnya dibawa ya</b>!</p>
                       </td>
                     </tr>
                     <tr>
@@ -119,16 +119,29 @@ const paymentCallback = async (req, res) => {
                         <!-- Table -->
                         <table width="100%" cellpadding="10" cellspacing="0" border="0">
                           <tr>
-                            <td style="width: 33%;  padding: 10px; text-align: justify;">No. Transaction</td>
-                            <td style="width: 33%;  padding: 10px; text-align: justify;">Place</td>
-                            <td style="width: 33%;  padding: 10px; text-align: justify;">Event Date</td>
+                              <td style="width: 33%;  padding: 10px; text-align: justify;">Event Date</td>
+                              <td style="width: 33%;  padding: 10px; text-align: justify;">Event Time</td>
+                              <td style="width: 33%;  padding: 10px; text-align: justify;">Place</td>
                           </tr>
                           <tr>
-                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">${externalAccount.transactionID}</td>
-                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">Universitas Multimedia Nusantara</td>
-                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">07-10-2023</td>
+                              <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">Sabtu, 7 Oktober 2023</td>
+                              <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">16:00 WIB </td>
+                              <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">Universitas Multimedia Nusantara</td>
                           </tr>
                         </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                          <!-- Table -->
+                          <table width="100%" cellpadding="10" cellspacing="0" border="0" >
+                              <tr>
+                                  <td style="width: 33%;  padding: 10px; text-align: justify;">TransactionID</td>
+                              </tr>
+                              <tr>
+                                  <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">${externalAccount.transactionID}</td>
+                              </tr>
+                          </table>
                       </td>
                     </tr>
                     <tr>
