@@ -150,6 +150,13 @@ const sendEmail = async (req, res) => {
       to: mahasiswa.email,
       subject: "[ MAXIMA: Ticket To Malam Puncak ]",
       html: emailHTML,
+      attachments: [
+        {
+          filename: "Do's and Don't.pdf",
+          path: "attachment/Do's.pdf",
+          cid: "Image1",
+        }
+      ]
     };
 
     await Mahasiswa.query()
