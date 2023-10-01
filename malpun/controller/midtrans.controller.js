@@ -8,6 +8,131 @@ const sendGridClient = require("../../config/sendgrid");
 const mailConfig = require("../../config/mail");
 const QRCode = require("qrcode");
 
+// const tes = async (req, res) => {
+//   try{
+//     const emailHTML = `
+//       <!DOCTYPE html>
+//       <html lang="en">
+//         <head>
+//           <meta charset="UTF-8" />
+//           <style>
+//             table,
+//             th,
+//             td {
+//               border-collapse: collapse;
+//             }
+//             th,
+//             td {
+//               padding: 0.5em;
+//             }
+//           </style>
+//         </head>
+//         <body style="width: 100%; height: 100vh; font-family: 'Nunito Sans', sans-serif; color: #062d5f; background-color: #ededed">
+//           <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 3em">
+//             <div style="width: 55em; min-width: 35em; max-width: auto; height: auto; text-align: center; background-color: #fff; padding: 2em; box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.25); border-radius: 0.5em">
+//               <div>
+//                 <img src="https://storage.googleapis.com/mxm23-app-client/webps/webps/public/assets/MaximaLogoEmail.webp" alt="mxmLogo" style="width: 180px" />
+//               </div>
+//               <div style="margin-top: 2em; text-align: justify; line-height: 1.5em">
+//                 <p style="font-size: 1.2em">
+//                   <b>Halo ${externalAccount.name}!</b>
+//                 <p>
+//                   Terima kasih sudah membeli tiket untuk
+//                   <b>Malam Puncak MAXIMA 2023</b>. Ini ada tiket buat kamu biar
+//                   bisa nikmatin <b> Malam Puncak MAXIMA 2023</b> bersama
+//                   <b>Maxi</b>, <b>Xima</b> dan teman-teman kamu!
+//                 </p>
+//                 <p><b>Jangan lupa baca "Do's and Dont's" dan bawa tiketnya ya</b>!</p>
+//               </div>
+//               <hr style="border-color: #062d5f" />
+//               <div>
+//                 <table style="width: 100%">
+//                   <tr>
+//                     <td style="text-align: left; padding-right: 1em">Nama</td>
+//                     <td style="text-align: left; padding-right: 1em">Email</td>
+//                     <td style="text-align: left; padding-right: 1em">Ticket Cost</td>
+//                   </tr>
+//                   <tr>
+//                     <th style="text-align: left; padding-right: 1em">${externalAccount.name}</th>
+//                     <th style="text-align: left; padding-right: 1em">${externalAccount.email}</th>
+//                     <th style="text-align: left; padding-right: 1em">Rp. 35.000</th>
+//                   </tr>
+//                   <tr>
+//                     <td style="text-align: left; padding-right: 1em">Event Date</td>
+//                     <td style="text-align: left; padding-right: 1em">Event Time</td>
+//                     <td style="text-align: left; padding-right: 1em">Place</td>
+//                   </tr>
+//                   <tr>
+//                     <th style="text-align: left; padding-right: 1em">Sabtu, 7 Oktober 2023</th>
+//                     <th style="text-align: left; padding-right: 1em">16:00 WIB</th>
+//                     <th style="text-align: left; padding-right: 1em">Universitas Multimedia Nusantara</th>
+//                   </tr>
+//                 </table>
+//               </div>
+//               <div>
+//                 <table style="width: 100%; margin-top: 5em">
+//                   <tr>
+//                     <td style="text-align: left; padding-right: 1em">Transaction ID</td>
+//                   </tr>
+//                   <tr>
+//                     <th style="text-align: left; padding-right: 1em">${externalAccount.transactionID}</th>
+//                   </tr>
+//                 </table>
+//               </div>
+//               <div style="width: 100%; margin-top: 5em">
+//                 <a href="https://maximaumn.com/malpun/tiket/${token}" style="text-decoration: none; background-color: #f7b70c; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block">Claim Your Ticket</a>
+//                 <p style="font-size: 0.8em">*Ticket ini hanya berlaku untuk 1 orang</p>
+//               </div>
+//               <div style="width: 100%; margin-top: 5em; text-align: left; line-height: 0.75em">
+//                 <p>Jika <b>maximers</b> memiliki pertanyaan, silahkan hubungi kami di</p>
+//                 <p><b></b>Instagram: <a href="https://www.instagram.com/maximaumn/" target="_blank" style="text-decoration: none; color: #062d5f">@maximaumn</a></p>
+//                 <p>Line: <a href="https://line.me/R/ti/p/@vuu3203w" target="_blank" style="text-decoration: none; color: #062d5f">@maximaumn</a></p>
+//                 <p>
+//                   Email:
+//                   <a href="mailto:maxima@umn.ac.id">maxima@umn.ac.id</a>
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+//         </body>
+//       </html>
+      
+//     `;
+  
+//     // Define email options
+//     const mailOptions = {
+//       from: process.env.MAIL_ACCOUNT,
+//       to: "gilberthenrym@gmail.com",
+//       subject: "Ticket To Malam Puncak",
+//       attachDataUrls: true,
+//       html: emailHTML,
+//       //here is a drive pdf link (https://drive.google.com/file/d/1sehb4o3vlIqHEgk9-cETjAj-vYBd6hX5/view?usp=sharing) show to the mail
+//       attachments: [
+//         {
+//           filename: "Do's and Don't.pdf",
+//           path: "attachment/Do's.pdf",
+//           cid: "Image1",
+//         }
+
+//       ],
+//     };
+  
+//     sendGridClient.send(mailOptions).catch((error) => {
+//       mailConfig.sendMail(mailOptions);
+//     });
+//     return res.status(200).send({
+//       code: 200,
+//       message: "success",
+//     });
+//   }catch(err){
+//     console.error(err);
+//     return res.status(500).send({
+//       code: 500,
+//       message: err.message,
+//     });
+//   };
+// };
+
 const paymentCallback = async (req, res) => {
   // wait for input alfagift ID
   // tanya ini API input alfagift sama sponsor pisah apa gabung
@@ -74,86 +199,86 @@ const paymentCallback = async (req, res) => {
           <html lang="en">
             <head>
               <meta charset="UTF-8" />
+              <style>
+                table,
+                th,
+                td {
+                  border-collapse: collapse;
+                }
+                th,
+                td {
+                  padding: 0.5em;
+                }
+              </style>
             </head>
-            <table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ededed; ">
-              <tr>
-                <td align="center" valign="middle">
-                  <table width="500" cellspacing="0" cellpadding="20" border="0" style="background-color: #ffffff;min-width:auto;max-width:600px; border-radius: 0.7em; box-shadow: 0 2px 10px rgba(0.4, 0.4, 0.4, 0.4);">
-                    <tr>
-                      <td align="center">
-                        <!-- Image -->
-                        <img src="https://storage.googleapis.com/mxm23-app-client/webps/webps/public/assets/MaximaLogoEmail.webp" alt="mxmLogo" width="226" height="62" style="width: 226px; height: 62px;" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="font-family: 'Nunito Sans', sans-serif; font-size: 15px; text-align: left; text-shadow: 0 2px 10px rgba(0.4, 0.4, 0.4, 0.4); margin-left: 1em; margin-right: 1em;">
-                        <!-- Text Container -->
-                        <p>
-                          Hi, <b>${externalAccount.name}</b>. Selamat datang di
-                          <b>Malam Puncak MAXIMA 2023</b>. Ini ada ticket buat kamu biar bisa
-                          nikmatin <b> Malam Puncak MAXIMA 2023</b> bersama <b>Maxi </b>,
-                          <b>Xima</b> dan teman-teman kamu!
-                        </p>
-                        <p><b>Jangan lupa ticketnya dibawa ya</b>!</p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <!-- Table -->
-                        <table width="100%" cellpadding="10" cellspacing="0" border="0">
-                          <tr>
-                            <td style="width: 33%; padding: 10px; text-align: justify;">Buyers Name</td>
-                            <td style="width: 33%; padding: 10px; text-align: justify;">Buyers Email</td>
-                            <td style="width: 33%; padding: 10px; text-align: justify;">Ticket Cost</td>
-                          </tr>
-                          <tr>
-                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">${externalAccount.name}</td>
-                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">${externalAccount.email}</td>
-                            <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">35.000,00</td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <!-- Table -->
-                        <table width="100%" cellpadding="10" cellspacing="0" border="0">
-                          <tr>
-                              <td style="width: 33%;  padding: 10px; text-align: justify;">Event Date</td>
-                              <td style="width: 33%;  padding: 10px; text-align: justify;">Event Time</td>
-                              <td style="width: 33%;  padding: 10px; text-align: justify;">Place</td>
-                          </tr>
-                          <tr>
-                              <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">Sabtu, 7 Oktober 2023</td>
-                              <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">16:00 WIB </td>
-                              <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">Universitas Multimedia Nusantara</td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                          <!-- Table -->
-                          <table width="100%" cellpadding="10" cellspacing="0" border="0" >
-                              <tr>
-                                  <td style="width: 33%;  padding: 10px; text-align: justify;">TransactionID</td>
-                              </tr>
-                              <tr>
-                                  <td style="width: 33%; font-weight: bold; padding: 10px; text-align: justify;">${externalAccount.transactionID}</td>
-                              </tr>
-                          </table>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td align="center">
-                        <!-- QR Code Image -->
-                        <a href="https://maximaumn.com/malpun/tiket/${token}" style="text-decoration: none; background-color: #F7B70C; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block;">Claim Your Ticket</a><br><br>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
+            <body style="width: 100%; height: 100vh; font-family: 'Nunito Sans', sans-serif; color: #062d5f; background-color: #ededed">
+              <div style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 3em">
+                <div style="width: 55em; min-width: 35em; max-width: auto; height: auto; text-align: center; background-color: #fff; padding: 2em; box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.25); border-radius: 0.5em">
+                  <div>
+                    <img src="https://storage.googleapis.com/mxm23-app-client/webps/webps/public/assets/MaximaLogoEmail.webp" alt="mxmLogo" style="width: 180px" />
+                  </div>
+                  <div style="margin-top: 2em; text-align: justify; line-height: 1.5em">
+                    <p style="font-size: 1.2em">
+                      <b>Halo ${externalAccount.name}!</b>
+                    <p>
+                      Terima kasih sudah membeli tiket untuk
+                      <b>Malam Puncak MAXIMA 2023</b>. Ini ada tiket buat kamu biar
+                      bisa nikmatin <b> Malam Puncak MAXIMA 2023</b> bersama
+                      <b>Maxi</b>, <b>Xima</b> dan teman-teman kamu!
+                    </p>
+                    <p><b>Jangan lupa baca "Do's and Dont's" dan bawa tiketnya ya</b>!</p>
+                  </div>
+                  <hr style="border-color: #062d5f" />
+                  <div>
+                    <table style="width: 100%">
+                      <tr>
+                        <td style="text-align: left; padding-right: 1em">Nama</td>
+                        <td style="text-align: left; padding-right: 1em">Email</td>
+                        <td style="text-align: left; padding-right: 1em">Ticket Cost</td>
+                      </tr>
+                      <tr>
+                        <th style="text-align: left; padding-right: 1em">${externalAccount.name}</th>
+                        <th style="text-align: left; padding-right: 1em">${externalAccount.email}</th>
+                        <th style="text-align: left; padding-right: 1em">Rp. 35.000</th>
+                      </tr>
+                      <tr>
+                        <td style="text-align: left; padding-right: 1em">Event Date</td>
+                        <td style="text-align: left; padding-right: 1em">Event Time</td>
+                        <td style="text-align: left; padding-right: 1em">Place</td>
+                      </tr>
+                      <tr>
+                        <th style="text-align: left; padding-right: 1em">Sabtu, 7 Oktober 2023</th>
+                        <th style="text-align: left; padding-right: 1em">16:00 WIB</th>
+                        <th style="text-align: left; padding-right: 1em">Universitas Multimedia Nusantara</th>
+                      </tr>
+                    </table>
+                  </div>
+                  <div>
+                    <table style="width: 100%; margin-top: 5em">
+                      <tr>
+                        <td style="text-align: left; padding-right: 1em">Transaction ID</td>
+                      </tr>
+                      <tr>
+                        <th style="text-align: left; padding-right: 1em">${externalAccount.transactionID}</th>
+                      </tr>
+                    </table>
+                  </div>
+                  <div style="width: 100%; margin-top: 5em">
+                    <a href="https://maximaumn.com/malpun/tiket/${token}" style="text-decoration: none; background-color: #f7b70c; color: #fff; padding: 10px 20px; border-radius: 64px; display: inline-block">Claim Your Ticket</a>
+                    <p style="font-size: 0.8em">*Ticket ini hanya berlaku untuk 1 orang</p>
+                  </div>
+                  <div style="width: 100%; margin-top: 5em; text-align: left; line-height: 0.75em">
+                    <p>Jika <b>maximers</b> memiliki pertanyaan, silahkan hubungi kami di</p>
+                    <p><b></b>Instagram: <a href="https://www.instagram.com/maximaumn/" target="_blank" style="text-decoration: none; color: #062d5f">@maximaumn</a></p>
+                    <p>Line: <a href="https://line.me/R/ti/p/@vuu3203w" target="_blank" style="text-decoration: none; color: #062d5f">@maximaumn</a></p>
+                    <p>
+                      Email:
+                      <a href="mailto:maxima@umn.ac.id">maxima@umn.ac.id</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </body>
           </html>
         `;
 
@@ -161,9 +286,16 @@ const paymentCallback = async (req, res) => {
         const mailOptions = {
           from: process.env.MAIL_ACCOUNT,
           to: externalAccount.email,
-          subject: "Ticket To Malam Puncak",
+          subject: "[ Ticket To Malam Puncak MAXIMA 2023 ]",
           // attachDataUrls: true,
           html: emailHTML,
+          attachments: [
+            {
+              filename: "Do's and Don't in Malam Puncak MAXIMA 2023.pdf",
+              path: "attachment/Do's.pdf",
+              cid: "aturan",
+            }
+          ],
         };
 
         sendGridClient.send(mailOptions).catch((error) => {
@@ -222,5 +354,6 @@ const paymentCallback = async (req, res) => {
 };
 
 module.exports = {
-  paymentCallback,
+  paymentCallback
+  // ,tes
 };

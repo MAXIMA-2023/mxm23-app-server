@@ -1,5 +1,5 @@
 const {
-    paymentCallback
+    paymentCallback,tes
 } = require('../controller/midtrans.controller');
 const {
     verifyJWT,
@@ -16,4 +16,5 @@ module.exports = (app) => {
     ExternalBuyTicket, 
     checkToggle,
     paymentCallback);
+    // app.get('/api/malpun/tes', tes);
 }
