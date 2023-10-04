@@ -9,6 +9,10 @@ const mailConfig = require("../../config/mail");
 const QRCode = require("qrcode");
 
 // const tes = async (req, res) => {
+//   const {name, 
+//     email, 
+//     transactionID,
+//     token} = req.body;
 //   try{
 //     const emailHTML = `
 //       <!DOCTYPE html>
@@ -35,7 +39,7 @@ const QRCode = require("qrcode");
 //               </div>
 //               <div style="margin-top: 2em; text-align: justify; line-height: 1.5em">
 //                 <p style="font-size: 1.2em">
-//                   <b>Halo ${externalAccount.name}!</b>
+//                   <b>Halo ${name}!</b>
 //                 <p>
 //                   Terima kasih sudah membeli tiket untuk
 //                   <b>Malam Puncak MAXIMA 2023</b>. Ini ada tiket buat kamu biar
@@ -53,8 +57,8 @@ const QRCode = require("qrcode");
 //                     <td style="text-align: left; padding-right: 1em">Ticket Cost</td>
 //                   </tr>
 //                   <tr>
-//                     <th style="text-align: left; padding-right: 1em">${externalAccount.name}</th>
-//                     <th style="text-align: left; padding-right: 1em">${externalAccount.email}</th>
+//                     <th style="text-align: left; padding-right: 1em">${name}</th>
+//                     <th style="text-align: left; padding-right: 1em">${email}</th>
 //                     <th style="text-align: left; padding-right: 1em">Rp. 35.000</th>
 //                   </tr>
 //                   <tr>
@@ -75,7 +79,7 @@ const QRCode = require("qrcode");
 //                     <td style="text-align: left; padding-right: 1em">Transaction ID</td>
 //                   </tr>
 //                   <tr>
-//                     <th style="text-align: left; padding-right: 1em">${externalAccount.transactionID}</th>
+//                     <th style="text-align: left; padding-right: 1em">${transactionID}</th>
 //                   </tr>
 //                 </table>
 //               </div>
@@ -96,17 +100,15 @@ const QRCode = require("qrcode");
 //           </div>
 //         </body>
 //       </html>
-      
-//     `;
+//   `;
   
 //     // Define email options
 //     const mailOptions = {
 //       from: process.env.MAIL_ACCOUNT,
-//       to: "gilberthenrym@gmail.com",
-//       subject: "Ticket To Malam Puncak",
+//       to: email,
+//       subject: "[ Ticket To Malam Puncak MAXIMA 2023 ]",
 //       attachDataUrls: true,
 //       html: emailHTML,
-//       //here is a drive pdf link (https://drive.google.com/file/d/1sehb4o3vlIqHEgk9-cETjAj-vYBd6hX5/view?usp=sharing) show to the mail
 //       attachments: [
 //         {
 //           filename: "Do's and Don't.pdf",
@@ -162,7 +164,7 @@ const paymentCallback = async (req, res) => {
       // paid
       if (transaction_status == "settlement") {
         // edit payment status on db
-        const token = "MXM23-" + randomToken(32);
+        const token = await External.query().select("token").where({transactionID: order_id});
         const updateTransactionStatus = await MalpunTransaction.query()
           .where({
             id: order_id,
@@ -176,8 +178,7 @@ const paymentCallback = async (req, res) => {
             transactionID: order_id,
           })
           .update({
-            ticketBuyed: true,
-            token: token,
+            ticketBuyed: true
           });
         // send email to user (according to token)
 
