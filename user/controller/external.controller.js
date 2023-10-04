@@ -66,7 +66,7 @@ const registerexternal = async (req, res) => {
       };
 
       const token = await midtransSnap.createTransactionToken(body);
-      return res.redirect().status(201).send({
+      return res.status(201).send({
         code: 201,
         message: "Pendaftaran berhasil.",
         data: { ...externalData, transaction_id: transactionID, token }, // tokennya disimpen di state frontend
