@@ -14,8 +14,7 @@ const registerexternal = async (req, res) => {
       const validateBody = await registerValidator.safeParseAsync(req.body);
 
       const transactionID = randomToken(32);
-      const tokenMalpun = "MXM23-" + randomToken(32);
-      const callback_url = "https://maximaumn.com/malpun/tiket/" + tokenMalpun;
+      // const token = "MXM23-" + randomToken(32);
 
       if (!validateBody.success) {
         return res.status(400).send({
@@ -33,7 +32,7 @@ const registerexternal = async (req, res) => {
       const externalData = await External.query().insert({
         ...validateBody.data,
         transactionID,
-        token: tokenMalpun,
+        // token,
       });
 
       // midtrans snap token exchange
@@ -53,20 +52,17 @@ const registerexternal = async (req, res) => {
           {
             id: "MXM23-MALPUN-TICKET",
             price: 35000,
-            quantity: 1,    
+            quantity: 1,
             name: "Tiket Malam Puncak MAXIMA UMN 2023",
-          },  
+          },
         ],
         // TESTER
         customer_details: externalData,
-        "gopay": {
-          "enable_callback": true,
-          "callback_url": callback_url
-        }
       };
 
       const token = await midtransSnap.createTransactionToken(body);
-      return res.redirect().status(201).send({
+
+      return res.status(201).send({
         code: 201,
         message: "Pendaftaran berhasil.",
         data: { ...externalData, transaction_id: transactionID, token }, // tokennya disimpen di state frontend

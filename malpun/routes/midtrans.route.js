@@ -16,5 +16,5 @@ module.exports = (app) => {
     ExternalBuyTicket, 
     checkToggle,
     paymentCallback);
-    // app.post('/api/malpun/tes', tes);
-}   
+    // app.get('/api/malpun/tes', tes);
+}
